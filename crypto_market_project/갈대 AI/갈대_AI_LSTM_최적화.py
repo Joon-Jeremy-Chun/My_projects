@@ -7,11 +7,32 @@ Original file is located at
     https://colab.research.google.com/drive/1fUXojAi1t-qHhiiBA3DSJZj_C5j2kcn6
 """
 
+from tensorflow.python.client import device_lib
+device_lib.list_local_devices()
+import tensorflow as tf
+tf.test.is_gpu_available()
+tf.__version__
+#conda activate directml
+tf.debugging.set_log_device_placement(True)
+
+
+
+
+
+
+
+
+
 import warnings
 warnings.filterwarnings('ignore')
 
-#!pip install konlpy
-#!pip install tweepy
+!pip install pandas
+!pip install matplotlib
+!pip install konlpy
+!pip install tqdm
+!pip install tweepy
+!pip install sklearn
+!pip install keras
 #!pip install tensorflow
 
 import pandas as pd
@@ -237,10 +258,10 @@ type(X_train)
 # np.save('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/y_test.npy', y_test)
 
 # 3진분류
-np.save('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/X_train_3_class.npy', X_train)
-np.save('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/X_test_3_class.npy', X_test)
-np.save('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/y_train_3_class.npy', y_train)
-np.save('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/y_test_3_class.npy', y_test)
+np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/X_train_3_class.npy', X_train)
+np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/X_test_3_class.npy', X_test)
+np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/y_train_3_class.npy', y_train)
+np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/y_test_3_class.npy', y_test)
 
 """## ndarray 불러오기"""
 
@@ -273,59 +294,62 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import GridSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
 
-# vocab_size = 8430
-vocab_size = 6638
-
-embedding_dim = [50, 100, 200, 400]
-hidden_units = [32, 64, 128, 256, 512]
-epochs = [400]
-batch_size = [16, 32, 64, 128]
-validation_split = [0.1,0.2]
-
-recoding = []
-
-for i in embedding_dim :
-  for j in hidden_units :
-    model = Sequential()
-    model.add(Embedding(vocab_size, i))
-    model.add(LSTM(j))
-    model.add(Dense(3, activation='softmax'))
-
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=8)
-    # mc = ModelCheckpoint('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/K_4_class_best_model_1210.h5',
-    mc = ModelCheckpoint('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/K_3_class_best_model_1210.h5',
-                     monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+#%%
+with tf.device('/CPU:0'):
+    # vocab_size = 8430
+    vocab_size = 6638
     
-    for a in epochs:
-      for b in batch_size:
-        for c in validation_split:
-          model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy', metrics=['acc'])
-          history = model.fit(X_train, y_train, epochs=a, callbacks=[es, mc],
-                                          batch_size=b, validation_split=c)
-          
-          # loaded_model = load_model('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/K_4_class_best_model_1210.h5')
-          loaded_model = load_model('/content/drive/MyDrive/Colab Notebooks/datasets/cryptocurrency_sentiment/crypto_labeling_Korean/K_3_class_best_model_1210.h5')
-          
-          print('\n테스트 정확도 : %.4f' % (loaded_model.evaluate(X_test, y_test)[1]))
-          print('embedding_dim : ', i, 'hidden_units : ', j, 'epoch : ', a, 'batch_size : ', b, 'validation_split : ', c,'\n\n')
-          y = '%.4f' % (loaded_model.evaluate(X_test, y_test)[1])
+    embedding_dim = [50, 100, 200, 400]
+    hidden_units = [32, 64, 128, 256, 512]
+    epochs = [400]
+    batch_size = [16, 32, 64, 128]
+    validation_split = [0.1,0.2]
+    
+    recoding = []
+    
+    for i in embedding_dim :
+      for j in hidden_units :
+        model = Sequential()
+        model.add(Embedding(vocab_size, i))
+        model.add(LSTM(j))
+        model.add(Dense(3, activation='softmax'))
+    
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=8)
+        # mc = ModelCheckpoint('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/K_4_class_best_model_1210.h5',
+        mc = ModelCheckpoint('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/K_3_class_best_model_1210.h5',
+                         monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+        
+        for a in epochs:
+          for b in batch_size:
+            for c in validation_split:
+              model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy', metrics=['acc'])
+              history = model.fit(X_train, y_train, epochs=a, callbacks=[es, mc],
+                                              batch_size=b, validation_split=c)
+              
+              # loaded_model = load_model('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/K_4_class_best_model_1210.h5')
+              loaded_model = load_model('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/K_3_class_best_model_1210.h5')
+              
+              print('\n테스트 정확도 : %.4f' % (loaded_model.evaluate(X_test, y_test)[1]))
+              print('embedding_dim : ', i, 'hidden_units : ', j, 'epoch : ', a, 'batch_size : ', b, 'validation_split : ', c,'\n\n')
+              y = '%.4f' % (loaded_model.evaluate(X_test, y_test)[1])
+    
+              x_embedding_dim = i
+              x_hidden_units = j
+              x_epochs = a
+              x_batch_size = b
+              x_validation_split = c
+    
+              
+    
+              X = [x_embedding_dim, x_hidden_units ,x_epochs , x_batch_size, x_validation_split,y]
+              recoding.append(X)
+    
+    dfr = pd.DataFrame(recoding)
+    dfr.columns = ['embedding_dim', 'hidden_units', 'epochs', 'batch_size',
+                   'validation_split', 'accuracy']
+    dfr.to_csv('/content/drive/MyDrive/Colab Notebooks/3rd project/history/best_model_1130.csv', index =False)
 
-          x_embedding_dim = i
-          x_hidden_units = j
-          x_epochs = a
-          x_batch_size = b
-          x_validation_split = c
-
-          
-
-          X = [x_embedding_dim, x_hidden_units ,x_epochs , x_batch_size, x_validation_split,y]
-          recoding.append(X)
-
-dfr = pd.DataFrame(recoding)
-dfr.columns = ['embedding_dim', 'hidden_units', 'epochs', 'batch_size',
-               'validation_split', 'accuracy']
-dfr.to_csv('/content/drive/MyDrive/Colab Notebooks/3rd project/history/best_model_1130.csv', index =False)
-
+#%%
 embedding_dim = 100
 hidden_units = 128
 
