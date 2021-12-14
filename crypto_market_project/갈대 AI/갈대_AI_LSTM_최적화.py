@@ -23,8 +23,7 @@ tf.debugging.set_log_device_placement(True)
 
 
 
-import warnings
-warnings.filterwarnings('ignore')
+
 
 !pip install pandas
 !pip install matplotlib
@@ -33,7 +32,13 @@ warnings.filterwarnings('ignore')
 !pip install tweepy
 !pip install sklearn
 !pip install keras
+!pip install tweepy==3.10.0
 #!pip install tensorflow
+
+#%%
+
+import warnings
+warnings.filterwarnings('ignore')
 
 import pandas as pd
 import numpy as np
@@ -44,7 +49,9 @@ from konlpy.tag import Okt
 from tqdm import tqdm
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
+import tensorflow as tf
+from tensorflow.python.client import device_lib
+#%%
 """## 데이터 불러오기"""
 
 "C:\My_data\cryptocurrency_sentiment\crypto_labeling_Korean\eth.xlsx"
@@ -262,7 +269,7 @@ np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/X_train_3_cl
 np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/X_test_3_class.npy', X_test)
 np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/y_train_3_class.npy', y_train)
 np.save('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/y_test_3_class.npy', y_test)
-
+#%%
 """## ndarray 불러오기"""
 
 # # 4진분류
@@ -283,7 +290,7 @@ print(np.concatenate((y_train, y_test), axis=0))
 
 X = np.concatenate((X_train, X_test), axis=0)
 y = np.concatenate((y_train, y_test), axis=0)
-
+#%%
 """## LSTM 감성 분류"""
 
 from tensorflow.keras.layers import Embedding, Dense, LSTM
@@ -295,14 +302,25 @@ from sklearn.model_selection import GridSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
 
 #%%
-with tf.device('/CPU:0'):
+#tf.debugging.set_log_device_placement(True)
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  # 텐서플로가 첫 번째 GPU에 1GB 메모리만 할당하도록 제한
+  try:
+    tf.config.experimental.set_virtual_device_configuration(
+        gpus[0],
+        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
+  except RuntimeError as e:
+    # 프로그램 시작시에 가상 장치가 설정되어야만 합니다
+    print(e)
+with tf.device('/CPU'):
     # vocab_size = 8430
     vocab_size = 6638
     
-    embedding_dim = [50, 100, 200, 400]
-    hidden_units = [32, 64, 128, 256, 512]
+    embedding_dim = [25, 50, 100, 200, 400]
+    hidden_units = [16, 32, 64, 128, 256, 512]
     epochs = [400]
-    batch_size = [16, 32, 64, 128]
+    batch_size = [8, 16, 32, 64, 128]
     validation_split = [0.1,0.2]
     
     recoding = []
@@ -347,7 +365,7 @@ with tf.device('/CPU:0'):
     dfr = pd.DataFrame(recoding)
     dfr.columns = ['embedding_dim', 'hidden_units', 'epochs', 'batch_size',
                    'validation_split', 'accuracy']
-    dfr.to_csv('/content/drive/MyDrive/Colab Notebooks/3rd project/history/best_model_1130.csv', index =False)
+    dfr.to_csv('C:/My_data/cryptocurrency_sentiment/crypto_labeling_Korean/best_model_1212.csv', index =False)
 
 #%%
 embedding_dim = 100
@@ -406,4 +424,29 @@ loaded_model = load_model('/content/drive/MyDrive/Colab Notebooks/3rd project/hi
 sentiment_predict(input, stopwords, vocab_size, word_index, loaded_model)
 
 input.head()
+#%%
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  # 텐서플로가 첫 번째 GPU만 사용하도록 제한
+  try:
+    tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
+  except RuntimeError as e:
+    # 프로그램 시작시에 접근 가능한 장치가 설정되어야만 합니다
+    print(e)
+    
+#%%
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  # 텐서플로가 첫 번째 GPU에 1GB 메모리만 할당하도록 제한
+  try:
+    tf.config.experimental.set_virtual_device_configuration(
+        gpus[0],
+        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
+  except RuntimeError as e:
+    # 프로그램 시작시에 가상 장치가 설정되어야만 합니다
+    print(e)
+#%%
+from tensorflow.python.client import device_lib
+device_lib.list_local_devices()
 
+    
