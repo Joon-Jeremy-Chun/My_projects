@@ -31,9 +31,14 @@ import yahoo_fin.stock_info as si
 #%%
 from yahoo_fin.stock_info import get_analysts_info
 #%%
-a = get_analysts_info('nflx')
+a = get_analysts_info('NFLX')
 print(a)
 #%%
-b = get_analysts_info('mitc')
+b = get_analysts_info('MITC')
 print(b)
 #%%
+c = get_analysts_info('AI')
+print(c)
+#%%
+d = get_analysts_info('SNOW')
+print(d)
