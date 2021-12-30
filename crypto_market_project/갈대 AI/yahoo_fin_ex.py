@@ -42,3 +42,13 @@ print(c)
 #%%
 d = get_analysts_info('SNOW')
 print(d)
+#%%
+e = get_analysts_info('RIVN')
+print(e)
+#%%
+f = get_analysts_info('LCID')
+print(f)
+#%%
+g = get_analysts_info('GOEV')
+print(g)
+#%%
