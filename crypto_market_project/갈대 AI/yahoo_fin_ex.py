@@ -30,6 +30,7 @@ import yahoo_fin.stock_info as si
 !pip install requests_html
 #%%
 from yahoo_fin.stock_info import get_analysts_info
+from yahoo_fin.stock_info import get_balance_sheet
 #%%
 a = get_analysts_info('NFLX')
 print(a)
@@ -52,3 +53,11 @@ print(f)
 g = get_analysts_info('GOEV')
 print(g)
 #%%
+h = get_analysts_info('BABA')
+print(h)
+#%%
+i = get_analysts_info('MSFT')
+print(i)
+#%%
+i_balance = get_balance_sheet('MSFT')
+print(i_balance)
