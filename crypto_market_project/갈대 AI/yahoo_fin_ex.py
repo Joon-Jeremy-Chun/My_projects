@@ -61,3 +61,6 @@ print(i)
 #%%
 i_balance = get_balance_sheet('MSFT')
 print(i_balance)
+#%%
+b_balance = get_balance_sheet('MITC')
+print(b_balance)
