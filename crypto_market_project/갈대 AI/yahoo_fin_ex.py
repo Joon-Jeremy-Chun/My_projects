@@ -31,6 +31,8 @@ import yahoo_fin.stock_info as si
 #%%
 from yahoo_fin.stock_info import get_analysts_info
 from yahoo_fin.stock_info import get_balance_sheet
+from yahoo_fin.stock_info import get_cash_flow
+from yahoo_fin.stock_info import get_company_info
 #%%
 a = get_analysts_info('NFLX')
 print(a)
@@ -64,3 +66,12 @@ print(i_balance)
 #%%
 b_balance = get_balance_sheet('MITC')
 print(b_balance)
+#%%
+b_cash_flow = get_cash_flow('MITC')
+print(b_cash_flow)
+#%%
+b_company_info = get_company_info('MITC')
+print(b_company_info)
+#%%
+i_company_info = get_company_info('MSFT')
+print(i_company_info)
