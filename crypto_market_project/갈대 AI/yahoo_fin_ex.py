@@ -33,6 +33,8 @@ from yahoo_fin.stock_info import get_analysts_info
 from yahoo_fin.stock_info import get_balance_sheet
 from yahoo_fin.stock_info import get_cash_flow
 from yahoo_fin.stock_info import get_company_info
+from yahoo_fin.stock_info import get_currencies
+from yahoo_fin.stock_info import get_data
 #%%
 a = get_analysts_info('NFLX')
 print(a)
@@ -78,3 +80,12 @@ print(b_company_info)
 #%%
 i_company_info = get_company_info('MSFT')
 print(i_company_info)
+#%%
+curr = get_currencies()
+print(curr)
+#%%
+i_price_data = get_data('MSFT', start_date = None , end_date = None ,index_as_date = True, interval = "1d") 
+print(i_price_data)
+#%%
+i_price_data_2 = get_data('MSFT', start_date = '2000-01-02' , end_date = None ,index_as_date = True, interval = "1mo") 
+print(i_price_data_2)
