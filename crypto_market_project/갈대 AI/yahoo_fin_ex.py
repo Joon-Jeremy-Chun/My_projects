@@ -89,3 +89,6 @@ print(i_price_data)
 #%%
 i_price_data_2 = get_data('MSFT', start_date = '2000-01-02' , end_date = None ,index_as_date = True, interval = "1mo") 
 print(i_price_data_2)
+#%%
+i_price_data_2.info()
+type(i_price_data_2)
