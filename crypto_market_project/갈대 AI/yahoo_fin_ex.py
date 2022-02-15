@@ -66,6 +66,9 @@ print(i)
 j = get_analysts_info('AAPL')
 print(j)
 #%%
+k = get_analysts_info('NU')
+print(k)
+#%%
 i_balance = get_balance_sheet('MSFT')
 print(i_balance)
 #%%
