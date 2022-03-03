@@ -78,6 +78,9 @@ print(b_balance)
 b_cash_flow = get_cash_flow('MITC')
 print(b_cash_flow)
 #%%
+c_cash_flow = get_cash_flow('AI')
+print(c_cash_flow)
+#%%
 b_company_info = get_company_info('MITC')
 print(b_company_info)
 #%%
