@@ -10,8 +10,8 @@ import pymysql
 from sqlalchemy import create_engine
 
 pymysql.install_as_MySQLdb()
-# daily_engine = create_engine("mysql+mysqldb://root:sda3004sda@localhost:3306/test", encoding='utf-8',pool_size = 100000,max_overflow = 0)
-daily_engine = create_engine("mysql+mysqldb://root:sda3004sda@localhost:3306/coinpan_raw_data", encoding='utf-8',pool_size = 100000,max_overflow = 0)
+# daily_engine = create_engine("", encoding='utf-8',pool_size = 100000,max_overflow = 0)
+daily_engine = create_engine("", encoding='utf-8',pool_size = 100000,max_overflow = 0)
 #   static variable
 domain_url = "https://coinpan.com"
 coin_dict = {
