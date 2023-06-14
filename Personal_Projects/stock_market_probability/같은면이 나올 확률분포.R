@@ -52,3 +52,6 @@ ggplot(data = df, aes(x = x, y = y)) +
   geom_line() +
   labs(title = "연속해서 나올 확률", x = "연속 횟수", y = "확률") +
   theme_minimal()
+
+# 결과
+# 1/2 (1/2)^2 (1/2)^3
