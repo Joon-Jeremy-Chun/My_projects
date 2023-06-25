@@ -1,7 +1,7 @@
 library(quantmod)
 
 # Define the ticker symbol for the stock of interest
-ticker_symbol <- "AAPL"  # Replace with your desired stock symbol
+ticker_symbol <- "TMF"  # Replace with your desired stock symbol
 
 # Fetch dividend history using quantmod and Yahoo Finance
 dividend_data <- getDividends(ticker_symbol, src = "yahoo")
