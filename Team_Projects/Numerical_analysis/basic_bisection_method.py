@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 26 17:00:02 2023
 
+@author: joonc
+"""
 #pip install matplotlib
 
 import numpy as np
