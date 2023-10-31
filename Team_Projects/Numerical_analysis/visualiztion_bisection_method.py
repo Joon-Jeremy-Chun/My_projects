@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def bisection(f, a, b, decimal, max_iter):
+def bisection(f, a, b, diff_a_b, max_iter):
     if f(a) * f(b) >= 0:
         print("Bisection method may not converge because f(a) * f(b) >= 0")
         return None
@@ -23,7 +23,7 @@ def bisection(f, a, b, decimal, max_iter):
     data_list.append(data_a_b_iter)
     
     
-    while (b - a) / 2.0 > decimal and iteration < max_iter:
+    while (b - a) > diff_a_b and iteration < max_iter:
         midpoint = (a + b) / 2.0
 
         iteration += 1
@@ -54,26 +54,26 @@ def bisection(f, a, b, decimal, max_iter):
     return pd.DataFrame(data_list)
 
 
-# Define the function you want to find the root of
+# Define the function that want to find the root of
 def f(x):
    return x**2-3
 #   return np.sin(x)
 
 
-# Initial interval [a, b] and decimal(tolerance)
+# Initial interval [a, b] and diff_a_b(tolerance)
 a = -1
 b = 2
-decimal = 1e-6
+diff_a_b = 1e-6
 #max_iterations = 10
 
-result = bisection(f, a, b, decimal, 100)
+result = bisection(f, a, b, diff_a_b, 100)
 
 
 #print(result)
 
 df = result
 
-#root by calculating
+#actual root by calculating
 #later
 
 # Create a line plot for X- 'a' and 'b' values and Y- 'iterations'
@@ -86,7 +86,8 @@ plt.legend()
 plt.title('Plot of a and b values over iterations')
 plt.grid(True)
 
-plt.axhline(y=0.5, color='red', linestyle='--', label='Horizontal Line at the root')
+#y-value temporally solve by hand
+plt.axhline(y=np.sqrt(3), color='red', linestyle='--', label='Horizontal Line at the root')
 
 
 plt.show()

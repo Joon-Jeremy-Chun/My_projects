@@ -4,13 +4,15 @@
 
 import numpy as np
 
-def bisection(f, a, b, decimal, max_iter):
+#To prevent infinite loops, limit by 1.difference between a and b, and 2.the number of iterations.
+ 
+def bisection(f, a, b, diff_a_b, max_iter):
     if f(a) * f(b) >= 0:
         print("Bisection method may not converge because f(a) * f(b) >= 0")
         return None
 
     iteration = 0
-    while (b - a) / 2.0 > decimal and iteration < max_iter:
+    while (b - a) > diff_a_b and iteration < max_iter:
         midpoint = (a + b) / 2.0
 
         iteration += 1
@@ -32,17 +34,21 @@ def bisection(f, a, b, decimal, max_iter):
 #    return (a + b) / 2.0, iteration
 
 
-# Define the function you want to find the root of
+# Define the function that want to find the root of
 def f(x):
-#   return x**2-3
-   return np.sin(x)
+   return x**2-3
+#   return np.sin(x)
 
 
-# Initial interval [a, b] and decimal(tolerance)
+# Initial interval [a, b] and diff_a_b(tolerance)
 a = -1
 b = 2
-decimal = 1e-6
+diff_a_b = 1e-6
 #max_iterations = 10
 
-result = bisection(f, a, b, decimal, 100)
+result = bisection(f, a, b, diff_a_b, 100)
 print(result)
+
+#real root 
+y=np.sqrt(3)
+print(y)
