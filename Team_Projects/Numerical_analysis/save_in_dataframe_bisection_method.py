@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 30 17:52:02 2023
+
+@author: joonc
+"""
+
+# -*- coding: utf-8 -*-
 
 #pip install matplotlib
 
@@ -9,13 +16,20 @@ def bisection(f, a, b, accuracy, max_iter):
     if f(a) * f(b) >= 0:
         print("Bisection method may not converge because f(a) * f(b) >= 0")
         return None
-
+    
+    midpoint_list = []
     iteration = 0
+    
     while (b - a) / 2.0 > accuracy and iteration < max_iter:
         midpoint = (a + b) / 2.0
 
         iteration += 1
-        print("~~iteration :", iteration)
+        print("~~ iteration :", iteration, "~~")
+        
+        midpoints = {
+            "iterations": iteration
+        }
+        midpoint_list.append(midpoints)
 
         if f(midpoint) == 0:
             print("midpoint",midpoint)
@@ -29,8 +43,9 @@ def bisection(f, a, b, accuracy, max_iter):
             print("a:", midpoint, "b:", b)       
         
         print("\n")
-    return midpoint, iteration
+#    return midpoint, iteration
 #    return (a + b) / 2.0, iteration
+    return pd.DataFrame(midpoint_list)
 
 
 # Define the function you want to find the root of
@@ -46,3 +61,11 @@ accuracy = 1e-6
 #max_iterations = 10
 
 result = bisection(f, a, b, accuracy, 100)
+
+#if result is not None:
+#    print(f"Approximate root: {result:.5f}")
+#else:
+#    print("Bisection method did not converge within the specified iterations.")
+
+
+print(result)
