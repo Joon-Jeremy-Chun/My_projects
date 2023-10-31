@@ -45,3 +45,4 @@ decimal = 1e-6
 #max_iterations = 10
 
 result = bisection(f, a, b, decimal, 100)
+print(result)

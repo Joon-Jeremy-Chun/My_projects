@@ -56,8 +56,8 @@ def bisection(f, a, b, decimal, max_iter):
 
 # Define the function you want to find the root of
 def f(x):
-#   return x**2-3
-   return np.sin(x)
+   return x**2-3
+#   return np.sin(x)
 
 
 # Initial interval [a, b] and decimal(tolerance)
@@ -71,20 +71,12 @@ result = bisection(f, a, b, decimal, 100)
 
 #print(result)
 
-# Sample DataFrame
-# data = {
-#     'iterations': list(range(22)),
-#     'a': [-1.0, -1.0, -0.25, -0.25, -0.0625, -0.0625, -0.015625, -0.015625, -0.00390625, -0.00390625,
-#           -0.0009765625, -0.0009765625, -0.000244140625, -0.000244140625, -6.103515625e-05, -6.103515625e-05,
-#           -1.52587890625e-05, -1.52587890625e-05, -3.814697265625e-06, -3.814697265625e-06, -9.5367431640625e-07, -9.5367431640625e-07],
-#     'b': [2.0, 0.5, 0.5, 0.125, 0.125, 0.03125, 0.03125, 0.0078125, 0.0078125, 0.001953125,
-#           0.001953125, 0.00048828125, 0.00048828125, 0.0001220703125, 0.0001220703125, 0.000030517578125,
-#           0.000030517578125, 0.00000762939453125, 0.00000762939453125, 0.0000019073486328125, 0.0000019073486328125, 0.000000476837158203125]
-# }
-
 df = result
 
-# Create a line plot for 'a' and 'b' values against 'iterations'
+#root by calculating
+#later
+
+# Create a line plot for X- 'a' and 'b' values and Y- 'iterations'
 plt.figure(figsize=(10, 5))
 plt.plot(df['iterations'], df['a'], label='a', marker='o', markersize=2)
 plt.plot(df['iterations'], df['b'], label='b', marker='s', markersize=2)
@@ -93,5 +85,8 @@ plt.ylabel('Value')
 plt.legend()
 plt.title('Plot of a and b values over iterations')
 plt.grid(True)
+
+plt.axhline(y=0.5, color='red', linestyle='--', label='Horizontal Line at the root')
+
 
 plt.show()

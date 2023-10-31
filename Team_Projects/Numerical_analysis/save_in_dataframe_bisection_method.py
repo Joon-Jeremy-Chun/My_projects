@@ -71,10 +71,4 @@ decimal = 1e-6
 
 result = bisection(f, a, b, decimal, 100)
 
-#if result is not None:
-#    print(f"Approximate root: {result:.5f}")
-#else:
-#    print("Bisection method did not converge within the specified iterations.")
-
-
 print(result)
