@@ -7,8 +7,6 @@ Created on Mon Oct 30 17:52:02 2023
 
 # -*- coding: utf-8 -*-
 
-#pip install matplotlib
-
 import numpy as np
 import pandas as pd
 
