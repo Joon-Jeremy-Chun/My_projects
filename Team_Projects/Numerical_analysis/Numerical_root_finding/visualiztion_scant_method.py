@@ -77,7 +77,7 @@ df = result
 
 # Create a line plot for X- 'a' and 'b' values and Y- 'iterations'
 plt.figure(figsize=(10, 5))
-plt.plot(df['x_'], df['x_value'], label='x_n', marker='o', markersize=2)
+plt.plot(df['iteration'], df['x_value'], label='x_n', marker='o', markersize=2)
 plt.xlabel('x_')
 plt.ylabel('Value')
 plt.legend()
