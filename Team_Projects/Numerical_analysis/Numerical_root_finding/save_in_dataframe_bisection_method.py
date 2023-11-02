@@ -10,6 +10,12 @@ Created on Mon Oct 30 17:52:02 2023
 import numpy as np
 import pandas as pd
 
+#Define the method as a function
+#Outcome: the dataframe; a and b values, its iteration
+#f: function, a: left end point, b: right end point, diff_a_b: difference a and b, max_iter: maximum # of iteration
+#To prevent infinite loops, limited by 1.difference between a and b, and 2.the number of iterations.
+#also difference between a and b can be considered as MAX error in that iteration. ( == accuray)
+
 def bisection(f, a, b, diff_a_b, max_iter):
     if f(a) * f(b) >= 0:
         print("Bisection method may not converge because f(a) * f(b) >= 0")
