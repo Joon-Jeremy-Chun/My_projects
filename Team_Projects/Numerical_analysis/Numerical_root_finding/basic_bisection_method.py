@@ -49,7 +49,7 @@ def f(x):
 # Initial interval [a, b] and diff_a_b(tolerance)
 a = 5
 b = 6
-diff_a_b = 1e-20
+diff_a_b = 1e-4
 #max_iterations = 10
 
 result = bisection(f, a, b, diff_a_b, 100)

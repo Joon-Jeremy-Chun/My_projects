@@ -55,15 +55,17 @@ def bisection(f, a, b, diff_a_b, max_iter):
 
 
 # Define the function that want to find the root of
-def f(x):
-   return x**2-3
-#   return np.sin(x)
+# def f(x):
+#    return x**2-3
+# #   return np.sin(x)
 
+def f(x):
+   return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
 # Initial interval [a, b] and diff_a_b(tolerance)
-a = -1
-b = 2
-diff_a_b = 1e-6
+a = 5
+b = 6
+diff_a_b = 1e-4
 #max_iterations = 10
 
 result = bisection(f, a, b, diff_a_b, 100)
@@ -78,16 +80,16 @@ df = result
 
 # Create a line plot for X- 'a' and 'b' values and Y- 'iterations'
 plt.figure(figsize=(10, 5))
-plt.plot(df['iterations'], df['a'], label='a', marker='o', markersize=2)
-plt.plot(df['iterations'], df['b'], label='b', marker='s', markersize=2)
+plt.plot(df['iterations'], df['a'], label='a:left point', marker='o', markersize=2)
+plt.plot(df['iterations'], df['b'], label='b:right point', marker='s', markersize=2)
 plt.xlabel('Iterations')
 plt.ylabel('Value')
 plt.legend()
-plt.title('Plot of a and b values over iterations')
+plt.title('Bisection method : Plot of a and b values over iterations')
 plt.grid(True)
 
 #y-value temporally solve by hand
-plt.axhline(y=np.sqrt(3), color='red', linestyle='--', label='Horizontal Line at the root')
+#plt.axhline(y=np.sqrt(3), color='red', linestyle='--', label='Horizontal Line at the root')
 
 
 plt.show()

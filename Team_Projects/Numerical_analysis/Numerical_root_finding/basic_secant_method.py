@@ -13,12 +13,12 @@ def secant(f, x_0, x_1, diff_a_b, max_iter):
         return None
 
     iteration = 0
-    x_2 = 0
+    x_2 = 0.123 # define any x_2 value at first that avoid for(x_2) to undefined
     a = x_0
     b = x_1
     c = x_2
     
-    while abs(b - a) > diff_a_b and iteration < max_iter and f(b)-f(a) != 0:
+    while abs(b - a) > diff_a_b and iteration < max_iter and f(b)-f(a) != 0 and c !=0:
         
         iteration += 1
         print("~~iteration :", iteration)
@@ -49,14 +49,11 @@ def f(x):
 # Initial x_0 and x_1
 x_0 = 5
 x_1 = 6
-diff_a_b = 1e-10
+diff_a_b = 1e-4
 #max_iterations = 10
 
-result = secant(f, x_0, x_1, diff_a_b, 1)
+result = secant(f, x_0, x_1, diff_a_b, 100)
 print(result)
 
 # y = np.sqrt(3) 
 # print(y)
-
-f(5)
-f(6)

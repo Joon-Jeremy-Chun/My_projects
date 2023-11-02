@@ -16,7 +16,7 @@ def secant(f, x_0, x_1, diff_a_b, max_iter):
     data_list = []
     iteration = 0
     
-    x_2 = 0
+    x_2 = 0.123 # define any x_2 value at first that avoid for(x_2) to undefined
     a = x_0
     b = x_1
     c = x_2
@@ -55,18 +55,20 @@ def secant(f, x_0, x_1, diff_a_b, max_iter):
     return pd.DataFrame(data_list)
 
 # Define the function that want to find the root of
-def f(x):
-   return x**2-3
+# def f(x):
+#    return x**2-3
 
+def f(x):
+   return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
 # Initial x_0 and x_1
-x_0 = -1
-x_1 = 2
-diff_a_b = 1e-20
+x_0 = 5
+x_1 = 6
+diff_a_b = 1e-4
 #max_iterations = 10
 
 result = secant(f, x_0, x_1, diff_a_b, 100)
 print(result)
 
-y = np.sqrt(3) 
-print(y)
+# y = np.sqrt(3) 
+# print(y)
