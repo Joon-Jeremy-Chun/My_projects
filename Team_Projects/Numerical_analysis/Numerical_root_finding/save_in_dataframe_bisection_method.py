@@ -11,11 +11,10 @@ import numpy as np
 import pandas as pd
 
 #Define the method as a function
-#Outcome: the dataframe; a and b values, its iteration
+#Outcome: the dataframe; #iterations, a, and b values
 #f: function, a: left end point, b: right end point, diff_a_b: difference a and b, max_iter: maximum # of iteration
 #To prevent infinite loops, limited by 1.difference between a and b, and 2.the number of iterations.
 #also difference between a and b can be considered as MAX error in that iteration. ( == accuray)
-
 def bisection(f, a, b, diff_a_b, max_iter):
     if f(a) * f(b) >= 0:
         print("Bisection method may not converge because f(a) * f(b) >= 0")
@@ -23,7 +22,7 @@ def bisection(f, a, b, diff_a_b, max_iter):
     
     data_list = []
     iteration = 0
-    
+    #record given a,b value as a initial value
     data_a_b_iter = {
         "iterations": 0, "a": a, "b": b
     }
@@ -31,6 +30,7 @@ def bisection(f, a, b, diff_a_b, max_iter):
     
     
     while (b - a) > diff_a_b and iteration < max_iter:
+        #midoint is the tentative point can be a or b in next cycle
         midpoint = (a + b) / 2.0
 
         iteration += 1
@@ -56,20 +56,14 @@ def bisection(f, a, b, diff_a_b, max_iter):
             data_list.append(data_a_b_iter)
         
         print("\n")
-#    return midpoint, iteration
-#    return (a + b) / 2.0, iteration
     return pd.DataFrame(data_list)
 
 
 # Define the function that want to find the root of
-# def f(x):
-# #   return x**2-3
-#    return np.sin(x)
-
 def f(x):
    return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
-# Initial interval [a, b] and diff_a_b(tolerance)
+# Initial interval [a, b] and diff_a_b(tolerance)(== accuray)
 a = 5
 b = 6
 diff_a_b = 1e-4

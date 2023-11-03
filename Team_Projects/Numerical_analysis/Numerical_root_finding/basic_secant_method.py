@@ -26,24 +26,24 @@ def secant(f, x_0, x_1, diff_a_b, max_iter):
     while abs(b - a) > diff_a_b and iteration < max_iter and f(b)-f(a) != 0 and c !=0:
         
         iteration += 1
-        print("~~iteration :", iteration)
+       # print("~~iteration :", iteration)
 
 
         #If we find the tageted root then must stop the roof and gives of output.
         if f(c) == 0:
-            print("root :", c)
+        #    print("root :", c)
             return c
 
         else:
             c = b - (f(b)*(b - a))/(f(b) - f(a))
-            print("x:", c)  
+         #   print("x:", c)  
             
             #to prepare next cycle let b become a and c become b
             a = b
             b = c
             
         
-        print("\n")
+      #  print("\n")
     return c, iteration
 
 
@@ -60,5 +60,18 @@ diff_a_b = 1e-4
 result = secant(f, x_0, x_1, diff_a_b, 100)
 print(result)
 
-# y = np.sqrt(3) 
-# print(y)
+
+r = result[0]
+h = 1000/(np.pi*(r**2))
+SA = 2*np.pi*(r + .25)**2 + (2*np.pi*r + .25)*h
+Cost = .5*SA
+
+r = round(r,2)
+h = round(h,2)
+SA = round(SA, 2)
+Cost = round(Cost,2)
+
+
+print("You optimal dimensions for this can is listed below:")
+print(f"Radius = {r}, Height = {h}")
+print(f"The total cost to produce one can would be ${Cost}.")

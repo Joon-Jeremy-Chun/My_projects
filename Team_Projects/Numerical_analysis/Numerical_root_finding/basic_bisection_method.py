@@ -24,25 +24,24 @@ def bisection(f, a, b, diff_a_b, max_iter):
         midpoint = (a + b) / 2.0
 
         iteration += 1
-        print("~~iteration :", iteration)
+#        print("~~iteration :", iteration)
 
         if f(midpoint) == 0:
-            print("midpoint",midpoint)
+#            print("midpoint",midpoint)
             return midpoint
 
         if f(a) * f(midpoint) < 0:
             b = midpoint
-            print("a:", a, "b:", midpoint)
+#            print("a:", a, "b:", midpoint)
         else:
             a = midpoint
-            print("a:", midpoint, "b:", b)       
+#            print("a:", midpoint, "b:", b)       
         
-        print("\n")
+ #       print("\n")
     return midpoint, iteration
 
 
 #define the function we want to know
-
 def f(x):
     return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
@@ -54,3 +53,19 @@ diff_a_b = 1e-4
 
 result = bisection(f, a, b, diff_a_b, 100)
 print(result)
+
+
+r = result[0]
+h = 1000/(np.pi*(r**2))
+SA = 2*np.pi*(r + .25)**2 + (2*np.pi*r + .25)*h
+Cost = .5*SA
+
+r = round(r,2)
+h = round(h,2)
+SA = round(SA, 2)
+Cost = round(Cost,2)
+
+
+print("You optimal dimensions for this can is listed below:")
+print(f"Radius = {r}, Height = {h}")
+print(f"The total cost to produce one can would be ${Cost}.")

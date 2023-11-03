@@ -22,7 +22,7 @@ def bisection(f, a, b, diff_a_b, max_iter):
         midpoint = (a + b) / 2.0
 
         iteration += 1
-        print("~~iteration :", iteration)
+#        print("~~iteration :", iteration)
 
         if f(midpoint) == 0:
             print("midpoint",midpoint)
