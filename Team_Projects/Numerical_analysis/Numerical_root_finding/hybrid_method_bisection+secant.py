@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Nov  2 07:00:17 2023
 
-@author: joonc
-"""
-
-#hybrid method
-#bisection + secant
-
-import numpy as np
+import math
 
 #hybrid method = bisection + secant
 #hybrid function input define
@@ -38,42 +30,42 @@ def hybrid(f, g, a, b, diff_a_b, max_iter):
 
         #Denote iteration
         iteration += 1
-        print("~~iteration :", iteration)
+        #print("~~iteration :", iteration)
 
         #Check for location of new x value
         #First condition checks if new value lies outside of the interval
         if x_prime < a or x_prime>b:
             #Performs bisection to obtain new x value
-            print("bicetion mothod")
+            #print("bicetion mothod")
             x_prime = (b-a)/2.0
 
             #Checks image of new x value
             if f(a) * f(x_prime) < 0:
                 b = x_prime
-                print("a:", a, "b:", x_prime)
+            #    print("a:", a, "b:", x_prime)
             else:
                 a = x_prime
-                print("a:", x_prime, "b:", b)
+            #    print("a:", x_prime, "b:", b)
 
         else:
             #Checks image of new x value if secant lies within the interval
-            print("secant mothod")
+            #print("secant mothod")
             if f(a)*f(x_prime)<0:
                 b = x_prime
-                print("a:", a, "b:", x_prime)
+            #    print("a:", a, "b:", x_prime)
             else:
                 a=x_prime
-                print("a:", x_prime, "b:", b)
+            #    print("a:", x_prime, "b:", b)
 
-        print("\n")
+        #print("\n")
     height = g(x_prime)
     return x_prime, iteration, height
 
-#define the function we want to know
+# Define the function that want to find the root of
 def f(x):
-    return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
+    return (-2000/(x**2))-(500/((math.pi)*(x**3)))+(4*math.pi*x)+math.pi
 def g(c):
-    return 1000/(np.pi*c**2)
+    return 1000/(math.pi*c**2)
 
 a = 5 
 b = 6
@@ -82,3 +74,9 @@ diff_a_b = 1e-4
 #Print final number of iterations required to land within the error
 result = hybrid(f, g, a, b, diff_a_b, 100)
 print(result)
+
+if result[1]<100:
+    print(f"We require {result[1]} iterations for the error to lie within 10e-4.")
+else:
+    print("We require over 100 iterations for the error to lie within 10e-4.")
+print(f"The most optimal radius of the can will be {round(result[0],2)} cm and the most optimal height will be  {round(result[2],2)} cm.")
