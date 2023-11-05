@@ -26,24 +26,24 @@ def secant(f, x_0, x_1, diff_a_b, max_iter):
     while abs(b - a) > diff_a_b and iteration < max_iter and f(b)-f(a) != 0 and c !=0:
         
         iteration += 1
-        print("~~iteration :", iteration)
+ #       print("~~iteration :", iteration)
 
 
         #If we find the tageted root then must stop the roof and gives of output.
         if f(c) == 0:
-            print("root :", c)
+ #           print("root :", c)
             return c
 
         else:
             c = b - (f(b)*(b - a))/(f(b) - f(a))
-            print("x:", c)  
+ #           print("x:", c)  
             
             #to prepare next cycle let b become a and c become b
             a = b
             b = c
             
         
-        print("\n")
+ #       print("\n")
     return c, iteration
 
 

@@ -87,4 +87,5 @@ plt.grid(True)
 #plt.axhline(y=np.sqrt(3), color='red', linestyle='--', label='Horizontal Line at the root')
 
 
-plt.show()
+#plt.show()
+plt.savefig('Bisection_method.png')

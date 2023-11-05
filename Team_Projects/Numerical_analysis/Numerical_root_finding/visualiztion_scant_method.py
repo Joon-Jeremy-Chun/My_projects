@@ -87,10 +87,11 @@ df = result
 
 plt.figure(figsize=(10, 5))
 plt.plot(df['iteration'], df['x_value'], label='x_n', marker='o', markersize=2, color = 'g')
-plt.xlabel('x_')
+plt.xlabel('Iteration')
 plt.ylabel('Value')
 plt.legend()
 plt.title('Secant method : Plot of x_n values over iterations')
 plt.grid(True)
 
-plt.show()
+#plt.show()
+plt.savefig('Secant_method.png')
