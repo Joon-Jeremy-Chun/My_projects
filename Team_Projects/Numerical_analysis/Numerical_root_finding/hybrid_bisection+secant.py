@@ -75,10 +75,12 @@ def f(x):
 def g(c):
     return 1000/(np.pi*c**2)
 
-a = 5 
-b = 6
+a = 1
+b = 1000
 diff_a_b = 1e-4
 # max_iterations = 100
 #Print final number of iterations required to land within the error
-result = hybrid(f, g, a, b, diff_a_b, 100)
+result = hybrid(f, g, a, b, diff_a_b, 1000)
 print(result)
+
+print(f"The most optimal radius of the can will be {round(result[0],2)} cm and the most optimal height will be  {round(result[2],2)} cm.")

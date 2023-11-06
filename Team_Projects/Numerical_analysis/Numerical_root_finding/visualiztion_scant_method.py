@@ -69,14 +69,14 @@ def f(x):
    return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
 # Initial point; x_0 and x_1
-x_0 = 5
-x_1 = 6
+x_0 = 1
+x_1 = 100
 # The maximum difference between x_n and x_n_1
-diff_a_b = 1e-4
+diff_a_b = 1e-6
 #max_iterations = 10
 
 #Output save in the 'result' variable
-result = secant(f, x_0, x_1, diff_a_b, 100)
+result = secant(f, x_0, x_1, diff_a_b, 1000)
 
 
 # drowing plots in order to check convergence and speed of convergence

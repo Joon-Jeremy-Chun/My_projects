@@ -46,12 +46,12 @@ def f(x):
     return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
 # Initial interval [a, b] and diff_a_b(tolerance)(== accuray)
-a = 5
-b = 6
+a = 1
+b = 100
 diff_a_b = 1e-4
 #max_iterations = 10
 
-result = bisection(f, a, b, diff_a_b, 100)
+result = bisection(f, a, b, diff_a_b, 1000)
 print(result)
 
 
