@@ -33,7 +33,7 @@ def hybrid(f, g, a, b, diff_a_b, max_iter):
     iteration = 0
     x_prime = (a+b)/2 #initiated the first sudo x_prime (not record, not effect) for geting start the first roof
     
-    while (x_prime - (b - ((f(b)*(b-a))/(f(b)-f(a)))) ) > diff_a_b and iteration < max_iter and f(b) - f(a) != 0:
+    while abs(x_prime - (b - ((f(b)*(b-a))/(f(b)-f(a)))) ) > diff_a_b and iteration < max_iter and f(b) - f(a) != 0:
         # Perform secant method first
         x_prime = b - ((f(b)*(b-a))/(f(b)-f(a)))
 
@@ -43,7 +43,7 @@ def hybrid(f, g, a, b, diff_a_b, max_iter):
 
         #Check for location of new x value
         #First condition checks if new value lies outside of the interval
-        if x_prime < a or x_prime>b:
+        if x_prime < a or x_prime > b:
             #Performs bisection to obtain new x value
             print("bicetion mothod")
             x_prime = (b-a)/2.0
@@ -80,12 +80,11 @@ def f(x):
     return (20*x -1) / (19*x)
 def g(x):
     return x
-a = 1
-b = 1000
-diff_a_b = 1e-4
+a = 0.01
+b = 1
+diff_a_b = 1e-20
 # max_iterations = 100
 #Print final number of iterations required to land within the error
 result = hybrid(f, g, a, b, diff_a_b, 1000)
 print(result)
 
-print(f"The most optimal radius of the can will be {round(result[0],2)} cm and the most optimal height will be  {round(result[2],2)} cm.")

@@ -55,10 +55,10 @@ def f(x):
 # Initial x_0 and x_1
 x_0 = 1
 x_1 = 100
-diff_a_b = 1e-4
+diff_a_b = 1e-8
 #max_iterations = 10
 
-result = secant(f, x_0, x_1, diff_a_b, 1000)
+result = secant(f, x_0, x_1, diff_a_b, 10000)
 print(result)
 
 

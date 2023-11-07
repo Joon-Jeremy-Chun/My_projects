@@ -72,15 +72,14 @@ def f(x):
 x_0 = 1
 x_1 = 100
 # The maximum difference between x_n and x_n_1
-diff_a_b = 1e-6
+diff_a_b = 1e-8
 #max_iterations = 10
 
 #Output save in the 'result' variable
-result = secant(f, x_0, x_1, diff_a_b, 1000)
-
+result = secant(f, x_0, x_1, diff_a_b, 10000)
+print(result)
 
 # drowing plots in order to check convergence and speed of convergence
-
 df = result
 
 # Create a line plot for X- # iteration and and Y- 'x_n' valuse (converge to the root)
@@ -93,5 +92,5 @@ plt.legend()
 plt.title('Secant method : Plot of x_n values over iterations')
 plt.grid(True)
 
-#plt.show()
-plt.savefig('Secant_method.png')
+plt.show()
+#plt.savefig('Secant_method.png')

@@ -19,7 +19,7 @@ def bisection(f, a, b, diff_a_b, max_iter):
         return None
 
     iteration = 0
-    while (b - a) > diff_a_b and iteration < max_iter:
+    while abs(b - a) > diff_a_b and iteration < max_iter:
         #midoint is the tentative point can be a or b in next cycle
         midpoint = (a + b) / 2.0
 
@@ -48,7 +48,7 @@ def f(x):
 # Initial interval [a, b] and diff_a_b(tolerance)(== accuray)
 a = 1
 b = 100
-diff_a_b = 1e-4
+diff_a_b = 1e-8
 #max_iterations = 10
 
 result = bisection(f, a, b, diff_a_b, 1000)

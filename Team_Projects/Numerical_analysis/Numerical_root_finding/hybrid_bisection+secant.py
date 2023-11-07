@@ -32,40 +32,40 @@ def hybrid(f, g, a, b, diff_a_b, max_iter):
     iteration = 0
     x_prime = (a+b)/2 #initiated the first sudo x_prime (not record, not effect) for geting start the first roof
     
-    while (x_prime - (b - ((f(b)*(b-a))/(f(b)-f(a)))) ) > diff_a_b and iteration < max_iter and f(b) - f(a) != 0:
+    while abs(x_prime - (b - ((f(b)*(b-a))/(f(b)-f(a)))) ) > diff_a_b and iteration < max_iter and f(b) - f(a) != 0:
         # Perform secant method first
         x_prime = b - ((f(b)*(b-a))/(f(b)-f(a)))
 
         #Denote iteration
         iteration += 1
-        print("~~iteration :", iteration)
+        #print("~~iteration :", iteration)
 
         #Check for location of new x value
         #First condition checks if new value lies outside of the interval
         if x_prime < a or x_prime>b:
             #Performs bisection to obtain new x value
-            print("bicetion mothod")
+            #print("bicetion mothod")
             x_prime = (b-a)/2.0
 
             #Checks image of new x value
             if f(a) * f(x_prime) < 0:
                 b = x_prime
-                print("a:", a, "b:", x_prime)
+                #print("a:", a, "b:", x_prime)
             else:
                 a = x_prime
-                print("a:", x_prime, "b:", b)
+                #print("a:", x_prime, "b:", b)
 
         else:
             #Checks image of new x value if secant lies within the interval
-            print("secant mothod")
+            #print("secant mothod")
             if f(a)*f(x_prime)<0:
                 b = x_prime
-                print("a:", a, "b:", x_prime)
+                #print("a:", a, "b:", x_prime)
             else:
                 a=x_prime
-                print("a:", x_prime, "b:", b)
+                #print("a:", x_prime, "b:", b)
 
-        print("\n")
+        #print("\n")
     height = g(x_prime)
     return x_prime, iteration, height
 
@@ -76,11 +76,12 @@ def g(c):
     return 1000/(np.pi*c**2)
 
 a = 1
-b = 1000
-diff_a_b = 1e-4
+b = 100
+diff_a_b = 1e-8
 # max_iterations = 100
 #Print final number of iterations required to land within the error
-result = hybrid(f, g, a, b, diff_a_b, 1000)
+result = hybrid(f, g, a, b, diff_a_b, 10000)
 print(result)
+
 
 print(f"The most optimal radius of the can will be {round(result[0],2)} cm and the most optimal height will be  {round(result[2],2)} cm.")

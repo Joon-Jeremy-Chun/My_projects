@@ -28,7 +28,7 @@ def bisection(f, a, b, diff_a_b, max_iter):
     data_list.append(data_a_b_iter)
     
     
-    while (b - a) > diff_a_b and iteration < max_iter:
+    while abs(b - a) > diff_a_b and iteration < max_iter:
         #midoint is the tentative point can be a or b in next cycle
         midpoint = (a + b) / 2.0
 
@@ -62,12 +62,12 @@ def f(x):
    return 4*np.pi*(x+0.25)+(-2000/(x**2))+(-2*0.25*1000)/(np.pi*x**3)
 
 # Initial interval [a, b] and diff_a_b(tolerance)(== accuray)
-a = 5
-b = 6
-diff_a_b = 1e-4
+a = 1
+b = 100
+diff_a_b = 1e-6
 #max_iterations = 10
 
-result = bisection(f, a, b, diff_a_b, 100)
+result = bisection(f, a, b, diff_a_b, 10000)
 
 # drowing plots in order to check convergence and speed of convergence
 

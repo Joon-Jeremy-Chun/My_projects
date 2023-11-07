@@ -29,7 +29,7 @@ def bisection(f, a, b, diff_a_b, max_iter):
     data_list.append(data_a_b_iter)
     
     
-    while (b - a) > diff_a_b and iteration < max_iter:
+    while abs(b - a) > diff_a_b and iteration < max_iter:
         #midoint is the tentative point can be a or b in next cycle
         midpoint = (a + b) / 2.0
 
