@@ -60,10 +60,13 @@ def hybrid(f, g, a, b, diff_a_b, max_iter):
             #Checks image of new x value if secant lies within the interval
             print("secant mothod")
             if f(a)*f(x_prime)<0:
+                a = a
                 b = x_prime
+                
                 print("a:", a, "b:", x_prime)
             else:
-                a=x_prime
+                a = x_prime
+                b = b
                 print("a:", x_prime, "b:", b)
 
         print("\n")
@@ -76,15 +79,25 @@ def hybrid(f, g, a, b, diff_a_b, max_iter):
 # def g(c):
 #     return 1000/(np.pi*c**2)
 
+# def f(x):
+#    return (20*x -1) / (19*x)
+
 def f(x):
-    return (20*x -1) / (19*x)
+    return 2*x*np.exp(-15) -2*np.exp(-15*x) +1
+
+
 def g(x):
     return x
-a = 0.01
+a = 0
 b = 1
 diff_a_b = 1e-20
 # max_iterations = 100
 #Print final number of iterations required to land within the error
-result = hybrid(f, g, a, b, diff_a_b, 1000)
+result = hybrid(f, g, a, b, diff_a_b, 500)
 print(result)
 
+a = 0.5
+b = 1
+
+x_1 = b - ((f(b)*(b-a))/(f(b)-f(a)))
+x_1
