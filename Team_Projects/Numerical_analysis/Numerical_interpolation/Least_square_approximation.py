@@ -21,3 +21,12 @@ data = {
 df = pd.DataFrame(data)
 
 #%%
+#Linear approximation
+#creating a table first, for X_i, Y_i, X_i^2, and X_iY_i
+#later
+df.iloc[0]['time']
+df.iloc[0]
+for k in range(len(df)):
+    i = k
+    a = df[x(0)]
+    print("test")
