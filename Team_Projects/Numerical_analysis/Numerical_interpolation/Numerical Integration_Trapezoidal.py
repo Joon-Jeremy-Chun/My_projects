@@ -64,42 +64,24 @@ print('In mile:', Ta(Y,6)**0.000189394)
 
 def Sim(Y, h):
     Sum = 0
-    Sum += Y[0]
-    Sum += Y[-1]
-    
-    for i in range(len(Y)-2):
-        if i%2 !=0:
-            Sum += 4*Y[i+1]
-        else:
-            Sum += 2*Y[i+1]
+        
+    for i in range(len(Y)):
+        if i%2 != 0: #odd terms
+            Sum += 4*Y[i]
+        else: #even terms
+            Sum += 2*Y[i]
+            
+    #the first and last terms correction
+    Sum += -Y[0]
+    Sum += -Y[-1]    
     
     return h/3*Sum
-
 #%%
-h=6
-Sum = 0
-Sum += Y[0]
-Sum += Y[-1]
+#Calculate the Simpson's Rule
 
+X = [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84]
+Y = [124, 134, 148, 156, 147, 133, 121, 109, 99, 85, 78, 89, 104, 116, 123]
 
-for i in range(len(Y)-2):
-    if i%2 !=0:
-        Sum += 4*Y[i+1]
-    else:
-        Sum += 2*Y[i+1]
+print('In feet:', Sim(Y, 6))
+print('In mile:', Sim(Y, 6)**0.000189394)
 
-print(h/3*Sum)
-
-#%%
-
-h=6
-Sum = 0
-Sum += Y[0]
-Sum += Y[-1]
-
-
-
-for i in range(len(Y)-2):
-    Sum += 2*Y[i+1]
-    
-print(h/2*Sum)
