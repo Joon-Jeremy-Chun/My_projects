@@ -31,10 +31,10 @@ for i in range(len(df)):
     Sf += c
 
 #left sied Riemann sum
-print('-left side Riemann sum-')
-print('nearly:',Sf,'feet')
+print('-left Riemann sum-')
+print('In feets:',Sf,)
 
 #change the units: feet -> miles
 # 1 feet = 0.000189394 miles
 Sm = Sf*0.000189394
-print('nearly:',Sm,'miles')
+print('In miles:',Sm,'miles')
