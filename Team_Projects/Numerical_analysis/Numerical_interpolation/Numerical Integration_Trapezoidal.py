@@ -4,13 +4,10 @@ Created on Thu Nov 16 09:55:04 2023
 
 @author: joonc
 """
-
-#Numerical Integration
-
+#Numertical integration;Trapezoid rule by given data points or functions
+#1. Use the given data points
 #%%
-#Use the given data points
-#Choose the numerical integration method - Trapezoidal Rule
-
+#Define the Trapezid integration by given points
 def Ta(Y, h):
     Sum = 0
     
@@ -31,5 +28,24 @@ print('-trapezoidal-')
 print('In feets:', Ta(Y, 6))
 print('In miles:', Ta(Y,6)*0.000189394)
     
+#%%
 
+import numpy as np
 
+#2. Use the given functions
+#Given function
+def f(x):
+    return np.sin(x)
+
+#%%
+#define Trapezoid intergration
+
+#f;function, n; # of intervals, a;left end, b; right end
+def Trf(f, n, a, b):
+    area = 0
+    
+    for i in range(n):
+        
+        h = abs(b-a)/n
+        x_i = i(b-a)/n
+        
