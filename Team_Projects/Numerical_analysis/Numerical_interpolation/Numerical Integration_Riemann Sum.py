@@ -50,6 +50,11 @@ import numpy as np
 # Define the function
 def f(x):
     return np.sin(x)
+#%%
+# Polynomial funciton from Brad's works
+
+def b(x):
+    return 118.515*x**4 + 5.276*x**3 - 0.244*x**2 + 0.003**x + -1.175
 
 #%%
 # Define left riemann sum
@@ -67,6 +72,9 @@ def lrs( f, n, a, b):
     return area
 #%%
 #test
-print(lrs(f, 3, 0, np.pi))
-print(lrs(f, 1000, 0, np.pi))
+# print(lrs(f, 3, 0, np.pi))
+# print(lrs(f, 1000, 0, np.pi))
+
+#print(lrs(b, 3, 0, 90))
+print(lrs(b, 1000, 0, 90))
 
