@@ -39,4 +39,33 @@ print("-Simpson's Rule-")
 print('In feets:', Sim(Y, 6))
 print('In miles:', Sim(Y, 6)*0.000189394 if isinstance(Sim(Y, 6), (int, float)) else "None")
 
+#%%
+#Use the given functions
+#Simpson's Rule
 
+#f;function, n; # of intervals, a;left end, b; right end
+def Simf(f, n, a, b):
+    iSum = 0
+    h = abs(b-a)/n
+    #print(iSum)
+    
+    for i in range(n):
+        if i%2 != 0: #odd terms
+            iSum += 4*f(i*(b-a)/n)
+            #print('ith',i)
+            #print('accumulate_i',iSum)
+        if i%2 == 0: #even terms
+            iSum += 2*f(i*(b-a)/n)
+            #print('ith',i)
+            #print('accumulate_i',iSum)
+            
+    iSum += -f(a)
+    iSum += -f(b)   
+    #print(iSum)
+    return h/3*iSum
+#%%
+def f(x):
+    return x*(1-x**2)
+#%%
+#test
+print(Simf(f, 4, 0, 1))

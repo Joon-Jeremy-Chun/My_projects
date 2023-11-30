@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['plot_given_data.py', 'Least_square_approximation.py', 'Numerical Integration_Riemann Sum.py', 'Numerical Integration_Trapezoidal.py', "Numerical Integration_Simpson's Rule.py"]
+recent_files = ['plot_given_data.py', 'Least_square_approximation.py', 'Numerical Integration_Riemann Sum.py', 'graph test.py', 'Numerical Integration_Trapezoidal.py', "Numerical Integration_Simpson's Rule.py"]
 
 [main]
 version = 0.2.0
