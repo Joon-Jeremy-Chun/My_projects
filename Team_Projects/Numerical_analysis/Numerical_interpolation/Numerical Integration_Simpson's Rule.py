@@ -80,4 +80,16 @@ def g(x):
 #%%
 #test2
 
-print(Simf(g, 4, 0, 1))
+print(Simf(g, 100000, 0, 1))
+#%%
+print(Simf(g, 10, 0, 1))
+#%%
+print(Simf(g, 3, 0, 1))
+
+#%%
+#test3
+
+def my_function(x):
+   return 123.740 * x**0 + 3.475 * x**1 - 0.140 * x**2 + 0.001 * x**3
+#%%
+print(Simf(my_function, 100, 0, 90))
