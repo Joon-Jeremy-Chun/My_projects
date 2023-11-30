@@ -57,7 +57,7 @@ def b(x):
     return 118.515*x**4 + 5.276*x**3 - 0.244*x**2 + 0.003**x + -1.175
 
 #%%
-# Define left riemann sum
+# Define left Riemann sum
 def lrs( f, n, a, b):
     #f;function, n; # of intervals, a;left end, b; right end
     area = 0
