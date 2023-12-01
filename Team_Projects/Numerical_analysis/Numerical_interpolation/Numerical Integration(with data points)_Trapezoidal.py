@@ -4,10 +4,10 @@ Created on Thu Nov 16 09:55:04 2023
 
 @author: joonc
 """
-#Numertical integration;Trapezoid rule by given data points
+#Numertical integration;Trapezoid rule (for data points)
 #1. Use the given data points
 #%%
-#Define the Trapezid integration by given points
+#Define the Trapezid integration (for data points)
 def Ta(Y, h):
     Sum = 0
     
@@ -27,7 +27,4 @@ Y = [124, 134, 148, 156, 147, 133, 121, 109, 99, 85, 78, 89, 104, 116, 123]
 
 print('-Trapezoidal-')
 print('In feets:', Ta(Y, 6))
-print('In miles:', Ta(Y,6)*0.000189394)
-    
-
-        
+print('In miles:', Ta(Y,6)*0.000189394)        

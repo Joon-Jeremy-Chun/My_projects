@@ -4,7 +4,7 @@ Created on Mon Nov 20 12:34:26 2023
 
 @author: joonc
 """
-#Numertical integration;left Riemann sum by given data points or functions
+#Numertical integration;left Riemann sum by given data points
 
 #1. Integration by given data points
 import pandas as pd
@@ -39,5 +39,5 @@ print('In feets:',Sf,)
 #change the units: feet -> miles
 # 1 feet = 0.000189394 miles
 Sm = Sf*0.000189394
-print('In miles:',Sm,'miles')
+print('In miles:',Sm)
 
