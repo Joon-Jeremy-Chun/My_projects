@@ -34,10 +34,10 @@ for i in range(len(df)):
 
 #left sied Riemann sum
 print('-left Riemann sum-')
-print('In feets:',Sf,)
+print('In feets:',Sf)
 
 #change the units: feet -> miles
 # 1 feet = 0.000189394 miles
 Sm = Sf*0.000189394
-print('In miles:',Sm)
+print('In miles:', Sm)
 
