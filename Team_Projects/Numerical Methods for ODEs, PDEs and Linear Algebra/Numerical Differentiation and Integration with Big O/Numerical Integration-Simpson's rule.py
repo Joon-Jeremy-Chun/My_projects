@@ -9,7 +9,7 @@ import numpy as np
 
 #%%
 #Define the Simpson's Rule integration (for continous functions)
-#F : functions, a: starting point, b: Ending point, N: # of segments 
+#F : functions, a: starting point, b: Ending point, N: # of Segments 
 def SimC(F, a, b, N):
     Sum = 0  
     h = (b - a) / N
