@@ -4,6 +4,7 @@ Created on Tue Jan 30 13:11:09 2024
 
 @author: joonc
 """
+#Objectives: To Build Simpson's Rule integration
 import numpy as np
 
 #%%
