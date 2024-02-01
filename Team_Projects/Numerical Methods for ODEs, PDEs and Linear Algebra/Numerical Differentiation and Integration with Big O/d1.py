@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 30 13:11:09 2024
+Created on Wed Jan 31 17:49:30 2024
 
 @author: joonc
 """
-#Objectives: To Build Simpson's Rule integration
-import numpy as np
 
 #%%
-#Define the Simpson's Rule integration (for continuous functions)
-#F : functions, a: starting point, b: Ending point, N: # of Segments 
+#F : functions, a: starting point, b: Ending point, N: # of Segments
 def SimC(F, a, b, N):
     Sum = 0  
     h = (b - a) / N
@@ -34,13 +31,4 @@ def SimC(F, a, b, N):
         Sum += -F(b)
         
         return h/3*Sum
-        
 #%%
-#Define the text function
-def T_Sin(x):
-        return np.sin(x)
-#%%
-#Define the ranges of x and N
-Y = SimC(T_Sin, 0, np.pi*2, 11)
-print(Y)
-
