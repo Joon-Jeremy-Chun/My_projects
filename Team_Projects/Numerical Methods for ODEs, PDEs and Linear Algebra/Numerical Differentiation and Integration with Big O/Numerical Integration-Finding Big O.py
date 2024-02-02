@@ -102,3 +102,6 @@ for i in range(1,t):
 #Check the Big O
 #Since we     
 error_ratios = [errors[i] / errors[i-1] for i in range(1, len(errors))]
+print(error_ratios)
+for i in range(1, len(errors)):
+    rrors[i] / errors[i-1]

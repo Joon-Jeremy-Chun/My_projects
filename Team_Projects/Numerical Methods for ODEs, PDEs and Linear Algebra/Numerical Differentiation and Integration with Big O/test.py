@@ -29,3 +29,40 @@ def SimC(F, a, b, N):
         Sum += -F(b)
         
         return h/3*Sum
+#%%
+import numpy as np
+#Test Function
+def T_Sin(x):
+        return np.sin(x)
+#%%
+a = 0
+b = np.pi
+t = 20 # max N
+
+errors = []
+for i in range(1,t):
+    S = SimC(T_Sin, a, b, 2**i + 1)# need odd nodes
+    print(f"For N = 2**{i}+1, approx = {S}")
+    print(S - 2)
+    print(abs(S-2))
+    errors.append(S)
+    
+#%%
+a = 0
+b = np.pi
+t = 20 # max N
+exact_v = 2
+abs_errors = []
+for i in range(1,t):
+    S = SimC(T_Sin, a, b, 2**i + 1)# need odd nodes
+    Err_S = abs(exact_v - S)
+    abs_errors.append(Err_S)
+    print(f"For N = 10**{i}+1, abs_err = {Err_S}")
+#%%
+error_ratios = [abs_errors[i] / abs_errors[i-1] for i in range(1, len(abs_errors))]
+print(error_ratios)
+#%%
+log_values = [math.log(value) for value in abs_errors]
+
+# Print the result
+print(log_values)
