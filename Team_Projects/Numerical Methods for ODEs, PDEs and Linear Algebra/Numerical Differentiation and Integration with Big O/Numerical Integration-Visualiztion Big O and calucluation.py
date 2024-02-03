@@ -55,7 +55,6 @@ print(log_value_n)
 x = [0,1,2,3,4,5,6,7,8,9,10,11,12]
 y = [0,-2,-4,-6,-8,-10,-12,-14,-16,-18,-20,-22,-24]
 plt.plot(log_value_n, log_values_e, label='error in log')
-#plt.plot(log_values_e, log_value_n, label='test line' )
 plt.plot(x,y, label='test line slope 2' )
 plt.title('Graph')
 plt.xlabel('x')
