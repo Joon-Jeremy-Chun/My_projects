@@ -9,9 +9,6 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import integrate
-
-# #%%
-
 #%%
 #F : functions, a: starting point, b: Ending point, N: # of Subinvervals
 def SimC(F, a, b, N):
