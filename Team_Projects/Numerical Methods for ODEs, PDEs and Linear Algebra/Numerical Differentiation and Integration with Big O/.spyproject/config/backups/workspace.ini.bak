@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Numerical Differentiation.py', "Numerical Integration-Simpson's rule.py", 'Numerical Integration-Finding Big O.py', 'Numerical Integration-Visualiztion Big O and calucluation.py', 'd1.py', 'test.py', '..\\..\\Numerical_analysis\\Numerical_interpolation\\graph test.py']
+recent_files = ['Numerical Differentiation.py', "Numerical Integration-Simpson's rule.py", 'Numerical Integration-Finding Big O.py', 'Numerical Integration-Visualiztion Big O and calucluation.py', 'Simpson_Rule.py', 'Summary-Numerical Interation and finding Big O.py']
 
 [main]
 version = 0.2.0

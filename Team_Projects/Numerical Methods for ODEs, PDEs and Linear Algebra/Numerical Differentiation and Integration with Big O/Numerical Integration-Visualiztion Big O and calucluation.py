@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
 import math
-import d1
+import Simpson_Rule as d1
 
 #%%
 def T_Sin(x):
