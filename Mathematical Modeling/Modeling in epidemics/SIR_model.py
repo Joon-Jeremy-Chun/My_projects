@@ -25,8 +25,8 @@ S0 = 999
 N = S0 + I0 + R0
 
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta = 0.3
-gamma = 0.1
+beta = 0.5
+gamma = 0.2
 
 # A grid of time points (in days)
 t = np.linspace(0, 160, 160)
