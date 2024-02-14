@@ -22,3 +22,12 @@ Created on Tue Jan 30 13:20:34 2024
 #  5. Use your code to verify the order of accuracy of the Midpoint method (see notes on
 #  Order of Accuracy on how to do this) and compare it with your theoretical result
 #  obtained in #1.
+
+#%%
+#Define midpoint method
+def Mid_p(y_prime, y_0, a, b, N):
+    y_value = []
+    y_0 = #initial point
+    y_1 = #second part
+    for i in 
+        y = y_value[-2] + 2*h*y_prime(t, )
