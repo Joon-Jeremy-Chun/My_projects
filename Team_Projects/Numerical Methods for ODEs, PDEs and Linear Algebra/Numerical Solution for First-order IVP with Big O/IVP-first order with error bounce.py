@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 30 13:20:34 2024
+Created on Wed Feb 14 13:46:07 2024
 
 @author: joonc
 """
 
-# Consider the initial value problem:
-#  y′ = 2
-#  t y +t2et, 1 ≤ t ≤ 2, y(1) = 0
-#  with exact solution y(t) = t2(et − e).
-#  The Midpoint method is given by
-#  yn+1 = yn−1 +2hf(tn,yn).
 #  1. By computing its truncation error, determine the order of accuracy of the Midpoint
 #  method.
 #  2. Implement the Midpoint method with h = 0.01 to approximate the solution to the
@@ -22,12 +16,3 @@ Created on Tue Jan 30 13:20:34 2024
 #  5. Use your code to verify the order of accuracy of the Midpoint method (see notes on
 #  Order of Accuracy on how to do this) and compare it with your theoretical result
 #  obtained in #1.
-
-#%%
-#Define midpoint method
-def Mid_p(y_prime, y_0, a, b, N):
-    y_value = []
-    y_0 = #initial point
-    y_1 = #second part
-    for i in 
-        y = y_value[-2] + 2*h*y_prime(t, )
