@@ -17,10 +17,10 @@ def deriv(y, t, N, beta, gamma):
     dRdt = gamma * I
     return dSdt, dIdt, dRdt
 
-# Initial number of infected and recovered individuals, everyone else is susceptible to infection initially.
-I0 = 1
-R0 = 0
-S0 = 999
+# Initial number in ratio of infected and recovered individuals, everyone else is susceptible to infection initially.
+I0 = 1/1000
+R0 = 199/1000
+S0 = 800/1000
 N = S0 + I0 + R0
 
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
