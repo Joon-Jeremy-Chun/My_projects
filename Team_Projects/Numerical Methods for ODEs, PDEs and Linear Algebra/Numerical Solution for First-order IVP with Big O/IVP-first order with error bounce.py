@@ -16,3 +16,6 @@ Created on Wed Feb 14 13:46:07 2024
 #  5. Use your code to verify the order of accuracy of the Midpoint method (see notes on
 #  Order of Accuracy on how to do this) and compare it with your theoretical result
 #  obtained in #1.
+import numpy as np
+#from scipy.integrate import odeint
+import matplotlib.pyplot as plt

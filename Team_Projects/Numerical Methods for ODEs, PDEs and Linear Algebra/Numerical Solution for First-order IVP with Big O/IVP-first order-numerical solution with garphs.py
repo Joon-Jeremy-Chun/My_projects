@@ -13,7 +13,6 @@ Created on Tue Jan 30 13:20:34 2024
 
 #%%
 import numpy as np
-#from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 #%%
 #Define inline function
@@ -25,7 +24,7 @@ def model(t,y):
 y0 = 0
 #%%
 #Define time point
-N=5 #intervals
+N= 5 #intervals
 a = 1 #starting
 b = 2 #ending
 t = np.linspace(a,b,N+1) #N+1 points
@@ -54,7 +53,7 @@ y_e = [ Exact_f(i) for i in t]
 #%%
 plt.plot(t, y , "v",label='midpoint method')
 plt.plot(t, y_e, label='exact solution' )
-plt.title(f'Intervals:{N} Exact solution vs midpoint method ')
+plt.title(f' Exact solution vs midpoint method, Intervals:{N} ')
 plt.xlabel('T value')
 plt.ylabel('y value')
 plt.legend()
