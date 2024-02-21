@@ -10,7 +10,7 @@ Created on Tue Jan 30 13:20:34 2024
 #  with exact solution y(t) = t^2*(e^t − e).
 #  The Midpoint method is given by
 #  yn+1 = yn−1 +2hf(tn,yn).
-
+# The order of the global truncation error is 2. by local trancation error (order 3) * by N = (b-a)/h = O(h^2)
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,8 +23,8 @@ def model(t,y):
 #Define initial condition
 y0 = 0
 #%%
-#Define time point
-N= 5 #intervals
+#Define time and invervals
+N= 100 #intervals
 a = 1 #starting
 b = 2 #ending
 t = np.linspace(a,b,N+1) #N+1 points
