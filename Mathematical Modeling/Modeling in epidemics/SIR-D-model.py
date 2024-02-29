@@ -19,10 +19,10 @@ def deriv(y, t, N, beta, gamma, delta):
     return dSdt, dIdt, dRdt, dDdt
 
 # Initial number in ratio of infected, recovered, death individuals, everyone else is susceptible to infection initially.
-S0 = 999/1000
-I0 = 1/1000
-R0 = 0/1000
-D0 = 0/1000
+S0 = 999
+I0 = 1
+R0 = 0
+D0 = 0
 
 N = S0 + I0 + R0 + D0
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 30 15:53:23 2024
+Created on Wed Feb 28 20:50:17 2024
 
 @author: joonc
 """
@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 # SIR model differential equations.
 def deriv(y, t, N, beta, gamma):
     S, I, R = y
-    dSdt = -beta * S * I / N
-    dIdt = beta * S * I / N - gamma * I
-    dRdt = gamma * I
+    dSdt = mu*N -beta * S * I / N - mu*S
+    dIdt = beta * S * I / N - (gamma + mu) * I
+    dRdt = gamma * I - mu * R
     return dSdt, dIdt, dRdt
 
 # Initial number in ratio of infected and recovered individuals, everyone else is susceptible to infection initially.
@@ -24,11 +24,18 @@ S0 = 1000
 N = S0 + I0 + R0
 
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta = 0.5
+beta = 0.7
 gamma = 0.2
 
+# beta = 0.5
+# gamma = 0.2
+# mu = 0.1
+
+# Birth and death rate are equal, mu
+mu = 0.4 
+
 # A grid of time points (in days)
-t = np.linspace(0, 160, 160)
+t = np.linspace(0, 1600, 1600)
 
 # Initial conditions vector
 y0 = S0, I0, R0
@@ -46,3 +53,8 @@ plt.ylabel('Population')
 plt.title('SIR Model Example')
 plt.legend()
 plt.show()
+
+#Print Basic Reproduction Number R_0
+
+R_0 = beta / (gamma + mu)
+print("Basic Reproduction Number R_0:", R_0)
