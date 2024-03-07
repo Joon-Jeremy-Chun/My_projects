@@ -35,7 +35,7 @@ sigma = 0.1
 mu = 0.01
 
 # A grid of time points (in days)
-t = np.linspace(0, 1600, 1600)
+t = np.linspace(0, 5000, 5000)
 
 # Initial conditions vector
 y0 = S0, E0, I0, R0
@@ -56,5 +56,5 @@ plt.legend()
 plt.show()
 
 # Print Basic Reproduction Number R_0
-R_0 = beta / (gamma + mu)
+R_0 = beta / ((gamma + mu) * (sigma + mu))
 print("Basic Reproduction Number R_0:", R_0)

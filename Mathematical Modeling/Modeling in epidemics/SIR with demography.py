@@ -25,7 +25,7 @@ N = S0 + I0 + R0
 
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
 beta = 0.7
-gamma = 0.2
+gamma = 0.5
 
 # beta = 0.5
 # gamma = 0.2
