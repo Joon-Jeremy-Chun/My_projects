@@ -4,7 +4,7 @@ Created on Wed Mar  6 21:29:33 2024
 
 @author: joonc
 """
-#need work on more
+#need work more on this code
 
 import numpy as np
 from scipy.integrate import odeint
