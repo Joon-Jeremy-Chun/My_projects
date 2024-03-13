@@ -1,29 +1,33 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 11 18:57:25 2024
+Created on Tue Mar 12 15:21:01 2024
 
 @author: joonc
 """
+# an introduction to numerical methods and analysis 2nd ed. by j. epperson.
+# 6.8 Q11.
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 #%%
 # Parameters
-beta = 0.2   # Infection rate
-gamma = 0.1  # Recovery rate
+# r = 2.18 * 10**(-3)   # Infection rate
+# a = 0.44  # Recovery rate
+r=0.2
+a =0.1
 #%%
 # ODE function
 def f_S(S, I, R, t):
-    dSdt = -beta*S*I
+    dSdt = -r*S*I
     return dSdt
 
 def f_I(S, I, R, t):
-    dIdt = beta*S*I - gamma*I
+    dIdt = r*S*I - a*I
     return dIdt
 
 def f_R(S, I, R, t):
-    dRdt = gamma*I
+    dRdt = a*I
     return dRdt
 
 #%%
@@ -55,9 +59,15 @@ def trapezoidal_pc(y0, t0, fS, fI, fR, h, N):
 t0 = 0
 h = 0.1
 N = 2000
-S0 = 0.999
-I0 = 0.001
-R0 = 0
+S = 762
+I = 1
+R = 0
+
+#Ratio
+total_p = S + I + R
+S0 = S / total_p
+I0 = I / total_p
+R0 = R / total_p
 y0 = [S0, I0, R0]
 
 # Solve using Trapezoidal Predictor-Corrector method
@@ -73,3 +83,6 @@ plt.title('SIR using Trapezoidal Predictor-Corrector Method')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+R1 = np.zeros(N+1)
+print(R1)

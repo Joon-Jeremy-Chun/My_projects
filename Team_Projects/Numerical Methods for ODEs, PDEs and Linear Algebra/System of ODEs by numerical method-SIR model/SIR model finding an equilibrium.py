@@ -1,34 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 11 18:57:25 2024
+Created on Tue Mar 12 13:38:44 2024
 
 @author: joonc
 """
+#finding equilibrium
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import fsolve
 
-#%%
 # Parameters
 beta = 0.2   # Infection rate
 gamma = 0.1  # Recovery rate
-#%%
-# ODE function
+
+# Equations for the SIR model
 def f_S(S, I, R, t):
-    dSdt = -beta*S*I
-    return dSdt
+    return -beta * S * I
 
 def f_I(S, I, R, t):
-    dIdt = beta*S*I - gamma*I
-    return dIdt
+    return beta * S * I - gamma * I
 
 def f_R(S, I, R, t):
-    dRdt = gamma*I
-    return dRdt
+    return gamma * I
 
-#%%
 # Trapezoidal predictor-corrector method
-# h:length of segement, N total iteration or Ns intervals
 def trapezoidal_pc(y0, t0, fS, fI, fR, h, N):
     t = np.zeros(N+1)
     S = np.zeros(N+1)
@@ -50,26 +46,55 @@ def trapezoidal_pc(y0, t0, fS, fI, fR, h, N):
         t[n+1] = t[n] + h
 
     return t, S, I, R
-#%%
+
+# Find equilibrium points
+def find_equilibrium():
+    def equations(y):
+        S, I, R = y
+        eq1 = f_S(S, I, R, 0)
+        eq2 = f_I(S, I, R, 0)
+        eq3 = f_R(S, I, R, 0)
+        return [eq1, eq2, eq3]
+
+    # Initial guess
+    y_guess = [0.9, 0.1, 0]
+
+    # Solve equations
+    S_eq, I_eq, R_eq = fsolve(equations, y_guess)
+
+    return S_eq, I_eq, R_eq
+
 # Initial conditions
 t0 = 0
 h = 0.1
-N = 2000
-S0 = 0.999
-I0 = 0.001
+N = 5000
+S0 = 0.99
+I0 = 0.01
 R0 = 0
 y0 = [S0, I0, R0]
 
-# Solve using Trapezoidal Predictor-Corrector method
+# Simulate using Trapezoidal Predictor-Corrector method
+t_max = 1000  # Maximum time for simulation
+N = int(t_max / h)  # Number of time steps
 t, S, I, R = trapezoidal_pc(y0, t0, f_S, f_I, f_R, h, N)
-#%%
+
 # Plot the results
 plt.plot(t, S, label='Susceptible')
 plt.plot(t, I, label='Infectious')
 plt.plot(t, R, label='Recovered')
 plt.xlabel('Time')
-plt.ylabel('Pupluation')
-plt.title('SIR using Trapezoidal Predictor-Corrector Method')
+plt.ylabel('Population')
+plt.title('SIR Model - Long-term Behavior')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+# Extract long-term values
+S_long_term = S[-1]
+I_long_term = I[-1]
+R_long_term = R[-1]
+
+print("Long-term values:")
+print("Susceptible (S) =", S_long_term)
+print("Infectious (I) =", I_long_term)
+print("Recovered (R) =", R_long_term)
