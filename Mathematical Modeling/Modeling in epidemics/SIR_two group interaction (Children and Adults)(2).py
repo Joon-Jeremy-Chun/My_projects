@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 28 23:20:10 2024
+Created on Wed Mar 13 09:38:33 2024
 
 @author: joonc
 """
-
 
 import numpy as np
 from scipy.integrate import odeint
@@ -33,10 +32,10 @@ Na = Sa0 + Ia0 + Ra0
 #%%
 #constants
 # Contact rates, beta, and mean recovery rates, gamma, for children and adults (in 1/days)
-beta_cc = 0.15
+beta_cc = 0.3
 beta_ca = 0.3
 gamma_c = 0.1
-beta_aa = 0.35
+beta_aa = 0.3
 beta_ac = 0.3
 gamma_a = 0.1
 
