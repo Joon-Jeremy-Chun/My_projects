@@ -13,11 +13,11 @@ import matplotlib.pyplot as plt
 # SIR model differential equations with two groups.
 def deriv(y, t, Nc, Na, beta_cc, beta_ca, beta_ac, beta_aa, gamma_c, gamma_a, fg):
     Sc, Ic, Rc, Sa, Ia, Ra = y
-    dScdt = -(beta_cc*Sc*Ic/Nc + beta_ac*Ia/Na) - fg*Sc + mu_A*Na
-    dIcdt = (beta_cc*Sc*Ic/Nc + beta_ac*Ia/Na) - gamma_c*Ic - fg*Ic
+    dScdt = -(beta_cc*Ic/Nc + beta_ac*Ia/Na)*Sc - fg*Sc + mu_A*Na
+    dIcdt = (beta_cc*Ic/Nc + beta_ac*Ia/Na)*Sc - gamma_c*Ic - fg*Ic
     dRcdt = gamma_c*Ic - fg*Rc
-    dSadt = -(beta_aa*Sa*Ia/Na + beta_ca*Ic/Nc) + fg*Sc - mu_A
-    dIadt = (beta_aa*Sa*Ia/Na + beta_ca*Ic/Nc) - gamma_a*Ia + fg*Ic - mu_A
+    dSadt = -(beta_aa*Ia/Na + beta_ca*Ic/Nc)*Sa + fg*Sc - mu_A
+    dIadt = (beta_aa*Ia/Na + beta_ca*Ic/Nc)*Sa - gamma_a*Ia + fg*Ic - mu_A
     dRadt = gamma_a*Ia + fg*Rc - mu_A
     return dScdt, dIcdt, dRcdt, dSadt, dIadt, dRadt
 
@@ -35,7 +35,7 @@ Na = Sa0 + Ia0 + Ra0
 # Contact rates, beta, and mean recovery rates, gamma, for children and adults (in 1/days)
 beta_cc = 0.15
 beta_ca = 0.3
-gamma_c = 0.1
+gamma_c = 0.12
 beta_aa = 0.35
 beta_ac = 0.3
 gamma_a = 0.1

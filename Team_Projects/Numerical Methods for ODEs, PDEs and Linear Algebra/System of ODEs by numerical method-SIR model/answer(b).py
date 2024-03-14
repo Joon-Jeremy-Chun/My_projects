@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 12 15:42:39 2024
+Created on Wed Mar 13 12:51:54 2024
 
 @author: joonc
 """
 
 # an introduction to numerical methods and analysis 2nd ed. by j. epperson.
 # 6.8 Q11.
-# (a) Influenza epidemic at English boys' school:
-#  1.How long does the epidemic run its course? .............
-#  2.When does it reach the peak? ............
-#  3.How many percent of the population is infected by the disease?  .............
-#  4.Insert the plot showing  here.
+# Now consider the case where S0 = 10^6, R0 = 0, a = 1.74, r = 0.3 x 10^(-5). 
+# Solve the system (again, using the method of your choice) for a range of values 
+# of I0 > 0. Is there a critical value of I0 beyond which the disease spreads to 
+# almost all of the population? These data are taken, roughly, from a study of a 
+# plague epidemic in Bombay; the time scale is weeks. 
 
 import numpy as np
 import pandas as pd
@@ -20,8 +20,8 @@ import matplotlib.pyplot as plt
 
 #%%
 # Parameters
-r = 2.18 * 10**(-3)   # Infection rate
-a = 0.44  # Recovery rate
+r = 0.3 * 10**(-5)   # Infection rate
+a = 1.74  # Recovery rate
 
 #%%
 # ODE function
@@ -65,10 +65,10 @@ def trapezoidal_pc(y0, t0, fS, fI, fR, h, N):
 # Initial conditions
 t0 = 0
 h = 0.1
-N = 500
+N = 200
 
-S0 = 786
-I0 = 1
+S0 = 10**6
+I0 = 1778279.410038923
 R0 = 0
 y0 = [S0, I0, R0]
 
@@ -85,13 +85,13 @@ for i in range(len(I)):
         end_time = i * h
         break
 
-print("The epidemic runs its course until day:", end_time)    
+print("The epidemic runs its course until week:", end_time)    
 #%%
 #  2.When does it reach the peak? ............
 
 Max_peak = max(I)
-Max_day = pd.Series(I).idxmax() * h
-print("The day of reachs to the peak: ", Max_day)
+Max_week = pd.Series(I).idxmax() * h
+print("The day of reachs to the peak: ", Max_week)
 print("The number infected pepole: ", Max_peak)
 
 #%%
@@ -109,13 +109,13 @@ total_p = S[0]+I[0]+R[0]
 total_infected = R[-1]/total_p
 print("Percent of infected =", total_infected*100)
 #%%
-# 4.Plot the results
+#4.Plot the results
 plt.plot(t, S, label='Susceptible')
 plt.plot(t, I, label='Infectious')
 plt.plot(t, R, label='Recovered')
 plt.xlabel('Time')
 plt.ylabel('Pupluation')
-plt.title('SIR using Trapezoidal Predictor-Corrector Method')
+plt.title('Initial infected: 10^5')
 plt.legend()
 plt.grid(True)
 plt.show()
