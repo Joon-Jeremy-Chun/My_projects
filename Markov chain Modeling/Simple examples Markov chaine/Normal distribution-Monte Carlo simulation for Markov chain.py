@@ -11,28 +11,10 @@ import matplotlib.pyplot as plt
 # Define the number of steps
 n_steps = 100
 
-# Define the initial position
-initial_position = np.array([0.0, 0.0], dtype=np.float64)
 
-# Define the step options (up, left)
+# Define the step options (right, left)
 step_options = np.array([[1, 0], [-1, 0]])
 
-# Initialize the position array
-positions = np.zeros((n_steps + 1, 2))
-positions[0] = initial_position
-
-# Simulate the Brownian motion
-for i in range(1, n_steps + 1):
-    random_step = step_options[np.random.randint(2)]  # Choose a random step
-    positions[i] = positions[i - 1] + random_step
-
-# # Plot the trajectory
-# plt.plot(positions[:, 0], positions[:, 1])
-# plt.xlabel("X position")
-# plt.ylabel("Y position")
-# plt.title("Brownian Motion Simulation")
-# plt.grid(True)
-# plt.show()
 
 # Monte Carlo simulation for final x-coordinates
 n_simulations = 10000
@@ -45,7 +27,7 @@ for i in range(n_simulations):
         position += random_step
     final_x_coordinates[i] = position[0]
 
-# Now `final_y_coordinates` contains the final y-coordinates from 100,000 simulations
+# Now `final_x_coordinates` contains the final x-coordinates from 100,000 simulations
 # You can analyze or visualize this data as needed
 
 print (final_x_coordinates)
