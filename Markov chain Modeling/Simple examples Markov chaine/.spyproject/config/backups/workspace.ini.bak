@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', '2 space state example.py', 'Brownian Motion Simulation- simple move.py']
+recent_files = ['2 space state example.py', 'Brownian Motion Simulation- simple move.py', 'piday_ipynb의_사본.py', 'Normal distribution-Monte Carlo simulation for Markov chain.py', '(Not completed)Poisson distribution - Markov chain and Monte Carlo simulation.py', '2D oneside motion.py', 'test.py', '(Not completed)Poisson distribution - condtion1.py']
 
 [main]
 version = 0.2.0

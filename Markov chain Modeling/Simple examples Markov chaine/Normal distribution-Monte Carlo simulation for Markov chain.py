@@ -9,11 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define the number of steps
-n_steps = 100
+n_steps = 30
 
 
-# Define the step options (right, left)
-step_options = np.array([[1, 0], [-1, 0]])
+# Define the step options (right, not move ,left)
+step_options = np.array([[1, 0], [0, 0], [-1, 0]])
 
 
 # Monte Carlo simulation for final x-coordinates
@@ -23,10 +23,10 @@ final_x_coordinates = np.zeros(n_simulations)
 for i in range(n_simulations):
     position = np.array([0.0, 0.0], dtype=np.float64)
     for _ in range(n_steps):
-        random_step = step_options[np.random.randint(2)]
+        random_step = step_options[np.random.choice([0,1], p = [0.5, 0.5])]
         position += random_step
     final_x_coordinates[i] = position[0]
-
+    
 # Now `final_x_coordinates` contains the final x-coordinates from 100,000 simulations
 # You can analyze or visualize this data as needed
 
