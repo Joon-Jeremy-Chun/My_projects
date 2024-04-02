@@ -6,4 +6,4 @@ Welcome to my personal GitHub repository, showcasing a variety of projects acros
 
 - **Mathematical Modeling**: Projects applying mathematical concepts to model and solve real-world problems.
 - **Numerical Linear Algebra**: Explorations and implementations of algorithms within linear algebra.
-- **Markov Chain Practices**: Detailed exercises and solutions based on textbook questions, specifically from Sheldon M. Ross's work.
+- **Markov Chain Practices**: Detailed exercises and solutions based on textbook, Sheldon M. Ross, questions.
