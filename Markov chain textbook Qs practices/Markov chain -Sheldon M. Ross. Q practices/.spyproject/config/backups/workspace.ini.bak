@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', 'Finding an expectation.py', 'eigenvalus eigenvectors.py', 'Digonaliztion.py']
+recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', 'Finding an expectation.py', 'eigenvalus eigenvectors.py', 'Digonaliztion.py', 'Transition probability matrix.py']
 
 [main]
 version = 0.2.0
