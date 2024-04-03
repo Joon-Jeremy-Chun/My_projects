@@ -51,7 +51,7 @@ for i in range(n_simulations):
             random_step = step_options[np.random.choice([0,1])]
         else:
             # Otherwise, choose a random step
-            random_step = step_options[np.random.choice([0,1], p = [0.05,0.95])]
+            random_step = step_options[np.random.choice([0,1], p = [0.1,0.9])]
         position += random_step
     final_x_coordinates[i] = position[0]
 
