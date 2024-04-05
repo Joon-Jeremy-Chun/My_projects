@@ -56,7 +56,7 @@ y0 = Sc0, Ic0, Rc0, Sa0, Ia0, Ra0
 # Integrate the SIR equations over the time grid, t.
 ret = odeint(deriv, y0, t, args=(Nc, Na, beta_cc, beta_ca, beta_ac, beta_aa, gamma_c, gamma_a, fg))
 Sc, Ic, Rc, Sa, Ia, Ra = ret.T
-
+#%%
 # Plot the data on six separate curves for Sc(t), Ic(t), Rc(t), Sa(t), Ia(t), and Ra(t)
 
 plt.plot(t, Rc, label='Recovered Children')
@@ -66,7 +66,7 @@ plt.ylabel('Population')
 plt.title('SIR Model with Two Groups (Children and Adults)')
 plt.legend()
 plt.show()
-
+#%%
 # Plot the data on six separate curves for Sc(t), Ic(t), Rc(t), Sa(t), Ia(t), and Ra(t)
 plt.plot(t, Sc, label='Susceptible Children')
 plt.plot(t, Sa, label='Susceptible Adults')
@@ -76,7 +76,7 @@ plt.ylabel('Population')
 plt.title('SIR Model with Two Groups (Children and Adults)')
 plt.legend()
 plt.show()
-
+#%%
 # Plot the data on six separate curves for Sc(t), Ic(t), Rc(t), Sa(t), Ia(t), and Ra(t)
 plt.plot(t, Ic, label='Infected Children')
 plt.plot(t, Ia, label='Infected Adults')
@@ -86,7 +86,7 @@ plt.ylabel('Population')
 plt.title('SIR Model with Two Groups (Children and Adults)')
 plt.legend()
 plt.show()
-
+#%%
 # Plot the data on six separate curves for Sc(t), Ic(t), Rc(t), Sa(t), Ia(t), and Ra(t)
 plt.plot(t, Sc, label='Susceptible Children')
 plt.plot(t, Ic, label='Infected Children')
