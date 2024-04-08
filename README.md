@@ -1,16 +1,6 @@
-# My Projects Overview
-
-Welcome to my personal GitHub repository, showcasing a variety of projects across different areas of computational science and mathematical modeling. Here, you'll find a collection of works demonstrating applications of numerical methods, mathematical theories, and collaborative projects.
-
-## Highlights
-
-- **Mathematical Modeling**: Projects applying mathematical concepts to model and solve real-world problems.
-- **Numerical Linear Algebra**: Explorations and implementations of algorithms within linear algebra.
-- **Markov Chain Practices**: Detailed exercises and solutions based on textbook, Sheldon M. Ross, questions.
-
 # Mathematics MS Projects at Cal State LA
 
-Welcome to my personal repository of projects completed during my Master of Science in Mathematics at California State University, Los Angeles. This collection reflects the culmination of rigorous academic training, research, and practical application in various branches of mathematics.
+Welcome to my personal repository of projects completed during my Master of Science in Mathematics at California State University, Los Angeles. This collection reflects the culmination of rigorous academic training, research, and practical application in various branches of mathematics. Here, you'll find a collection of works demonstrating applications of numerical methods, mathematical theories, and collaborative projects.
 
 ## About Me
 
@@ -22,12 +12,15 @@ The MS in Mathematics program at Cal State LA has been an incredible platform fo
 
 ## Project Highlights
 
+- **Mathematical Modeling**: Projects applying mathematical concepts to model and solve real-world problems.
+- **Numerical Linear Algebra**: Explorations and implementations of algorithms within linear algebra.
+- **Markov Chain Practices**: Detailed exercises and solutions based on textbook, Sheldon M. Ross, questions.
+
 
 ## Skills and Technologies
 
 My academic and professional experiences have equipped me with a robust set of skills, including:
 
-- **Mathematical Software**: MATLAB, Mathematica
+- **Mathematical Software**: MATLAB
 - **Programming Languages**: Python, R
-- **Data Analysis Tools**: Excel, SPSS
 - **Visualization Tools**: Tableau, ggplot2 in R
