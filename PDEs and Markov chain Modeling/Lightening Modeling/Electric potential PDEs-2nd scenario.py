@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  7 15:41:58 2024
+Created on Sun Apr  7 15:31:18 2024
 
 @author: joonc
 """
@@ -22,8 +22,8 @@ phi = np.zeros((nx, ny))
 phi[0, :] = -100  # High negative potential at the top boundary (cloud)
 phi[-1, :] = 0    # Ground potential at the bottom boundary
 
-# Set high positive potential at the point (50, 0)
-phi[-5, 49] = 100  # High positive potential at the specified point
+# Set high positive potential at the point (50, 50)
+phi[49, 49] = 100  # High positive potential at the specified point
 
 # Iteration parameters
 max_iter = 1000  # Maximum number of iterations
@@ -36,7 +36,7 @@ for iteration in range(max_iter):
     for i in range(1, nx-1):
         for j in range(1, ny-1):
             # Ensure the special point's potential remains unchanged
-            if i == 95 and j == 49:
+            if i == 49 and j == 49:
                 continue
             phi[i, j] = 0.25 * (phi[i+1, j] + phi[i-1, j] + phi[i, j+1] + phi[i, j-1])
     
