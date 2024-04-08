@@ -22,7 +22,7 @@ phi = np.zeros((nx, ny))
 phi[0, :] = -100  # High negative potential at the top boundary (cloud)
 phi[-1, :] = 0    # Ground potential at the bottom boundary
 
-# Set high positive potential at the point (50, 0)
+# Set high positive potential at the point (50, 5)
 phi[-5, 49] = 100  # High positive potential at the specified point
 
 # Iteration parameters
