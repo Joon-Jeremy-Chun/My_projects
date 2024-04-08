@@ -23,4 +23,3 @@ My academic and professional experiences have equipped me with a robust set of s
 
 - **Mathematical Software**: MATLAB
 - **Programming Languages**: Python, R
-- **Visualization Tools**: Tableau, ggplot2 in R
