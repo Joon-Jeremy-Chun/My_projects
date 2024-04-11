@@ -8,22 +8,19 @@ The core of the project involves discretizing the BVP into a system of linear eq
 
 ## Differential Equation
 
-The deflection of the beam `u(x)` is described by the differential equation:
+The deflection of the beam `u(x)` is governed by the differential equation:
 
+$$ - u'' + pu = qx(L - x), \quad 0 < x < L $$
 
+With boundary conditions:
 
-d^2u/dx^2 = -q(x) / EI
+$$ u(0) = u(L) = 0. $$
 
+Where:
+- $\frac{d^2u}{dx^2}$ is the second derivative of the deflection `u` with respect to the position `x` along the beam.
+- $p$ a constant that depends on the material properties of the beam.
+- $q$ a constant that depends on the material properties of the beam.
 
-
-- Where:
-
-- `d^2u/dx^2` is the second derivative of the deflection `u` with respect to the position `x` along the beam.
-- `q(x)` represents the load applied per unit length as a function of `x`.
-- `E` is the modulus of elasticity of the beam material.
-- `I` is the moment of inertia of the beam's cross-section.
-
-*Note: Replace the equation above with the specific equation from your document.*
 
 ## Objectives
 
