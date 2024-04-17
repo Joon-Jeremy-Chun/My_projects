@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  8 08:42:13 2024
+Created on Wed Apr 17 08:16:02 2024
 
 @author: joonc
 """
-#The model including group flow rate = fg (ageing)
-
+# modeling from  'A modified age‑structured SIR model for COVID‑19 type viruses', Vishaal Ram1 & Laura P. Schaposnik2
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
@@ -14,47 +13,52 @@ from mpl_toolkits.mplot3d import Axes3D
 # Adjusted group identifiers for zero-based indexing
 CHILDREN, ADULTS, SENIORS = 0, 1, 2
 
-# Extended SIR model differential equations including seniors.
-def deriv(y, t, N, beta, gamma, fg):
-    Sc, Ic, Rc, Sa, Ia, Ra, Ss, Is, Rs = y
-    dScdt = -(beta[CHILDREN, CHILDREN] * Ic/N[CHILDREN] + beta[CHILDREN, ADULTS] * Ia/N[ADULTS] + beta[CHILDREN, SENIORS] * Is/N[SENIORS]) * Sc - fg[CHILDREN, ADULTS] * Sc
-    dIcdt = (beta[CHILDREN, CHILDREN] * Ic/N[CHILDREN] + beta[CHILDREN, ADULTS] * Ia/N[ADULTS] + beta[CHILDREN, SENIORS] * Is/N[SENIORS]) * Sc - gamma[CHILDREN] * Ic - fg[CHILDREN, ADULTS] * Ic
-    dRcdt = gamma[CHILDREN] * Ic - fg[CHILDREN, ADULTS] * Rc
-    dSadt = -(beta[ADULTS, ADULTS] * Ia/N[ADULTS] + beta[ADULTS, CHILDREN] * Ic/N[CHILDREN] + beta[ADULTS, SENIORS] * Is/N[SENIORS]) * Sa + fg[CHILDREN, ADULTS] * Sc - fg[ADULTS, SENIORS] * Sa
-    dIadt = (beta[ADULTS, ADULTS] * Ia/N[ADULTS] + beta[ADULTS, CHILDREN] * Ic/N[CHILDREN] + beta[ADULTS, SENIORS] * Is/N[SENIORS]) * Sa - gamma[ADULTS] * Ia + fg[CHILDREN, ADULTS] * Ic - fg[ADULTS, SENIORS] * Ia
-    dRadt = gamma[ADULTS] * Ia + fg[CHILDREN, ADULTS] * Rc - fg[ADULTS, SENIORS] * Ra
-    dSsdt = -(beta[SENIORS, SENIORS] * Is/N[SENIORS] + beta[SENIORS, CHILDREN] * Ic/N[CHILDREN] + beta[SENIORS, ADULTS] * Ia/N[ADULTS]) * Ss + fg[ADULTS, SENIORS] * Sa
-    dIsdt = (beta[SENIORS, SENIORS] * Is/N[SENIORS] + beta[SENIORS, CHILDREN] * Ic/N[CHILDREN] + beta[SENIORS, ADULTS] * Ia/N[ADULTS]) * Ss - gamma[SENIORS] * Is + fg[ADULTS, SENIORS] * Ia
-    dRsdt = gamma[SENIORS] * Is + fg[ADULTS, SENIORS] * Ra
-    return dScdt, dIcdt, dRcdt, dSadt, dIadt, dRadt, dSsdt, dIsdt, dRsdt
+# Differential equations with summation form
+def deriv(y, t, N, beta, gamma, M):
+    S = y[::3]  # Extract all Susceptible compartments (every third entry starting from 0)
+    I = y[1::3] # Extract all Infected compartments (every third entry starting from 1)
+    R = y[2::3] # Extract all Recovered compartments (every third entry starting from 2)
+    
+    dSdt = [-beta * S[i] / N[i] * sum(M[i, j] * I[j] for j in range(len(N))) for i in range(len(N))]
+    dIdt = [beta * S[i] / N[i] * sum(M[i, j] * I[j] for j in range(len(N))) - gamma[i] * I[i] for i in range(len(N))]
+    dRdt = [gamma[i] * I[i] for i in range(len(N))]
+    
+    # Flatten the list of derivatives for odeint
+    return sum([list(tup) for tup in zip(dSdt, dIdt, dRdt)], [])
 
-# Initial conditions and parameters (unchanged)
+
+# Initial conditions and parameters
 group_initial_conditions = {
     CHILDREN: {'S0': 100, 'I0': 1, 'R0': 0},
     ADULTS: {'S0': 800, 'I0': 1, 'R0': 0},
     SENIORS: {'S0': 100, 'I0': 1, 'R0': 0}
 }
 
-# Beta matrix (unchanged)
-beta = np.array([
+# M matrix here (3x3 eample)
+M = np.array([
     [0.15, 0.3, 0.2],  # CHILDREN to CHILDREN, ADULTS, SENIORS
     [0.3, 0.35, 0.15],  # ADULTS to CHILDREN, ADULTS, SENIORS
     [0.2, 0.15, 0.25]   # SENIORS to CHILDREN, ADULTS, SENIORS
 ])
 
-# Recovery rates and flow rates (unchanged)
+# The constant transmission rate
+beta_constant = 0.5  # Example value, set this to your chosen average contacts rate
+
+
+# Recovery rates
 gamma = {CHILDREN: 0.12, ADULTS: 0.1, SENIORS: 0.08}
-fg = {(CHILDREN, ADULTS): 0.001, (ADULTS, SENIORS): 0.0005}
+
 
 # Total populations (unchanged)
 N = {group: conditions['S0'] + conditions['I0'] + conditions['R0'] for group, conditions in group_initial_conditions.items()}
 
-# Time grid (in days) and initial conditions vector (unchanged)
+# Time grid (in days) and initial conditions vector
 t = np.linspace(0, 400, 4000)
 y0 = sum(([conditions[key] for key in ['S0', 'I0', 'R0']] for conditions in group_initial_conditions.values()), [])
 
-# Integration and plotting (unchanged)
-ret = odeint(deriv, y0, t, args=(N, beta, gamma, fg))
+# Integration call updated with M and beta_constant
+ret = odeint(deriv, y0, t, args=(N, beta_constant, gamma, M))
+
 Sc, Ic, Rc, Sa, Ia, Ra, Ss, Is, Rs = ret.T
 plt.figure(figsize=(14, 10))
 for idx, group in enumerate([CHILDREN, ADULTS, SENIORS], start=1):
@@ -118,4 +122,4 @@ plt.show()
 #%%
 
 # Save the figure
-fig.savefig("SIR_model_3D_plots.png", dpi=600) 
+fig.savefig("SIR_i_groups_model_3D_plots.png", dpi=600) 
