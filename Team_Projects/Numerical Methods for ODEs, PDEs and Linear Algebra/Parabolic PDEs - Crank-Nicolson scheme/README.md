@@ -26,7 +26,7 @@ Boundary conditions assume no heat transfer at the pond's bottom and maintain a 
    - \( C = 0.5 \)
    - \( L = 1 \) (depth of the pond)
    - \( T0 = 60 \) (surface temperature)
-   - Grid sizes: \( \Delta x = 0.1 \) and \( \Delta t = 0.005 \)
+   - Grid sizes: \( $\Delta x = 0.1 \$) and \( $\Delta t = 0.005 \$)
 3. **Initial and Boundary Conditions:** These conditions define the initial temperature distribution and the boundary conditions at the pond’s surface and bottom.
 4. **Tridiagonal Matrix Approach:** Employed for efficient resolution of the numerical scheme.
 
