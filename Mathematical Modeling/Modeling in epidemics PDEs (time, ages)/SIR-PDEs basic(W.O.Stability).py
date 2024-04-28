@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 23 22:02:25 2024
+Created on Wed Apr 24 10:07:36 2024
 
 @author: joonc
 """
@@ -37,9 +37,9 @@ R[:, 0] = 0     # Initial recovered population
 # Finite difference method to update the populations
 for j in range(num_t - 1):  # Time loop
     for i in range(0, num_a):  # Age loop
-        S[i, j+1] = S[i-1, j] - beta*S[i, j]*I[i, j]*h
-        I[i, j+1] = I[i-1, j] + beta*S[i, j]*I[i, j]*h - gamma*I[i, j]*h 
-        R[i, j+1] = R[i-1, j] + gamma * I[i, j] * h 
+        S[i, j+1] = S[i-1, j]*k/h - beta*S[i, j]*I[i, j]*k + (h-k)/h*S[i,j]
+        I[i, j+1] = I[i-1, j]*k/h + beta*S[i, j]*I[i, j]*k - gamma*I[i, j]*k+ (h-k)/h*I[i,j] 
+        R[i, j+1] = R[i-1, j]*k/h + gamma * I[i, j]*k + (h-k)/h*R[i,j]
 
 # Visualization
 plt.figure(figsize=(14, 5))

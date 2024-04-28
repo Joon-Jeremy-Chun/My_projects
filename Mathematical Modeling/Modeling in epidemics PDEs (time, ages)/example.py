@@ -44,7 +44,7 @@ gamma_a = .5
 fg = 0.001
 
 #population birth and deat constant (assum total population  ==), population output apply only adult poplulation
-mu_A = 0.0001
+MU_A = 0.0001
 #%%
 
 # A grid of time points (in days)
