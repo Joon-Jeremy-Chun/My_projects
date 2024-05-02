@@ -9,17 +9,17 @@ import matplotlib.pyplot as plt
 from scipy.stats import poisson
 
 # Define the parameter lambda
-lmbda = 2
+lmbda = 3
 
 # Generate values for k (number of events)
-k_values = np.arange(0, 10)  # Let's plot up to 16 events
+k_values = np.arange(0, 13)  # Let's plot up to 16 events
 
 # Calculate the corresponding probabilities using the Poisson PMF formula
 poisson_probs = poisson.pmf(k_values, lmbda)
 
 # Plot the Poisson distribution
 plt.bar(k_values, poisson_probs, color='blue', alpha=0.7)
-plt.title('Poisson Distribution with λ = 6')
+plt.title(f'Poisson Distribution with λ = {lmbda}')
 plt.xlabel('Number of Events (k)')
 plt.ylabel('Probability')
 plt.xticks(k_values)
