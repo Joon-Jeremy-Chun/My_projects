@@ -30,27 +30,38 @@ def deriv(y, t, N, beta, gamma, fg):
 
 # Initial conditions and parameters (unchanged)
 group_initial_conditions = {
-    CHILDREN: {'S0': 100, 'I0': 1, 'R0': 0},
-    ADULTS: {'S0': 800, 'I0': 1, 'R0': 0},
-    SENIORS: {'S0': 100, 'I0': 1, 'R0': 0}
+    CHILDREN: {'S0': 2000, 'I0': 2000*0.0001, 'R0': 0},
+    ADULTS: {'S0': 3000, 'I0': 3000*0.0001, 'R0': 0},
+    SENIORS: {'S0': 3000, 'I0': 3000*0.0001, 'R0': 0}
 }
 
 # Beta matrix (unchanged)
 beta = np.array([
-    [0.15, 0.3, 0.2],  # CHILDREN to CHILDREN, ADULTS, SENIORS
-    [0.3, 0.35, 0.15],  # ADULTS to CHILDREN, ADULTS, SENIORS
-    [0.2, 0.15, 0.25]   # SENIORS to CHILDREN, ADULTS, SENIORS
+    [0.18, 0.06, 0.03],  # CHILDREN to CHILDREN, ADULTS, SENIORS
+    [0.04, 0.12, 0.04],  # ADULTS to CHILDREN, ADULTS, SENIORS
+    [0.02, 0.04, 0.07]   # SENIORS to CHILDREN, ADULTS, SENIORS
 ])
+
+average = beta.mean()
+print("Average of beta:", average)
+
+# # Beta matrix (unchanged)
+# beta = np.array([
+#     [0.15, 0.3, 0.2],  # CHILDREN to CHILDREN, ADULTS, SENIORS
+#     [0.3, 0.35, 0.15],  # ADULTS to CHILDREN, ADULTS, SENIORS
+#     [0.2, 0.15, 0.25]   # SENIORS to CHILDREN, ADULTS, SENIORS
+# ])
+
 
 # Recovery rates and flow rates (unchanged)
 gamma = {CHILDREN: 0.12, ADULTS: 0.1, SENIORS: 0.08}
-fg = {(CHILDREN, ADULTS): 0.001, (ADULTS, SENIORS): 0.0005}
+fg = {(CHILDREN, ADULTS): 0.0002, (ADULTS, SENIORS): 0.0003}
 
 # Total populations (unchanged)
 N = {group: conditions['S0'] + conditions['I0'] + conditions['R0'] for group, conditions in group_initial_conditions.items()}
 
 # Time grid (in days) and initial conditions vector (unchanged)
-t = np.linspace(0, 400, 4000)
+t = np.linspace(0, 300, 3000)
 y0 = sum(([conditions[key] for key in ['S0', 'I0', 'R0']] for conditions in group_initial_conditions.values()), [])
 
 # Integration and plotting (unchanged)

@@ -34,7 +34,16 @@ beta_cc, beta_ca, beta_cs = 0.15, 0.3, 0.2  # Transmission rates within and betw
 beta_ac, beta_aa, beta_as = 0.3, 0.35, 0.15  # Transmission rates within and between adults and other groups
 beta_sc, beta_sa, beta_ss = 0.2, 0.15, 0.25  # Transmission rates within and between seniors and other groups
 gamma_c, gamma_a, gamma_s = 0.12, 0.1, 0.08  # Recovery rates for children, adults, and seniors
-fg_ca, fg_as = 0.001, 0.0005  # Flow from children to adults and adults to seniors
+fg_ca, fg_as = 0.0001, 0.00005  # Flow from children to adults and adults to seniors
+
+
+# # Model parameters
+# beta_cc, beta_ca, beta_cs = 17.8, 5.6, 2.77  # Transmission rates within and between children and other groups
+# beta_ac, beta_aa, beta_as = 4.43, 12.17, 4.25  # Transmission rates within and between adults and other groups
+# beta_sc, beta_sa, beta_ss = 2.26, 3.58, 5.69  # Transmission rates within and between seniors and other groups
+# gamma_c, gamma_a, gamma_s = 0.12, 0.1, 0.08  # Recovery rates for children, adults, and seniors
+# fg_ca, fg_as = 0.0001, 0.00005  # Flow from children to adults and adults to seniors
+
 
 # Time grid (in days)
 t = np.linspace(0, 400, 4000)
