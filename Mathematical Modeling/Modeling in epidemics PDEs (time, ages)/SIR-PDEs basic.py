@@ -13,7 +13,7 @@ beta = 0.3  # Infection rate
 gamma = 0.1  # Recovery rate
 
 #Be aware of the Stability
-h = 0.01  # Time step size
+h = 1  # Time step size
 k = 1  # Age step size
 
 # Time and age limits
@@ -30,8 +30,12 @@ I = np.zeros((num_a, num_t))
 R = np.zeros((num_a, num_t))
 
 # Initial conditions
-S[:, 0] = 1000  # Initial susceptible population
-I[:, 0] = 1    # Initial infected population
+S[:, 0] = 1  # Initial susceptible population
+
+# I[:, 0] = 0.0001 #Initial infected population (initiated all age groups)
+
+
+I[20, 0] = 0.0001    # Initial infected population
 R[:, 0] = 0     # Initial recovered population
 
 # Finite difference method to update the populations

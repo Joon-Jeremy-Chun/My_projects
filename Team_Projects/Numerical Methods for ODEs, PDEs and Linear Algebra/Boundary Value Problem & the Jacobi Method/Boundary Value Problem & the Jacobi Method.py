@@ -38,7 +38,9 @@ np.fill_diagonal(A[:-1, 1:], -1)  # Super-diagonal
 np.fill_diagonal(A[1:, :-1], -1)  # Sub-diagonal
 
 # Construct the vector b
-b = np.full((n, ), -h**2 * q)
+b = np.array([-h**2 * q * (i*h) * (L - i*h) for i in range(1,n+1)])
+
+#b = np.full((n, ), -h**2 *q)
 
 # Initial guess u0
 u0 = np.ones(n)
