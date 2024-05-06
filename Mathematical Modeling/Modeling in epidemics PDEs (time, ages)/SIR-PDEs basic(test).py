@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 23 22:02:25 2024
+Created on Mon May  4 07:39:24 2024
 
 @author: joonc
 """
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,7 +30,7 @@ S = np.zeros((num_a, num_t))
 I = np.zeros((num_a, num_t))
 R = np.zeros((num_a, num_t))
 
-# Initial conditions
+#Initial conditions
 # Sigmoid function for initial susceptible population
 def sigmoid(x):
     return 1 / (1 + np.exp(0.1 * (x - 80)))
@@ -57,11 +58,24 @@ for j in range(num_t - 1):  # Time loop
         I[i, j+1] = I[i-1, j] + beta*S[i, j]*I[i, j]*h - 2*gamma*I[i, j]*h 
         R[i, j+1] = R[i-1, j] + gamma * I[i, j] * h 
     
-    # # Update the 0th row to be equal to the 1st row for each variable
-    # S[0, j+1] = S[1, j+1]
-    # I[0, j+1] = I[1, j+1]
-    # R[0, j+1] = R[1, j+1]
+    # Update the 0th row to be equal to the 1st row for each variable
+    S[0, j+1] = S[1, j+1]
+    I[0, j+1] = I[1, j+1]
+    R[0, j+1] = R[1, j+1]
     
+    
+# # Finite difference method to update the populations
+# for j in range(num_t - 1):  # Time loop
+#     for i in range(1, num_a):  # Start from 1, Age loop
+#         S[i, j+1] = S[i-1, j] - 2*beta*S[i, j]*I[i, j]*h
+#         I[i, j+1] = I[i-1, j] + 2*beta*S[i, j]*I[i, j]*h - 2*gamma*I[i, j]*h 
+#         R[i, j+1] = R[i-1, j] + 2*gamma * I[i, j] * h 
+    
+#     # Update the 0th row to be equal to the 1st row for each variable
+#     S[0, j+1] = S[1, j+1]
+#     I[0, j+1] = I[1, j+1]
+#     R[0, j+1] = R[1, j+1]
+        
 # # Finite difference method to update the populations
 # for j in range(num_t-1):  # Time loop
 #     for i in range(0, num_a-1):  # Age loop
