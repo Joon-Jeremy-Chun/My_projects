@@ -6,9 +6,44 @@ Created on Mon Apr 22 21:53:47 2024
 """
 
 import requests
+import xml.etree.ElementTree as ET
+import pandas as pd
 
-url = 'http://apis.data.go.kr/1352000/ODMS_COVID_04/callCovid04Api'
-params ={'serviceKey' : '서비스키', 'pageNo' : '1', 'numOfRows' : '500', 'apiType' : 'xml', 'std_day' : '2021-12-15', 'gubun' : '경기' }
 
+# API 요청 URL
+url = 'https://apis.data.go.kr/1352000/ODMS_COVID_05/callCovid05Api?serviceKey=VH1eV880GIQeDHmoQ61K1U%2BaOL4tjTbBKHVFwEL%2FEoPPYM6s1Ua7aYaJiRMABBzIlBPwFE2aR8Rs7CTJYcNyqQ%3D%3D'
+
+# 요청 파라미터
+params = {
+    'numOfRows': '10',      # 한 페이지 결과 수
+    'pageNo': '1',          # 페이지 번호
+    'apiType': 'xml',       # 결과 형식 (xml)
+    'create_dt': '2022-01-01'  # 데이터 기준일
+}
+
+# API 요청
 response = requests.get(url, params=params)
-print(response.content)
+
+# 응답 확인
+if response.status_code == 200:
+    xml_data = response.content  # XML 형식의 응답일 경우
+    # XML 데이터 파싱
+    root = ET.fromstring(xml_data)
+    
+    # 아이템 추출
+    items = []
+    for item in root.findall('.//item'):
+        parsed_item = {child.tag: child.text for child in item}
+        items.append(parsed_item)
+    
+    # XML 데이터를 DataFrame으로 변환
+    df = pd.DataFrame(items)
+    
+    # DataFrame을 CSV 파일로 저장 (Ensure UTF-8 encoding)
+    df.to_csv("covid19_data_20220101.csv", index=False, encoding='utf-8-sig')
+    
+    # CSV 파일 저장 완료 메시지
+    print("Data has been saved to covid19_data_20220101.csv")
+else:
+    print(f"Error {response.status_code}: {response.text}")
+
