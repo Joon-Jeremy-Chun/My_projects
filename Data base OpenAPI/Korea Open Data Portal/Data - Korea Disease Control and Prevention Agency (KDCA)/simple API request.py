@@ -11,7 +11,7 @@ import requests
 url = "http://apis.data.go.kr/1352000/ODMS_COVID_04/callCovid04Api"
 
 # Your service key needs to be URL-encoded if it contains special characters
-service_key = 'YOUR_SERVICE_KEY'  # Use your actual service key here, properly URL-encoded
+service_key = 'VH1eV880GIQeDHmoQ61K1U%2BaOL4tjTbBKHVFwEL%2FEoPPYM6s1Ua7aYaJiRMABBzIlBPwFE2aR8Rs7CTJYcNyqQ%3D%3D'  # Use your actual service key here, properly URL-encoded
 
 # Set parameters for the API request
 params = {
