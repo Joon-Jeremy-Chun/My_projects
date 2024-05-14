@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['example.py', 'example2.py', 'ODEs_model.py', 'SIR-PDEs basic.py', 'SIR-population distribution.py', 'SIR-PDEs basic(W.O.Stability).py', 'SIR-PDEs with plots.py', 'SIR-PDEs TWO different schemes.py', 'Logistic population stracture.py']
+recent_files = ['example.py', 'example2.py', 'ODEs_model.py', 'SIR-PDEs basic.py', 'SIR-PDEs basic(test).py', 'SIR-PDEs extract(10,30,70).py', 'SIR-population distribution.py', 'SIR-PDEs basic(W.O.Stability).py', 'SIR-PDEs with plots.py', 'SIR-PDEs TWO different schemes.py', 'Logistic population stracture.py']
 
 [main]
 version = 0.2.0
