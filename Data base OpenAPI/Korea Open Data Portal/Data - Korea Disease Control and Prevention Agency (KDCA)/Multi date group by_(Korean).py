@@ -11,7 +11,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 # API request URL
-base_url = 'https://apis.data.go.kr/1352000/ODMS_COVID_05/callCovid05Api?serviceKey=VH1eV880GIQeDHmoQ61K1U%2BaOL4tjTbBKHVFwEL%2FEoPPYM6s1Ua7aYaJiRMABBzIlBPwFE2aR8Rs7CTJYcNyqQ%3D%3D'
+base_url = 'https://apis.data.go.kr/1352000/ODMS_COVID_05/callCovid05Api?serviceKey='
 
 # Request parameters
 params = {

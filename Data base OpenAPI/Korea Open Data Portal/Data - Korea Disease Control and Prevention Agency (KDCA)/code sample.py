@@ -11,7 +11,7 @@ import pandas as pd
 
 
 # API 요청 URL
-url = 'https://apis.data.go.kr/1352000/ODMS_COVID_05/callCovid05Api?serviceKey=VH1eV880GIQeDHmoQ61K1U%2BaOL4tjTbBKHVFwEL%2FEoPPYM6s1Ua7aYaJiRMABBzIlBPwFE2aR8Rs7CTJYcNyqQ%3D%3D'
+url = ''
 
 # 요청 파라미터
 params = {
