@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from datetime import datetime, timedelta
 
-# API request URL
+# API request URL #Enter the service key!
 base_url = 'https://apis.data.go.kr/1352000/ODMS_COVID_05/callCovid05Api?serviceKey='
 
 # Request parameters
@@ -22,9 +22,14 @@ params = {
 }
 
 # Date range settings
-start_date = datetime.strptime('2022-01-01', '%Y-%m-%d')
-end_date = datetime.strptime('2022-01-07', '%Y-%m-%d')
-
+# start_date = datetime.strptime('2020-01-20', '%Y-%m-%d')
+# end_date = datetime.strptime('2021-01-19', '%Y-%m-%d')
+# start_date = datetime.strptime('2021-01-20', '%Y-%m-%d')
+# end_date = datetime.strptime('2022-01-19', '%Y-%m-%d')
+# start_date = datetime.strptime('2022-01-20', '%Y-%m-%d')
+# end_date = datetime.strptime('2023-01-19', '%Y-%m-%d')
+start_date = datetime.strptime('2023-01-20', '%Y-%m-%d')
+end_date = datetime.strptime('2023-07-30', '%Y-%m-%d')
 all_items = []
 
 # Column name translation from Korean to English
@@ -73,13 +78,16 @@ df.rename(columns=column_name_mapping, inplace=True)
 df_by_age = df.groupby('age_group')
 
 # Save data for each age group to separate CSV files
+start_date_str = start_date.strftime('%Y%m%d')
+end_date_str = end_date.strftime('%Y%m%d')
+
 for age_group, data in df_by_age:
-    filename = f"covid19_data_20220101_to_20220107_{age_group}.csv"
+    filename = f"covid19_data_{start_date_str}_to_{end_date_str}_{age_group}.csv"
     data.to_csv(filename, index=False, encoding='utf-8-sig')
     print(f"Data for age group {age_group} has been saved to {filename}")
 
 # Save all data to a single CSV file (Ensure UTF-8 encoding)
-df.to_csv("covid19_data_20220101_to_20220107.csv", index=False, encoding='utf-8-sig')
+df.to_csv(f"covid19_data_{start_date_str}_to_{end_date_str}.csv", index=False, encoding='utf-8-sig')
 
 # Completion message
-print("All data has been saved to covid19_data_20220101_to_20220107.csv")
+print(f"All data has been saved to covid19_data_{start_date_str}_to_{end_date_str}.csv")
