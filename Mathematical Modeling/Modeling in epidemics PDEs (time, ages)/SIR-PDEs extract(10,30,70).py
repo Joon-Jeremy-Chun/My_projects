@@ -7,7 +7,6 @@ Created on Mon May  5 08:53:05 2024
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 # Parameters
 beta = 0.3  # Infection rate
