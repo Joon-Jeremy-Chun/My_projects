@@ -9,7 +9,6 @@ Created on Mon Apr  8 08:42:13 2024
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 # Adjusted group identifiers for zero-based indexing
 CHILDREN, ADULTS, SENIORS = 0, 1, 2
@@ -28,14 +27,14 @@ def deriv(y, t, N, beta, gamma, fg):
     dRsdt = gamma[SENIORS] * Is + fg[ADULTS, SENIORS] * Ra
     return dScdt, dIcdt, dRcdt, dSadt, dIadt, dRadt, dSsdt, dIsdt, dRsdt
 
-# Initial conditions and parameters (unchanged)
+# Initial conditions and parameters
 group_initial_conditions = {
     CHILDREN: {'S0': 2000, 'I0': 2000*0.0001, 'R0': 0},
     ADULTS: {'S0': 3000, 'I0': 3000*0.0001, 'R0': 0},
     SENIORS: {'S0': 3000, 'I0': 3000*0.0001, 'R0': 0}
 }
 
-# Beta matrix (unchanged)
+# Beta matrix
 beta = np.array([
     [0.18, 0.06, 0.03],  # CHILDREN to CHILDREN, ADULTS, SENIORS
     [0.04, 0.12, 0.04],  # ADULTS to CHILDREN, ADULTS, SENIORS
@@ -45,26 +44,19 @@ beta = np.array([
 average = beta.mean()
 print("Average of beta:", average)
 
-# # Beta matrix (unchanged)
-# beta = np.array([
-#     [0.15, 0.3, 0.2],  # CHILDREN to CHILDREN, ADULTS, SENIORS
-#     [0.3, 0.35, 0.15],  # ADULTS to CHILDREN, ADULTS, SENIORS
-#     [0.2, 0.15, 0.25]   # SENIORS to CHILDREN, ADULTS, SENIORS
-# ])
 
-
-# Recovery rates and flow rates (unchanged)
+# Recovery rates and flow rates
 gamma = {CHILDREN: 0.12, ADULTS: 0.1, SENIORS: 0.08}
 fg = {(CHILDREN, ADULTS): 0.0002, (ADULTS, SENIORS): 0.0003}
 
-# Total populations (unchanged)
+# Total populations
 N = {group: conditions['S0'] + conditions['I0'] + conditions['R0'] for group, conditions in group_initial_conditions.items()}
 
-# Time grid (in days) and initial conditions vector (unchanged)
+# Time grid (in days) and initial conditions vector
 t = np.linspace(0, 300, 3000)
 y0 = sum(([conditions[key] for key in ['S0', 'I0', 'R0']] for conditions in group_initial_conditions.values()), [])
 
-# Integration and plotting (unchanged)
+# Integration and plotting
 ret = odeint(deriv, y0, t, args=(N, beta, gamma, fg))
 Sc, Ic, Rc, Sa, Ia, Ra, Ss, Is, Rs = ret.T
 plt.figure(figsize=(14, 10))
