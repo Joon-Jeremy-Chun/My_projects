@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jul  2 21:39:05 2024
+Created on Wed Jul  3 14:36:37 2024
 
 @author: joonc
 """
+
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
@@ -30,10 +31,16 @@ def deriv(y, t, N, beta, gamma, delta, a1, a2, b1, b2):
     SH, SM, SL, I, TI = y
 
     total_N = sum(N)
-    proportion_H = N[HIGHLY_CAUTIOUS] / total_N
-    proportion_M = N[MODERATELY_CAUTIOUS] / total_N
-    proportion_L = N[LOW_CAUTIOUS] / total_N
+    proportion_H = 1/6
+    proportion_M = 2/6
+    proportion_L = 3/6
+    
+    # total_N = sum(N)
+    # proportion_H = N[HIGHLY_CAUTIOUS] / total_N
+    # proportion_M = N[MODERATELY_CAUTIOUS] / total_N
+    # proportion_L = N[LOW_CAUTIOUS] / total_N
 
+        
     dSHdt = -beta[HIGHLY_CAUTIOUS] * SH * I / N[HIGHLY_CAUTIOUS] + delta * TI * proportion_H \
             + b1 * SM - a1 * SH
     dSMdt = -beta[MODERATELY_CAUTIOUS] * SM * I / N[MODERATELY_CAUTIOUS] + delta * TI * proportion_M \
@@ -49,19 +56,19 @@ def deriv(y, t, N, beta, gamma, delta, a1, a2, b1, b2):
 
 # Initial conditions and parameters
 initial_conditions = {
-    HIGHLY_CAUTIOUS: {'S0': 800, 'I0': 0, 'TI0': 0},  
-    MODERATELY_CAUTIOUS: {'S0': 150, 'I0': 0, 'TI0': 0},  
+    HIGHLY_CAUTIOUS: {'S0': 800, 'I0': 1, 'TI0': 0},  
+    MODERATELY_CAUTIOUS: {'S0': 150, 'I0': 1, 'TI0': 0},  
     LOW_CAUTIOUS: {'S0': 50, 'I0': 1, 'TI0': 0}  
 }
 
 # Transmission rates for each group
-beta = [0.25, 0.5, 0.75]
+beta = [0.21, 0.22, 0.23]
 
 # Recovery rate
-gamma = 0.07
+gamma = 0.2
 
 # Immunity loss rate
-delta = 0.004
+delta = 0.001  # Approximately corresponding to 8 months immunity duration
 # delta = 0.00417  # Approximately corresponding to 8 months immunity duration
 
 # Transition rates between groups
@@ -79,7 +86,10 @@ N = [initial_conditions[HIGHLY_CAUTIOUS]['S0'],
 y0 = [initial_conditions[HIGHLY_CAUTIOUS]['S0'], 
       initial_conditions[MODERATELY_CAUTIOUS]['S0'], 
       initial_conditions[LOW_CAUTIOUS]['S0'],
-      initial_conditions[LOW_CAUTIOUS]['I0'], 0]  # SH, SM, SL, I, TI
+      initial_conditions[HIGHLY_CAUTIOUS]['I0'] \
+     +initial_conditions[MODERATELY_CAUTIOUS]['I0'] \
+     +initial_conditions[LOW_CAUTIOUS]['I0'], \
+      0]  # SH, SM, SL, I, R
 
 # Time grid (in days)
 t = np.linspace(0, 300, 1600)  # Extended time grid for long-term behavior
@@ -109,7 +119,7 @@ def find_closest_index(array, value):
     idx = (np.abs(array - value)).argmin()
     return idx
 
-day = 51
+day = 100
 day_index = find_closest_index(t, day)
 
 total_population = SH[day_index] + SM[day_index] + SL[day_index] + I[day_index] + TI[day_index]
@@ -117,4 +127,3 @@ print(f"Total SH on day {day}: {SH[day_index]}")
 print(f"Total SM on day {day}: {SM[day_index]}")
 print(f"Total SL on day {day}: {SL[day_index]}")
 print(f"Total population on day {day}: {total_population}")
-
