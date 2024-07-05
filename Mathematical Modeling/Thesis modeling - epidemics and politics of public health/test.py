@@ -30,15 +30,15 @@ def deriv(y, t, N, beta, gamma, delta, a1, a2, b1, b2):
     """
     SH, SM, SL, I, TI = y
 
-    total_N = sum(N)
-    proportion_H = 1/6
-    proportion_M = 2/6
-    proportion_L = 3/6
-    
     # total_N = sum(N)
-    # proportion_H = N[HIGHLY_CAUTIOUS] / total_N
-    # proportion_M = N[MODERATELY_CAUTIOUS] / total_N
-    # proportion_L = N[LOW_CAUTIOUS] / total_N
+    # proportion_H = 1/6
+    # proportion_M = 2/6
+    # proportion_L = 3/6
+    
+    total_N = sum(N)
+    proportion_H = N[HIGHLY_CAUTIOUS] / total_N
+    proportion_M = N[MODERATELY_CAUTIOUS] / total_N
+    proportion_L = N[LOW_CAUTIOUS] / total_N
 
         
     dSHdt = -beta[HIGHLY_CAUTIOUS] * SH * I / N[HIGHLY_CAUTIOUS] + delta * TI * proportion_H \
@@ -56,13 +56,13 @@ def deriv(y, t, N, beta, gamma, delta, a1, a2, b1, b2):
 
 # Initial conditions and parameters
 initial_conditions = {
-    HIGHLY_CAUTIOUS: {'S0': 800, 'I0': 10, 'TI0': 0},  # Increase initial infected to 10
-    MODERATELY_CAUTIOUS: {'S0': 150, 'I0': 10, 'TI0': 0},  # Increase initial infected to 10
-    LOW_CAUTIOUS: {'S0': 50, 'I0': 10, 'TI0': 0}  # Increase initial infected to 10
+    HIGHLY_CAUTIOUS: {'S0': 800, 'I0': 1, 'TI0': 0},  
+    MODERATELY_CAUTIOUS: {'S0': 150, 'I0': 1, 'TI0': 0},  
+    LOW_CAUTIOUS: {'S0': 50, 'I0': 1, 'TI0': 0}  
 }
 
 # Transmission rates for each group
-beta = [0.25, 0.3, 0.35]
+beta = [0.21, 0.22, 0.23]
 
 # Recovery rate
 gamma = 0.2
@@ -86,7 +86,12 @@ N = [initial_conditions[HIGHLY_CAUTIOUS]['S0'],
 y0 = [initial_conditions[HIGHLY_CAUTIOUS]['S0'], 
       initial_conditions[MODERATELY_CAUTIOUS]['S0'], 
       initial_conditions[LOW_CAUTIOUS]['S0'],
-      initial_conditions[LOW_CAUTIOUS]['I0'], 0]  # SH, SM, SL, I, TI
+      initial_conditions[HIGHLY_CAUTIOUS]['I0'] \
+     +initial_conditions[MODERATELY_CAUTIOUS]['I0'] \
+     +initial_conditions[LOW_CAUTIOUS]['I0'], \
+      initial_conditions[HIGHLY_CAUTIOUS][ 'TI0'] \
+     +initial_conditions[MODERATELY_CAUTIOUS][ 'TI0'] \
+     +initial_conditions[LOW_CAUTIOUS][ 'TI0'] ]  # SH, SM, SL, I, R
 
 # Time grid (in days)
 t = np.linspace(0, 300, 1600)  # Extended time grid for long-term behavior

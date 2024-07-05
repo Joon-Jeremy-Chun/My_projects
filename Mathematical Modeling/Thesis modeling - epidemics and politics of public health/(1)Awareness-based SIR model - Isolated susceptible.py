@@ -62,7 +62,10 @@ y0 = [initial_conditions[HIGHLY_CAUTIOUS]['S0'],
       initial_conditions[LOW_CAUTIOUS]['S0'],
       initial_conditions[HIGHLY_CAUTIOUS]['I0'] \
      +initial_conditions[MODERATELY_CAUTIOUS]['I0'] \
-     +initial_conditions[LOW_CAUTIOUS]['I0'], 0]  # SH, SM, SL, I, R
+     +initial_conditions[LOW_CAUTIOUS]['I0'], \
+      initial_conditions[HIGHLY_CAUTIOUS][ 'TI0'] \
+     +initial_conditions[MODERATELY_CAUTIOUS][ 'TI0'] \
+     +initial_conditions[LOW_CAUTIOUS][ 'TI0'] ]  # SH, SM, SL, I, R
 
 # Time grid (in days)
 t = np.linspace(0, 100, 1600)
