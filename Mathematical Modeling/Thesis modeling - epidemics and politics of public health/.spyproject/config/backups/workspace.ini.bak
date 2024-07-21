@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', '(1)Awareness-based SIR model - Isolated susceptible.py', '(2)Awareness-Based SIR-TI Model (ABSIR-TI).py', '(3)Behavioral Transition SIR-TI Model (BTSIR-TI).py', '(4)Behavioral Transition nth wave model.py', 'test.py', '(1)Sensitivity Analysis - Behavioral Transition SI-TI model.py', 'Sensitivity analysis - test.py']
+recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', '(1)Awareness-based SIR model - Isolated susceptible.py', '(2)Awareness-Based SIR-TI Model (ABSIR-TI).py', '(3)Behavioral Transition SIR-TI Model (BTSIR-TI).py', '(4)Behavioral Transition nth wave model.py', 'test.py', '(1)Sensitivity Analysis - Behavioral Transition SI-TI model.py', 'Sensitivity analysis - test.py', 'plots - cases and death 2020-2023.py']
 
 [main]
 version = 0.2.0
