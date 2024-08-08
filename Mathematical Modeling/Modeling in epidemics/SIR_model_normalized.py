@@ -20,24 +20,26 @@ def deriv(y, t, N, beta, gamma):
     return dSdt, dIdt, dRdt
 #%%
 # Initial number in ratio of infected and recovered individuals, everyone else is susceptible to infection initially.
-S0 = 8000
-I0 = S0*0.0001
+S0 = 762
+#S0 = 800
+I0 = 1
+#I0 = S0*0.0001
 R0 = 0
 
 N = S0 + I0 + R0
 
-S0 = S0/N #Normalized
-I0 = I0/N #Normalized
-R0 = R0/N #Normalized
+S0 = S0 #Normalized
+I0 = I0 #Normalized
+R0 = R0 #Normalized
 
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-# beta = 0.5
-# gamma = 0.2
-beta = 1/2
-gamma = 1/3
+beta = 2.18*(10**(-3))
+gamma = 0.44
+# beta = 1/2
+# gamma = 1/3
 
 # A grid of time points (in days)
-t = np.linspace(0, 300, 3000)
+t = np.linspace(0, 50, 3000)
 
 # Initial conditions vector
 y0 = S0, I0, R0
