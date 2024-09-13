@@ -35,7 +35,8 @@ mu = [0.0001, 0.0002]  # μ1 (S1 -> S2, I1 -> I2, R1 -> R2), μ2 (S2 -> S3, I2 -
 W = 0.00005
 
 # Vaccination rates a_i for the three groups
-a = [0.001, 0.001, 0.001]
+a = [0.000, 0.000, 0.000]
+#a = [0.001, 0.001, 0.001]
 
 # Total populations for each group
 N = [2000, 3000, 3000]
