@@ -27,6 +27,12 @@ import sympy as sp
 
 a11,a21,a22,a32,a33 = sp.symbols('a11 a21 a22 a32 a33')
 
+# V = sp.Matrix([
+#     [a11,   0,   0],
+#     [0, a11,   0],
+#     [  0, 0, a11]
+# ])
+
 V = sp.Matrix([
     [a11,   0,   0],
     [a21, a22,   0],
