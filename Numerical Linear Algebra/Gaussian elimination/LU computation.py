@@ -33,10 +33,10 @@ def lu_decomposition(A):
     return L, U
 
 # Example of an n x n matrix
-A = np.array([[2, -1, 3, 4],
-              [4, 1, 2, -3],
-              [3, 4, -1, 1],
-              [1, 3, 2, 2]], dtype=float)
+A = np.array([[2, 1, -1, 3],
+              [-2, 0, 0, 0],
+              [4, 1, -2, 6],
+              [-6, -1, 2, -3]], dtype=float)
 
 # Perform LU decomposition
 L, U = lu_decomposition(A)
@@ -48,5 +48,6 @@ print("\nMatrix U (Upper triangular):")
 print(U)
 
 # Check
-A_1 = L*U
+A_1 = L@U
+print("Check LU=A")
 print(A_1)
