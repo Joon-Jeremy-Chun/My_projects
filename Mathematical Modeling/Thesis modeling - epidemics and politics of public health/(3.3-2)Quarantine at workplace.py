@@ -4,14 +4,6 @@ Created on Thu Sep 19 22:22:12 2024
 
 @author: joonc
 """
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Sep 19 21:58:42 2024
-
-@author: joonc
-"""
-
 import pandas as pd
 import numpy as np
 from scipy.integrate import odeint
@@ -50,9 +42,6 @@ def load_parameters(file_path):
 # Load the parameters from the Excel file
 file_path = 'Inputs.xlsx'
 (beta, gamma, mu, W, a, time_span, N) = load_parameters(file_path)
-
-# Group indices for readability
-S1, I1, R1, V1 = 0, 1, 2, 3  # First group (e.g., children)
 
 # SIRV model differential equations including vaccinated compartments
 def deriv(y, t, N, beta, gamma, mu, W, a):
@@ -97,65 +86,48 @@ initial_conditions = [
 # Time grid (in days)
 t = np.linspace(0, time_span, int(time_span))
 
-# Set up color maps for each group
-colors_group1 = cm.get_cmap('Reds', 10)    # Red for Group 1 (Children)
-colors_group2 = cm.get_cmap('Greens', 10)  # Green for Group 2 (Adults)
-colors_group3 = cm.get_cmap('Blues', 10)   # Blue for Group 3 (Seniors)
+# Function to create individual plots for each group
+def plot_group_infected(group_idx, group_label, color_map, beta, N, gamma, mu, W, a, initial_conditions):
+    plt.figure(figsize=(10, 6))
+    colors = plt.get_cmap(color_map, 10)  # Color map for the group
+    
+    for i in range(10):
+        beta[1, 1] *= 0.9  # Now reducing β22 for workplace quarantine levels
+        results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
+        
+        # Extract results for the Infected group
+        I = results[:, group_idx + 1]
+        
+        # Plot the Infected population for the group with different colors for each quarantine level
+        plt.plot(t, I, color=colors(i), label=f'Quarantine Level {i+1}: β22={beta[1,1]:.4f}')
+        
+        # Find and plot local maxima
+        maxima_indices, maxima_values = find_local_maxima(I)
+        plt.scatter(t[maxima_indices], maxima_values, color='black', zorder=5)
+        
+        # Annotate maxima with coordinates
+        for idx, val in zip(maxima_indices, maxima_values):
+            plt.annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
+    
+    plt.title(f'Infectious Population for {group_label} under Workplace Quarantine Levels with Maxima')
+    plt.xlabel('Days')
+    plt.ylabel(f'Infectious Population ({group_label})')
+    plt.legend(loc='upper right')
+    plt.tight_layout()
+    plt.show()
 
-# Create a figure for each group
-fig, axes = plt.subplots(3, 1, figsize=(10, 18))
-
-# Group 1 (Children)
-for i in range(10):
-    beta[1, 1] *= 0.9  # Now reducing β22 instead of β11 for quarantine levels at workplace
-    results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
-    _, I1, _, _, _, _, _, _, _, _, _, _ = results.T
-    axes[0].plot(t, I1, color=colors_group1(i), label=f'Quarantine Level {i+1}: β22={beta[1,1]:.4f}')
-    maxima_indices, maxima_values = find_local_maxima(I1)
-    axes[0].scatter(t[maxima_indices], maxima_values, color='black', zorder=5)
-    for idx, val in zip(maxima_indices, maxima_values):
-        axes[0].annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
-axes[0].set_title('Infectious Population (Group 1: Children)')
-axes[0].set_xlabel('Days')
-axes[0].set_ylabel('Infectious Population')
-axes[0].legend(loc='upper right')
-
-# Reset beta for next group
-(beta, gamma, mu, W, a, time_span, N) = load_parameters(file_path)
-
-# Group 2 (Adults)
-for i in range(10):
-    beta[1, 1] *= 0.9
-    results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
-    _, _, _, _, _, I2, _, _, _, _, _, _ = results.T
-    axes[1].plot(t, I2, color=colors_group2(i), label=f'Quarantine Level {i+1}: β22={beta[1,1]:.4f}')
-    maxima_indices, maxima_values = find_local_maxima(I2)
-    axes[1].scatter(t[maxima_indices], maxima_values, color='black', zorder=5)
-    for idx, val in zip(maxima_indices, maxima_values):
-        axes[1].annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
-axes[1].set_title('Infectious Population (Group 2: Adults)')
-axes[1].set_xlabel('Days')
-axes[1].set_ylabel('Infectious Population')
-axes[1].legend(loc='upper right')
+# Plot for Group 1 (Children)
+plot_group_infected(0, "Group 1 (Children)", 'Reds', beta.copy(), N, gamma, mu, W, a, initial_conditions)
 
 # Reset beta for next group
 (beta, gamma, mu, W, a, time_span, N) = load_parameters(file_path)
 
-# Group 3 (Seniors)
-for i in range(10):
-    beta[1, 1] *= 0.9
-    results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
-    _, _, _, _, _, _, _, _, _, I3, _, _ = results.T
-    axes[2].plot(t, I3, color=colors_group3(i), label=f'Quarantine Level {i+1}: β22={beta[1,1]:.4f}')
-    maxima_indices, maxima_values = find_local_maxima(I3)
-    axes[2].scatter(t[maxima_indices], maxima_values, color='black', zorder=5)
-    for idx, val in zip(maxima_indices, maxima_values):
-        axes[2].annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
-axes[2].set_title('Infectious Population (Group 3: Seniors)')
-axes[2].set_xlabel('Days')
-axes[2].set_ylabel('Infectious Population')
-axes[2].legend(loc='upper right')
+# Plot for Group 2 (Adults)
+plot_group_infected(4, "Group 2 (Adults)", 'Greens', beta.copy(), N, gamma, mu, W, a, initial_conditions)
 
-# Show the plot for all three groups
-plt.tight_layout()
-plt.show()
+# Reset beta for next group
+(beta, gamma, mu, W, a, time_span, N) = load_parameters(file_path)
+
+# Plot for Group 3 (Seniors)
+plot_group_infected(8, "Group 3 (Seniors)", 'Blues', beta.copy(), N, gamma, mu, W, a, initial_conditions)
+

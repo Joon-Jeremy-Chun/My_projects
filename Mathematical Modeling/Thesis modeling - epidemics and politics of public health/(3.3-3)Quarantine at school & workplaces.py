@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 19 21:58:42 2024
+Created on Thu Sep 19 23:50:12 2024
 
 @author: joonc
 """
-
 import pandas as pd
 import numpy as np
 from scipy.integrate import odeint
@@ -89,41 +88,50 @@ initial_conditions = [
 # Time grid (in days)
 t = np.linspace(0, time_span, int(time_span))
 
-# Set up color map for the mixed quarantine levels
-colors = plt.get_cmap('coolwarm', 10)  # Different color map for mixed policies
+# Function to create independent plots for each group
+def plot_group_infected(group_idx, group_label, beta, N, gamma, mu, W, a, initial_conditions):
+    # Create a figure for the plot
+    plt.figure(figsize=(12, 8))
+    colors = plt.get_cmap('coolwarm', 10)  # Color map for mixed policies
 
-# Create a figure for the plot
-plt.figure(figsize=(12, 8))
+    # Loop to reduce β11 (school quarantine) and β22 (workplace quarantine) and plot the Infected curves for the selected group
+    for i in range(10):
+        # Reduce β11 (school) and β22 (workplace) by 10% each time
+        beta[0, 0] *= 0.9
+        beta[1, 1] *= 0.9
 
-# Loop to reduce both β11 (school quarantine) and β22 (workplace quarantine) and plot the Infected curves for Group 1
-for i in range(10):
-    # Reduce β11 (school) and β22 (workplace) by 10% each time
-    beta[0, 0] *= 0.9
-    beta[1, 1] *= 0.9
-    
-    # Integrate the SIRV equations over time
-    results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
+        # Integrate the SIRV equations over time
+        results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
 
-    # Extract results for the Infected group in Group 1 (Children)
-    _, I1, _, _, _, I2, _, _, _, I3, _, _ = results.T
-    
-    # Plot the Infected population for Group 1, Group 2, and Group 3 with different colors for each mixed policy level
-    plt.plot(t, I1, color=colors(i), label=f'Level {i+1}: β11={beta[0,0]:.4f}, β22={beta[1,1]:.4f}')
-    
-    # Find and plot local maxima
-    maxima_indices, maxima_values = find_local_maxima(I1)
-    plt.scatter(t[maxima_indices], maxima_values, color='black', zorder=5)  # Black dots for maxima
+        # Extract results for the Infected group
+        I = results[:, group_idx + 1]  # Index for the infected group
 
-    # Annotate maxima with coordinates
-    for idx, val in zip(maxima_indices, maxima_values):
-        plt.annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
+        # Plot the Infected population for the group with different colors for each mixed policy level
+        plt.plot(t, I, color=colors(i), label=f'Level {i+1}: β11={beta[0,0]:.4f}, β22={beta[1,1]:.4f}')
 
-# Add labels, title, and legend
-plt.title('Infectious Population under Different School (β11) and Workplace (β22) Quarantine Levels with Maxima')
-plt.xlabel('Days')
-plt.ylabel('Infectious Population (Group 1)')
-plt.legend(loc='upper right')
+        # Find and plot local maxima
+        maxima_indices, maxima_values = find_local_maxima(I)
+        plt.scatter(t[maxima_indices], maxima_values, color='black', zorder=5)  # Black dots for maxima
 
-# Show the plot
-plt.tight_layout()
-plt.show()
+        # Annotate maxima with coordinates
+        for idx, val in zip(maxima_indices, maxima_values):
+            plt.annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
+
+    # Add labels, title, and legend
+    plt.title(f'Infectious Population for {group_label} under Different Quarantine Levels with Maxima')
+    plt.xlabel('Days')
+    plt.ylabel(f'Infectious Population ({group_label})')
+    plt.legend(loc='upper right')
+
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
+
+# Plot for Group 1 (Children)
+plot_group_infected(0, "Group 1 (Children)", beta.copy(), N, gamma, mu, W, a, initial_conditions)
+
+# Plot for Group 2 (Adults)
+plot_group_infected(4, "Group 2 (Adults)", beta.copy(), N, gamma, mu, W, a, initial_conditions)
+
+# Plot for Group 3 (Seniors)
+plot_group_infected(8, "Group 3 (Seniors)", beta.copy(), N, gamma, mu, W, a, initial_conditions)
