@@ -148,3 +148,7 @@ for i, (S, I, R, V, maxima_idx, maxima_val, group) in enumerate(zip(
 
 plt.tight_layout()
 plt.show()
+#%%
+# Save the figure in the 'Figures' folder
+plt.savefig(f'Figures/SIRV Dynamics for {group} with Quarantine Applied on Day {quarantine_day}.png')
+plt.show()

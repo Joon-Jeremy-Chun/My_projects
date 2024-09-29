@@ -120,8 +120,10 @@ def plot_group_infected(group_idx, group_label, color_map, beta, N, gamma, mu, W
     plt.ylabel(f'Infectious Population ({group_label})')
     plt.legend(loc='upper right')
     plt.tight_layout()
-    plt.show()
-    
+    plt.show()      
+    # Save the figure in the 'Figures' folder
+    plt.savefig(f'Figures/Infectious Population for {group_label} under School Quarantine Levels with Maxima.png')
+        
 
 # Plot for Group 1 (Children)
 plot_group_infected(0, "Group 1 (Children)", 'Reds', beta.copy(), N, gamma, mu, W, a, initial_conditions)
