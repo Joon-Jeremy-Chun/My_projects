@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
+import seaborn as sns
 from scipy.signal import argrelextrema
 
 # Function to load model parameters and initial conditions from Excel
@@ -160,23 +161,38 @@ maxima_I3_idx, maxima_I3_val = find_local_maxima(I3)
 #%%
 # Calculate economic costs over time
 costs = []
+costs_group_1 = []
+costs_group_2 = []
+costs_group_3 = []
+
 for idx in range(len(t)):
     I = [I1[idx], I2[idx], I3[idx]]
     V = [V1[idx], V2[idx], V3[idx]]
     D = 0  # Assuming no death component in current implementation
+    
+    # Calculate total cost
     cost = calculate_costs(I, V, D, t[idx])
     costs.append(cost)
+    
+    # Calculate cost by group
+    cost_group_1 = I[0] * (m * C_M + h * C_H + i * C_I) + V[0] * (VC + PC + LC) + I[0] * E[0] * D_in[0]
+    cost_group_2 = I[1] * (m * C_M + h * C_H + i * C_I) + V[1] * (VC + PC + LC) + I[1] * E[1] * D_in[1] + I[0] * E[1] * D_in[1]
+    cost_group_3 = I[2] * (m * C_M + h * C_H + i * C_I) + V[2] * (VC + PC + LC) + I[2] * E[2] * D_in[2]
+    
+    costs_group_1.append(cost_group_1)
+    costs_group_2.append(cost_group_2)
+    costs_group_3.append(cost_group_3)
 
 #%%
-# Plot the data for each group, highlighting the local maxima for the infected compartments
-plt.figure(figsize=(14, 16))
+# Plot the SIRV dynamics for each group
+plt.figure(figsize=(14, 12))
 for i, (S, I, R, V, maxima_idx, maxima_val, group) in enumerate(zip(
         [S1, S2, S3], [I1, I2, I3], [R1, R2, R3], [V1, V2, V3],
         [maxima_I1_idx, maxima_I2_idx, maxima_I3_idx],
         [maxima_I1_val, maxima_I2_val, maxima_I3_val],
         ['Group 1', 'Group 2', 'Group 3']), start=1):
     
-    plt.subplot(4, 1, i)
+    plt.subplot(3, 1, i)
     plt.plot(t, S, 'b', label=f'Susceptible ({group})')
     plt.plot(t, I, 'r', label=f'Infected ({group})')
     plt.plot(t, R, 'g', label=f'Recovered ({group})')
@@ -194,13 +210,37 @@ for i, (S, I, R, V, maxima_idx, maxima_val, group) in enumerate(zip(
     plt.ylabel('Population')
     plt.legend()
 
+plt.tight_layout()
+plt.show()
+
 # Plot total economic costs over time
-plt.subplot(4, 1, 4)
-plt.plot(t, costs, 'k', label='Total Economic Cost')
-plt.title('Total Economic Cost Over Time')
+plt.figure(figsize=(10, 6))
+plt.plot(t, costs_group_1, 'r', label='Group 1 Total Cost')
+plt.plot(t, costs_group_2, 'g', label='Group 2 Total Cost')
+plt.plot(t, costs_group_3, 'b', label='Group 3 Total Cost')
+plt.plot(t, costs, 'k', linestyle='--', label='Overall Total Cost')
+plt.title('Total Economic Cost by Group Over Time')
 plt.xlabel('Days')
 plt.ylabel('Cost ($)')
 plt.legend()
+plt.tight_layout()
+plt.show()
 
+# Plot cumulative bar graphs for total cost by groups and overall
+cumulative_cost_group_1 = sum(costs_group_1)
+cumulative_cost_group_2 = sum(costs_group_2)
+cumulative_cost_group_3 = sum(costs_group_3)
+cumulative_total_cost = sum(costs)
+
+labels = ['Group 1', 'Group 2', 'Group 3', 'Overall Total']
+cumulative_costs = [cumulative_cost_group_1, cumulative_cost_group_2, cumulative_cost_group_3, cumulative_total_cost]
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x=labels, y=cumulative_costs, palette='viridis')
+plt.title('Cumulative Total Economic Cost by Group')
+plt.xlabel('Group')
+plt.ylabel('Cost ($)')
+for index, value in enumerate(cumulative_costs):
+    plt.text(index, value + 1000, f'${value:,.2f}', ha='center', va='bottom')
 plt.tight_layout()
 plt.show()
