@@ -2,19 +2,6 @@
 
 Welcome to the **Mathematical Modeling** repository, showcasing a series of interdisciplinary projects that apply mathematical techniques to solve complex real-world problems.
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Projects](#projects)
-  - [Project 1: Age-Structured SIR Models](#project-1-age-structured-sir-models)
-  - [Project 2: Economic Impact Analysis Using Mathematical Models](#project-2-economic-impact-analysis-using-mathematical-models)
-- [Methodology](#methodology)
-- [Results](#results)
-- [Repository Structure](#repository-structure)
-- [How to Use This Repository](#how-to-use-this-repository)
-- [Contributing](#contributing)
-- [Acknowledgments](#acknowledgments)
-- [Contact Information](#contact-information)
 
 ## Introduction
 
