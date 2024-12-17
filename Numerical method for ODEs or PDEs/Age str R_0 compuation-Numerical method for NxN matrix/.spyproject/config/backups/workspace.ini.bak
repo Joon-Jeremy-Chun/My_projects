@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', '8X8 given data set.py', 'NxN contact matrix by Gaussian Smoothing.py', 'NxN contact matrix by polynomial interoplation.py', 'US population 2020 with normalized ratios.py', 'F matrix.py', 'V&Vinverse matrix.py', 'NGM_and_R_0.py', 'visualiztion NGM.py', 'Power_method_R_0 computation.py', 'Numpy built-in R_0 computation.py', 'scipy built-in computation.py']
+recent_files = ['..\\..\\..\\..\\.spyder-py3\\temp.py', '8X8 given data set.py', 'NxN contact matrix by Gaussian Smoothing.py', 'NxN contact matrix by polynomial interoplation.py', 'US population 2020 with normalized ratios.py', 'F matrix.py', 'V&Vinverse matrix.py', 'NGM_and_R_0.py', 'visualiztion NGM.py', 'Power_method_R_0 computation.py', 'Numpy built-in R_0 computation.py', 'scipy built-in computation.py', 'NxN contact matrix by Gaussian Smoothing-1.py', 'F matrix-1.py', 'Power Method and QR Method.py']
 
 [main]
 version = 0.2.0

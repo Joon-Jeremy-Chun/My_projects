@@ -1,131 +1,135 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  9 07:45:48 2024
+Created on Mon Dec 16 23:23:34 2024
 
 @author: joonc
 """
 
-import pandas as pd
-from scipy.optimize import minimize
 
-# Step 1: Load Real Data and Initial Parameters
-file_path_data = 'DataSets/Korea_threeGroups_covid19_data.csv'
+import pandas as pd
+import numpy as np
+from scipy.integrate import odeint
+from scipy.optimize import minimize
+import matplotlib.pyplot as plt
+
+# Step 1: Load Data and Fixed Parameters
+file_path_parameters = 'DataSets/Korea_threeGroups_SIRV_parameter.csv'
 file_path_inputs = 'Inputs.xlsx'
 
-# Load the dataset
-data = pd.read_csv(file_path_data)
+# Load real-world data
+real_data = pd.read_csv(file_path_parameters)
+real_data['Date'] = pd.to_datetime(real_data['Date'])
 
-# Ensure proper date parsing
-data['date'] = pd.to_datetime(data['date'])
-
-# Load initial parameters from inputs
+# Load fixed parameters
 inputs = pd.read_excel(file_path_inputs, header=None)
-
-# Extract initial populations, recovery rates, vaccination rates, and waning immunity rates
-initial_populations = inputs.iloc[14, 0:3].values
+initial_beta = inputs.iloc[0:3, 0:3].values 
 recovery_rates = inputs.iloc[4, 0:3].values
 vaccination_rates = inputs.iloc[10, 0:3].values
-waning_immunity_rate = inputs.iloc[8, 0]  # Single value
+waning_immunity_rate = inputs.iloc[8, 0]
 
-# Define compartments and initialize
+# Age groups
 age_groups = ['0-19', '20-49', '50-80+']
-S, I, R, V = {}, {}, {}, {}
+gamma = recovery_rates
+a = vaccination_rates
+delta = waning_immunity_rate
+
+# Step 2: Select Start and End Dates for Fitting
+start_date = '2020-02-01'  # Change this to your desired start date
+end_date = '2020-03-01'    # Change this to your desired end date
+
+# Filter real-world data for the specified date range
+fit_data = real_data[(real_data['Date'] >= start_date) & (real_data['Date'] <= end_date)].reset_index(drop=True)
+
+# Check if data is empty
+if fit_data.empty:
+    raise ValueError("No data found between the specified start_date and end_date. Please check the date range.")
+
+# Step 3: Define SIRV Model ODEs
+def sirv_model(y, t, beta, gamma, a, delta):
+    S1, I1, R1, V1, S2, I2, R2, V2, S3, I3, R3, V3 = y
+
+    # Force of infection (lambda)
+    N = [S1 + I1 + R1 + V1, S2 + I2 + R2 + V2, S3 + I3 + R3 + V3]
+    lambda1 = sum(beta[0, j] * Ij / Nj for j, Ij, Nj in zip(range(3), [I1, I2, I3], N))
+    lambda2 = sum(beta[1, j] * Ij / Nj for j, Ij, Nj in zip(range(3), [I1, I2, I3], N))
+    lambda3 = sum(beta[2, j] * Ij / Nj for j, Ij, Nj in zip(range(3), [I1, I2, I3], N))
+
+    # Differential equations
+    dS1 = -lambda1 * S1 - a[0] * S1 + delta * (R1 + V1)
+    dI1 = lambda1 * S1 - gamma[0] * I1
+    dR1 = gamma[0] * I1 - delta * R1
+    dV1 = a[0] * S1 - delta * V1
+
+    dS2 = -lambda2 * S2 - a[1] * S2 + delta * (R2 + V2)
+    dI2 = lambda2 * S2 - gamma[1] * I2
+    dR2 = gamma[1] * I2 - delta * R2
+    dV2 = a[1] * S2 - delta * V2
+
+    dS3 = -lambda3 * S3 - a[2] * S3 + delta * (R3 + V3)
+    dI3 = lambda3 * S3 - gamma[2] * I3
+    dR3 = gamma[2] * I3 - delta * R3
+    dV3 = a[2] * S3 - delta * V3
+
+    return [dS1, dI1, dR1, dV1, dS2, dI2, dR2, dV2, dS3, dI3, dR3, dV3]
+
+# Step 4: Objective Function to Minimize
+def objective(beta_flat):
+    beta = beta_flat.reshape((3, 3))
+    y0 = [
+        fit_data['S_0-19'][0], fit_data['I_0-19'][0], fit_data['R_0-19'][0], fit_data['V_0-19'][0],
+        fit_data['S_20-49'][0], fit_data['I_20-49'][0], fit_data['R_20-49'][0], fit_data['V_20-49'][0],
+        fit_data['S_50-80+'][0], fit_data['I_50-80+'][0], fit_data['R_50-80+'][0], fit_data['V_50-80+'][0]
+    ]
+    t = range(len(fit_data))
+
+    # Solve ODEs
+    result = odeint(sirv_model, y0, t, args=(beta, gamma, a, delta))
+    I_model = result[:, [1, 5, 9]]  # Extract Infectious compartments
+
+    # Compare model output to observed data
+    I_real = fit_data[['I_0-19', 'I_20-49', 'I_50-80+']].values
+    error = np.mean((I_model - I_real) ** 2)
+    return error
+
+# Step 5: Optimize Transmission Matrix Beta
+initial_beta = inputs.iloc[0:3, 0:3].values  # Initial guess for beta
+bounds = [(0, None)] * 9  # Bounds: 0 to infinity for all 9 beta values (flattened 3x3 matrix)
+
+result = minimize(objective, initial_beta.flatten(), method='L-BFGS-B', bounds=bounds)
+
+# Check if optimization was successful
+if result.success:
+    optimal_beta = result.x.reshape((3, 3))
+    print("Optimization Successful!")
+else:
+    print("Optimization Failed:", result.message)
+    exit()
+
+# Step 6: Solve the Model with Fitted Beta
+y0 = [
+    fit_data['S_0-19'][0], fit_data['I_0-19'][0], fit_data['R_0-19'][0], fit_data['V_0-19'][0],
+    fit_data['S_20-49'][0], fit_data['I_20-49'][0], fit_data['R_20-49'][0], fit_data['V_20-49'][0],
+    fit_data['S_50-80+'][0], fit_data['I_50-80+'][0], fit_data['R_50-80+'][0], fit_data['V_50-80+'][0]
+]
+t = range(len(fit_data))
+fitted_result = odeint(sirv_model, y0, t, args=(optimal_beta, gamma, a, delta))
+I_fitted = fitted_result[:, [1, 5, 9]]
+
+# Step 7: Plot Results
 for idx, age_group in enumerate(age_groups):
-    S[age_group] = [initial_populations[idx]]  # Initialize Susceptible
-    I[age_group] = [0]  # Initialize Infectious
-    R[age_group] = [0]  # Initialize Recovered
-    V[age_group] = [0]  # Initialize Vaccinated
+    plt.figure(figsize=(10, 6))
+    plt.plot(fit_data['Date'], fit_data[f'I_{age_group}'], label='Actual I(t)', color='blue', linestyle='--')
+    plt.plot(fit_data['Date'], I_fitted[:, idx], label='Fitted I(t)', color='red')
+    plt.title(f"Actual vs Fitted I(t) for Age Group {age_group}")
+    plt.xlabel("Date")
+    plt.ylabel("Infectious Population")
+    plt.legend()
+    plt.grid()
+    plt.tight_layout()
+    plt.show()
 
-# Time steps (days) based on the dataset
-dates = pd.to_datetime(data['date'].unique())
-time_steps = len(dates)
-
-# Update compartments daily based on ODEs
-for t in range(1, time_steps):
-    current_date = dates[t]
-    daily_data = data[data['date'] == current_date]
-
-    for idx, age_group in enumerate(age_groups):
-        # New cases directly from dataset
-        filtered_data = daily_data[daily_data['new_age_group'] == age_group]
-        new_cases = filtered_data['new_confirmed_cases'].sum()
-
-        # Parameters for the current age group
-        gamma = recovery_rates[idx]
-        a = vaccination_rates[idx]
-        delta = waning_immunity_rate
-
-        # Update ODEs compartments
-        S_new = S[age_group][-1] - new_cases - a * S[age_group][-1] + delta * (R[age_group][-1] + V[age_group][-1])
-        I_new = I[age_group][-1] + new_cases - gamma * I[age_group][-1]
-        R_new = R[age_group][-1] + gamma * I[age_group][-1] - delta * R[age_group][-1]
-        V_new = V[age_group][-1] + a * S[age_group][-1] - delta * V[age_group][-1]
-
-        # Ensure updates use real dataset for infectious compartment
-        I_new = max(new_cases, I_new)
-
-        # Append updated values
-        S[age_group].append(max(S_new, 0))  # Ensure non-negative values
-        I[age_group].append(max(I_new, 0))
-        R[age_group].append(max(R_new, 0))
-        V[age_group].append(max(V_new, 0))
-
-# Create a DataFrame to store results
-results = pd.DataFrame(index=dates)
-for age_group in age_groups:
-    results[f"S_{age_group}"] = S[age_group]
-    results[f"I_{age_group}"] = I[age_group]
-    results[f"R_{age_group}"] = R[age_group]
-    results[f"V_{age_group}"] = V[age_group]
-
-# Calculate total population compartments
-results["S_total"] = results[[f"S_{age}" for age in age_groups]].sum(axis=1)
-results["I_total"] = results[[f"I_{age}" for age in age_groups]].sum(axis=1)
-results["R_total"] = results[[f"R_{age}" for age in age_groups]].sum(axis=1)
-results["V_total"] = results[[f"V_{age}" for age in age_groups]].sum(axis=1)
-
-# Optimization Function
-def loss_function(beta_values, age_groups, start_date, end_date):
-    beta_matrix = beta_values.reshape(3, 3)  # Reshape to 3x3 matrix
-    start_idx = results.index.get_loc(start_date)
-    end_idx = results.index.get_loc(end_date)
-
-    simulated_I = []
-    observed_I = data[(data['date'] >= start_date) & (data['date'] <= end_date)]
-
-    for t in range(start_idx, end_idx + 1):
-        new_I = []
-        for i, age_i in enumerate(age_groups):
-            lambda_i = sum(beta_matrix[i, j] * I[age_groups[j]][t] for j in range(3))
-            new_I.append(lambda_i)
-        simulated_I.append(new_I)
-
-    simulated_I = pd.DataFrame(simulated_I, columns=age_groups, index=results.index[start_idx:end_idx + 1])
-    observed_I = observed_I.pivot(index='date', columns='new_age_group', values='new_confirmed_cases')
-
-    # Ensure matching lengths
-    simulated_I = simulated_I.loc[observed_I.index]
-
-    # Mean squared error for all groups
-    mse = ((simulated_I.values - observed_I.values) ** 2).mean()
-    return mse
-
-
-# Optimize Beta Matrix for All Age Groups and Time Interval
-start_fit_date = pd.to_datetime('2023-07-01')
-end_fit_date = pd.to_datetime('2023-07-30')
-
-# Initial guess for beta matrix
-initial_beta_matrix = [0.1] * 9  # Flattened 3x3 matrix
-
-# Perform optimization
-result = minimize(loss_function, initial_beta_matrix, args=(age_groups, start_fit_date, end_fit_date), bounds=[(0, 1)] * 9)
-
-# Extract optimized beta matrix
-optimized_beta_matrix = result.x.reshape(3, 3)
-print("Optimized Beta Matrix:")
-print(optimized_beta_matrix)
-
-# Output the results DataFrame
-print(results)
-
+# Step 8: Save Results
+output_file = 'DataSets/Fitted_Beta_Matrix.csv'
+print(optimal_beta)
+pd.DataFrame(optimal_beta, columns=age_groups, index=age_groups).to_csv(output_file, index=True)
+print(f"Fitted beta matrix saved to: {output_file}")
