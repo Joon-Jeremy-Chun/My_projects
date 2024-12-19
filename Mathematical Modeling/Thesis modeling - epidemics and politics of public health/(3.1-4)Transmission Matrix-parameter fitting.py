@@ -34,8 +34,8 @@ a = vaccination_rates
 delta = waning_immunity_rate
 
 # Step 2: Select Start and End Dates for Fitting
-start_date = '2020-02-01'  # Change this to your desired start date
-end_date = '2020-03-01'    # Change this to your desired end date
+start_date = '2020-02-01'  # Start date
+end_date = '2020-03-01'    # End date
 
 # Filter real-world data for the specified date range
 fit_data = real_data[(real_data['Date'] >= start_date) & (real_data['Date'] <= end_date)].reset_index(drop=True)
