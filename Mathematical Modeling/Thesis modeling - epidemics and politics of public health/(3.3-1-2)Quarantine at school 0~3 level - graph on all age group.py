@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 """
 Created on Fri Dec  6 08:02:23 2024
 
@@ -14,9 +14,6 @@ from scipy.signal import argrelextrema
 # Function to load model parameters from Excel
 def load_parameters(file_path):
     df = pd.read_excel(file_path, header=None)
-    
-    # Transmission rates matrix (3x3)
-    transmission_rates = df.iloc[0:3, 0:3].values
     
     # Recovery rates (3 values)
     recovery_rates = df.iloc[4, 0:3].values
@@ -42,13 +39,21 @@ def load_parameters(file_path):
     recovered_init = df.iloc[18, 0:3].values   
     vaccinated_init = df.iloc[20, 0:3].values  
     
-    return (transmission_rates, recovery_rates, maturity_rates, waning_immunity_rate,
-            vaccination_rates, time_span, population_size, susceptible_init, infectious_init,
-            recovered_init, vaccinated_init)
+    return (recovery_rates, maturity_rates, waning_immunity_rate,
+            vaccination_rates, time_span, population_size, susceptible_init,
+            infectious_init, recovered_init, vaccinated_init)
 
 # Load the parameters from the Excel file
 file_path = 'Inputs.xlsx'
-(beta, gamma, mu, W, a, time_span, N, S_init, I_init, R_init, V_init) = load_parameters(file_path)
+(gamma, mu, W, a, time_span, N, S_init, I_init, R_init, V_init) = load_parameters(file_path)
+
+# Load the transmission_rates matrix from the CSV file
+transmission_rates_csv_path = 'DataSets/Fitted_Beta_Matrix.csv'
+transmission_rates = pd.read_csv(transmission_rates_csv_path).iloc[0:3, 1:4].values
+
+# Override the beta parameter with the loaded transmission_rates
+beta = transmission_rates
+
 
 # Define initial conditions for the three groups (including vaccinated compartments)
 initial_conditions = [
@@ -61,7 +66,7 @@ initial_conditions = [
 def deriv(y, t, N, beta, gamma, mu, W, a):
     S1, I1, R1, V1, S2, I2, R2, V2, S3, I3, R3, V3 = y
     
-    # Force of infection (λ_i) for each group
+    # Force of infection (\u03bb_i) for each group
     lambda1 = beta[0, 0] * I1/N[0] + beta[0, 1] * I2/N[1] + beta[0, 2] * I3/N[2]
     lambda2 = beta[1, 0] * I1/N[0] + beta[1, 1] * I2/N[1] + beta[1, 2] * I3/N[2]
     lambda3 = beta[2, 0] * I1/N[0] + beta[2, 1] * I2/N[1] + beta[2, 2] * I3/N[2]
