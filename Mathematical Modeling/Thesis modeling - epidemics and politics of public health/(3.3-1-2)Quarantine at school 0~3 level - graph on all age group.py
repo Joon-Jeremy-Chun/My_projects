@@ -117,6 +117,16 @@ def compute_peak_reduction_and_delay_all(quarantine_levels, beta, N, gamma, mu, 
     for level in quarantine_levels[1:]:
         adjusted_beta = beta.copy()
         adjusted_beta[0, 0] *= (1 - level)  # Reduce beta for Group 1's transmission rate
+        # adjusted_beta[0, 1] *= (1 - level)
+        # adjusted_beta[0, 2] *= (1 - level)
+        # adjusted_beta[1, 0] *= (1 - level)
+        # adjusted_beta[1, 1] *= (1 - level)
+        # adjusted_beta[1, 2] *= (1 - level)
+        # adjusted_beta[2, 0] *= (1 - level)
+        # adjusted_beta[2, 1] *= (1 - level)
+        # adjusted_beta[2, 2] *= (1 - level)
+        
+        
         results_current = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
 
         # Extract results for the Infected groups
@@ -175,12 +185,18 @@ def plot_group_infected_4_levels(group_idx, group_label, beta, N, gamma, mu, W, 
 
     # Quarantine levels with respective reductions
     quarantine_levels = [0, 0.1, 0.35, 0.7]
-
     for i, level in enumerate(quarantine_levels):
         # Adjust beta[0, 0] for the current quarantine level
         adjusted_beta = beta.copy()
         adjusted_beta[0, 0] *= (1 - level)  # Reduce beta for Group 1's transmission rate
-
+        # adjusted_beta[0, 1] *= (1 - level)
+        # adjusted_beta[0, 2] *= (1 - level)
+        # adjusted_beta[1, 0] *= (1 - level)
+        # adjusted_beta[1, 1] *= (1 - level)
+        # adjusted_beta[1, 2] *= (1 - level)
+        # adjusted_beta[2, 0] *= (1 - level)
+        # adjusted_beta[2, 1] *= (1 - level)
+        # adjusted_beta[2, 2] *= (1 - level)
         # Simulate the model
         results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
 
@@ -227,7 +243,14 @@ def plot_total_infected_4_levels(beta, N, gamma, mu, W, a, initial_conditions, t
         # Adjust beta for the current quarantine level
         adjusted_beta = beta.copy()
         adjusted_beta[0, 0] *= (1 - level)  # Reduce beta for Group 1's transmission rate
-
+        adjusted_beta[0, 1] *= (1 - level)
+        adjusted_beta[0, 2] *= (1 - level)
+        adjusted_beta[1, 0] *= (1 - level)
+        adjusted_beta[1, 1] *= (1 - level)
+        adjusted_beta[1, 2] *= (1 - level)
+        adjusted_beta[2, 0] *= (1 - level)
+        adjusted_beta[2, 1] *= (1 - level)
+        adjusted_beta[2, 2] *= (1 - level)
         # Simulate the model
         results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
 
