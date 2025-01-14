@@ -174,7 +174,7 @@ for group, results in peak_results_all.items():
     for result in results:
         print(f"  Quarantine Level: {int(result['quarantine_level'] * 100)}% Reduction")
         print(f"  Peak Reduction: {result['peak_reduction_percent']:.2f}%")
-        print(f"  Peak Delay: {result['peak_delay_days']:.1f} days")
+        print(f"  Peak Delay: {result['peak_delay_days']:.2f} days")
     print()
 
 # Function to create plots for each group with 4 quarantine levels
@@ -185,34 +185,30 @@ def plot_group_infected_4_levels(group_idx, group_label, beta, N, gamma, mu, W, 
 
     # Quarantine levels with respective reductions
     quarantine_levels = [0, 0.1, 0.35, 0.7]
+
+    # Simulate Level 0 (no quarantine) to calculate baseline peak and timing
+    results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
+    I_base = results_base[:, group_idx + 1]
+    peak_base = np.max(I_base)
+    peak_time_base = t[np.argmax(I_base)]  # Time of peak for Level 0
+
     for i, level in enumerate(quarantine_levels):
-        # Adjust beta[0, 0] for the current quarantine level
+        # Adjust beta for the current quarantine level
         adjusted_beta = beta.copy()
         adjusted_beta[0, 0] *= (1 - level)  # Reduce beta for Group 1's transmission rate
-        # adjusted_beta[0, 1] *= (1 - level)
-        # adjusted_beta[0, 2] *= (1 - level)
-        # adjusted_beta[1, 0] *= (1 - level)
-        # adjusted_beta[1, 1] *= (1 - level)
-        # adjusted_beta[1, 2] *= (1 - level)
-        # adjusted_beta[2, 0] *= (1 - level)
-        # adjusted_beta[2, 1] *= (1 - level)
-        # adjusted_beta[2, 2] *= (1 - level)
+
         # Simulate the model
         results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
 
         # Extract results for the Infected group
         I = results[:, group_idx + 1]
+        maxima_indices, _ = find_local_maxima(I)
 
         # Plot the Infected population for the group
-        plt.plot(t, I, color=colors[i], label=f'Level {i}: {int(level * 100)}% reduction')
+        plt.plot(t, I, color=colors[i], label=f'Level: {int(level * 100)}%, Peak Reduction: {((peak_base - np.max(I)) / peak_base) * 100:.2f}%, Delay: {t[np.argmax(I)] - peak_time_base:.2f} days')
 
-        # Find and plot local maxima
-        maxima_indices, maxima_values = find_local_maxima(I)
-        plt.scatter(t[maxima_indices], maxima_values, color='black', zorder=5)
-
-        # Annotate maxima with coordinates
-        for idx, val in zip(maxima_indices, maxima_values):
-            plt.annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
+        # Add black dots for relative maxima
+        plt.scatter(t[maxima_indices], I[maxima_indices], color='black', zorder=5)
 
     plt.title(f'Infectious Population for {group_label} under School Quarantine Levels')
     plt.xlabel('Days')
@@ -220,6 +216,10 @@ def plot_group_infected_4_levels(group_idx, group_label, beta, N, gamma, mu, W, 
     plt.legend(loc='upper right')
     plt.tight_layout()
     plt.show()
+
+
+
+
 
 # Plot for Group 1 (Children)
 plot_group_infected_4_levels(0, "Group 1 (Children)", beta.copy(), N, gamma, mu, W, a, initial_conditions, time_span)
@@ -239,35 +239,29 @@ def plot_total_infected_4_levels(beta, N, gamma, mu, W, a, initial_conditions, t
     # Quarantine levels with respective reductions
     quarantine_levels = [0, 0.1, 0.35, 0.7]
 
+    # Simulate Level 0 (no quarantine) to calculate baseline peak and timing
+    results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
+    total_base = results_base[:, 1] + results_base[:, 5] + results_base[:, 9]
+    peak_base = np.max(total_base)
+    peak_time_base = t[np.argmax(total_base)]  # Time of peak for Level 0
+
     for i, level in enumerate(quarantine_levels):
         # Adjust beta for the current quarantine level
         adjusted_beta = beta.copy()
         adjusted_beta[0, 0] *= (1 - level)  # Reduce beta for Group 1's transmission rate
-        adjusted_beta[0, 1] *= (1 - level)
-        adjusted_beta[0, 2] *= (1 - level)
-        adjusted_beta[1, 0] *= (1 - level)
-        adjusted_beta[1, 1] *= (1 - level)
-        adjusted_beta[1, 2] *= (1 - level)
-        adjusted_beta[2, 0] *= (1 - level)
-        adjusted_beta[2, 1] *= (1 - level)
-        adjusted_beta[2, 2] *= (1 - level)
+
         # Simulate the model
         results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
 
-        # Extract results for the Infected groups
-        I1, I2, I3 = results[:, 1], results[:, 5], results[:, 9]
-        total_infected = I1 + I2 + I3  # Sum of infected from all groups
+        # Extract results for the total Infected population
+        total_infected = results[:, 1] + results[:, 5] + results[:, 9]
+        maxima_indices, _ = find_local_maxima(total_infected)
 
-        # Plot the total infected population
-        plt.plot(t, total_infected, color=colors[i], label=f'Level {i}: {int(level * 100)}% reduction')
+        # Plot the total Infected population
+        plt.plot(t, total_infected, color=colors[i], label=f'Level: {int(level * 100)}%, Peak Reduction: {((peak_base - np.max(total_infected)) / peak_base) * 100:.2f}%, Delay: {t[np.argmax(total_infected)] - peak_time_base:.2f} days')
 
-        # Find and plot local maxima
-        maxima_indices, maxima_values = find_local_maxima(total_infected)
-        plt.scatter(t[maxima_indices], maxima_values, color='black', zorder=5)
-
-        # Annotate maxima with coordinates
-        for idx, val in zip(maxima_indices, maxima_values):
-            plt.annotate(f'({t[idx]:.1f}, {val:.1f})', (t[idx], val), textcoords="offset points", xytext=(0, 10), ha='center')
+        # Add black dots for relative maxima
+        plt.scatter(t[maxima_indices], total_infected[maxima_indices], color='black', zorder=5)
 
     plt.title('Total Infectious Population under School Quarantine Levels')
     plt.xlabel('Days')
@@ -275,6 +269,8 @@ def plot_total_infected_4_levels(beta, N, gamma, mu, W, a, initial_conditions, t
     plt.legend(loc='upper right')
     plt.tight_layout()
     plt.show()
+
+
 
 # Plot the total infected population for all quarantine levels
 plot_total_infected_4_levels(beta.copy(), N, gamma, mu, W, a, initial_conditions, time_span)
