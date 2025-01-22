@@ -24,9 +24,6 @@ def load_parameters(file_path):
     # Waning immunity rate (single value)
     waning_immunity_rate = df.iloc[8, 0]
     
-    # Vaccination rates (3 values)
-    vaccination_rates = df.iloc[10, 0:3].values
-    
     # Time span (in days)
     time_span = df.iloc[12, 0]
     
@@ -40,12 +37,12 @@ def load_parameters(file_path):
     vaccinated_init = df.iloc[20, 0:3].values  
     
     return (recovery_rates, maturity_rates, waning_immunity_rate,
-            vaccination_rates, time_span, population_size, susceptible_init,
+            time_span, population_size, susceptible_init,
             infectious_init, recovered_init, vaccinated_init)
 
 # Load the parameters from the Excel file
 file_path = 'Inputs.xlsx'
-(gamma, mu, W, a, time_span, N, S_init, I_init, R_init, V_init) = load_parameters(file_path)
+(gamma, mu, W, time_span, N, S_init, I_init, R_init, V_init) = load_parameters(file_path)
 
 # Load the transmission_rates matrix from the CSV file
 transmission_rates_csv_path = 'DataSets/Fitted_Beta_Matrix.csv'
@@ -53,6 +50,9 @@ transmission_rates = pd.read_csv(transmission_rates_csv_path).iloc[0:3, 1:4].val
 
 # Override the beta parameter with the loaded transmission_rates
 beta = transmission_rates
+
+# Define custom vaccination rates directly in the script
+vaccination_rates = [0.1, 0.1, 0.1]  
 
 # Define initial conditions for the three groups (including vaccinated compartments)
 initial_conditions = [
@@ -88,47 +88,29 @@ def deriv(y, t, N, beta, gamma, mu, W, vaccination_rates):
     
     return dS1dt, dI1dt, dR1dt, dV1dt, dS2dt, dI2dt, dR2dt, dV2dt, dS3dt, dI3dt, dR3dt, dV3dt
 
-# Function to find the local maxima
-def find_local_maxima(I):
-    maxima_indices = argrelextrema(I, np.greater)[0]
-    maxima_values = I[maxima_indices]
-    return maxima_indices, maxima_values
-
-# Define quarantine levels
-quarantine_levels = [0, 0.1, 0.35, 0.7, 0.74]
-
-# Rainbow color scheme
-colors = plt.cm.rainbow(np.linspace(0, 1, len(quarantine_levels)))
-
 # Function to plot the total infected population over time
-def plot_total_infected_all_levels(beta, N, gamma, mu, W, a, initial_conditions, time_span):
+def plot_total_infected_with_vaccination(beta, N, gamma, mu, W, vaccination_rates, initial_conditions, time_span):
     t = np.linspace(0, time_span, int(time_span))
     plt.figure(figsize=(10, 6))
-
-    # Simulate Level 0 (no quarantine) to calculate baseline peak and timing
-    results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
+    
+    # Simulate Level 0 (no quarantine)
+    results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, vaccination_rates))
     total_base = results_base[:, 1] + results_base[:, 5] + results_base[:, 9]
     peak_base = np.max(total_base)
-    peak_time_base = t[np.argmax(total_base)]  # Time of peak for Level 0
-
+    peak_time_base = t[np.argmax(total_base)]
+    
+    # Quarantine levels and colors
+    quarantine_levels = [0, 0.1]  #Here Quarantine 
+    colors = plt.cm.rainbow(np.linspace(0, 1, len(quarantine_levels)))
+    
     for i, level in enumerate(quarantine_levels):
-        # Adjust beta for the current quarantine level
         adjusted_beta = beta.copy() * (1 - level)
-
-        # Simulate the model
-        results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
-
-        # Extract results for the total Infected population
+        results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, vaccination_rates))
         total_infected = results[:, 1] + results[:, 5] + results[:, 9]
-        maxima_indices, _ = find_local_maxima(total_infected)
-
-        # Plot the total Infected population
+        
         plt.plot(t, total_infected, color=colors[i], label=f'Level: {int(level * 100)}%, Peak Reduction: {((peak_base - np.max(total_infected)) / peak_base) * 100:.2f}%, Delay: {t[np.argmax(total_infected)] - peak_time_base:.2f} days')
-
-        # Add black dots for relative maxima
-        plt.scatter(t[maxima_indices], total_infected[maxima_indices], color='black', zorder=5)
-
-    plt.title('Total Infectious Population under Population-Wide Quarantine Levels')
+    
+    plt.title('Total Infectious Population with Vaccination under Quarantine Levels')
     plt.xlabel('Days')
     plt.ylabel('Total Infectious Population (All Groups)')
     plt.legend(loc='upper right')
@@ -136,4 +118,4 @@ def plot_total_infected_all_levels(beta, N, gamma, mu, W, a, initial_conditions,
     plt.show()
 
 # Plot the total infected population
-plot_total_infected_all_levels(beta.copy(), N, gamma, mu, W, a, initial_conditions, time_span)
+plot_total_infected_with_vaccination(beta.copy(), N, gamma, mu, W, vaccination_rates, initial_conditions, time_span)

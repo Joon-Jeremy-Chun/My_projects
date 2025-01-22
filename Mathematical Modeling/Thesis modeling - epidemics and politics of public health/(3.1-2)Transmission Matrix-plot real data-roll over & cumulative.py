@@ -67,20 +67,20 @@ def deriv(y, t, N, beta, gamma, mu, W, a):
     lambda3 = beta[2, 0] * I1/N[0] + beta[2, 1] * I2/N[1] + beta[2, 2] * I3/N[2]
 
     # Differential equations
-    dS1dt = -lambda1 * S1 - a[0] * S1 + W * R1 + W * V1
+    dS1dt = -lambda1 * S1 - a[0] / N[0] * S1 + W * R1 + W * V1
     dI1dt = lambda1 * S1 - gamma[0] * I1 - mu[0] * I1
     dR1dt = gamma[0] * I1 - W * R1 - mu[0] * R1
-    dV1dt = a[0] * S1 - W * V1
+    dV1dt = a[0] / N[0] * S1 - W * V1
 
-    dS2dt = -lambda2 * S2 + mu[0] * S1 - a[1] * S2 + W * R2 + W * V2
+    dS2dt = -lambda2 * S2 + mu[0] * S1 - a[1] / N[1] * S2 + W * R2 + W * V2
     dI2dt = lambda2 * S2 + mu[0] * I1 - gamma[1] * I2 - mu[1] * I2
     dR2dt = gamma[1] * I2 + mu[0] * R1 - W * R2 - mu[1] * R2
-    dV2dt = a[1] * S2 - W * V2
+    dV2dt = a[1] / N[1] * S2 - W * V2
 
-    dS3dt = -lambda3 * S3 + mu[1] * S2 - a[2] * S3 + W * R3 + W * V3
+    dS3dt = -lambda3 * S3 + mu[1] * S2 - a[2] / N[2] * S3 + W * R3 + W * V3
     dI3dt = lambda3 * S3 + mu[1] * I2 - gamma[2] * I3
     dR3dt = gamma[2] * I3 + mu[1] * R2 - W * R3
-    dV3dt = a[2] * S3 - W * V3
+    dV3dt = a[2] / N[2] * S3 - W * V3
 
     return dS1dt, dI1dt, dR1dt, dV1dt, dS2dt, dI2dt, dR2dt, dV2dt, dS3dt, dI3dt, dR3dt, dV3dt
 
