@@ -104,7 +104,7 @@ def simulate_with_reduction(beta, initial_conditions, N, gamma, mu, W, a, time_s
 
 # Simulation parameters
 k = 30  # Days before applying reduction
-r_sub = 0.27  # Reduction factor (1-x% reduction in beta)
+r_sub = 0.25  # Reduction factor (1-x% reduction in beta)
 
 # Run simulation
 t_combined, results_combined = simulate_with_reduction(beta, initial_conditions, N, gamma, mu, W, a, time_span, k, r_sub)
@@ -142,3 +142,46 @@ for idx, (label, I) in enumerate(I_groups_combined.items()):
     plt.grid()
     plt.tight_layout()
     plt.show()
+#%%
+
+# Function to compute relative maxima for all groups and total population
+def compute_relative_maxima(t, results_combined):
+    maxima_results = {}
+    # Individual groups
+    for idx, label in enumerate(["Group 1 (Children)", "Group 2 (Adults)", "Group 3 (Seniors)"]):
+        # Extract infected population for the group
+        I_group = results_combined[:, idx * 4 + 1]
+        
+        # Find relative maxima
+        maxima_indices = argrelextrema(I_group, np.greater)[0]
+        maxima_values = I_group[maxima_indices]
+        maxima_days = t[maxima_indices]
+        
+        # Store the results
+        maxima_results[label] = {
+            "Maxima Values": maxima_values,
+            "Days After Start": maxima_days
+        }
+    
+    # Total population
+    I_total = results_combined[:, 1] + results_combined[:, 5] + results_combined[:, 9]
+    maxima_indices_total = argrelextrema(I_total, np.greater)[0]
+    maxima_values_total = I_total[maxima_indices_total]
+    maxima_days_total = t[maxima_indices_total]
+    
+    # Store the results for the total population
+    maxima_results["Total Population"] = {
+        "Maxima Values": maxima_values_total,
+        "Days After Start": maxima_days_total
+    }
+    
+    return maxima_results
+
+# Compute relative maxima for all groups and total population
+relative_maxima_results = compute_relative_maxima(t_combined, results_combined)
+
+# Print results
+for group, data in relative_maxima_results.items():
+    print(f"\n{group}:")
+    for i, (value, day) in enumerate(zip(data["Maxima Values"], data["Days After Start"])):
+        print(f"  Relative Maximum {i + 1}: {value:.2f} (Day {day:.2f})")
