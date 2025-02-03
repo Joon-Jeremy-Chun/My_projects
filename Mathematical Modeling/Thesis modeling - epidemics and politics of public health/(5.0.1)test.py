@@ -52,7 +52,9 @@ transmission_rates = pd.read_csv(transmission_rates_csv_path).iloc[0:3, 1:4].val
 beta = transmission_rates
 
 # Define custom vaccination rates directly in the script
-vaccination_rates = [0.1, 0.1, 0.1]  
+#vaccination_rates = [0.1, 0.1, 0.1]
+vaccination_rates = [0.5, 0.5, 0.5]  
+  
 
 # Define initial conditions for the three groups (including vaccinated compartments)
 initial_conditions = [
