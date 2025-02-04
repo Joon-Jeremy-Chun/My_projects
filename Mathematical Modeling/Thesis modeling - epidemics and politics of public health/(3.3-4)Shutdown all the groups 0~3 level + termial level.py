@@ -65,7 +65,7 @@ initial_conditions = [
 def deriv(y, t, N, beta, gamma, mu, W, vaccination_rates):
     S1, I1, R1, V1, S2, I2, R2, V2, S3, I3, R3, V3 = y
     
-    # Force of infection (\u03bb_i) for each group
+    # Force of infection (λ_i) for each group
     lambda1 = beta[0, 0] * I1/N[0] + beta[0, 1] * I2/N[1] + beta[0, 2] * I3/N[2]
     lambda2 = beta[1, 0] * I1/N[0] + beta[1, 1] * I2/N[1] + beta[1, 2] * I3/N[2]
     lambda3 = beta[2, 0] * I1/N[0] + beta[2, 1] * I2/N[1] + beta[2, 2] * I3/N[2]
@@ -94,6 +94,69 @@ def find_local_maxima(I):
     maxima_values = I[maxima_indices]
     return maxima_indices, maxima_values
 
+# Function to compute reduction in peak and delay for all groups and total population
+def compute_peak_reduction_and_delay_all(quarantine_levels, beta, N, gamma, mu, W, a, initial_conditions, time_span):
+    results = {'Group 1': [], 'Group 2': [], 'Group 3': [], 'Total': []}
+    t = np.linspace(0, time_span, int(time_span))
+    
+    # Simulate baseline (Level 0, no quarantine)
+    results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
+    I1_level0, I2_level0, I3_level0 = results_base[:, 1], results_base[:, 5], results_base[:, 9]
+    total_base = I1_level0 + I2_level0 + I3_level0
+    
+    level0_peaks = {}
+    for key, data in zip(['Group 1', 'Group 2', 'Group 3', 'Total'],
+                         [I1_level0, I2_level0, I3_level0, total_base]):
+        max_idx, max_val = find_local_maxima(data)
+        if len(max_idx) > 0 and max_idx[0] > 0:
+            level0_peaks[key] = (max_idx, max_val)
+        else:
+            level0_peaks[key] = ([0], [data[0]])
+    
+    # Iterate through each quarantine level (excluding baseline)
+    for level in quarantine_levels[1:]:
+        adjusted_beta = beta.copy() * (1 - level)
+        results_current = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
+        I1, I2, I3 = results_current[:, 1], results_current[:, 5], results_current[:, 9]
+        total_infected = I1 + I2 + I3
+        
+        current_peaks = {}
+        for key, data in zip(['Group 1', 'Group 2', 'Group 3', 'Total'],
+                              [I1, I2, I3, total_infected]):
+            max_idx, max_val = find_local_maxima(data)
+            if len(max_idx) == 0 or max_idx[0] == 0:
+                current_peaks[key] = ([0], [data[0]])
+            else:
+                current_peaks[key] = (max_idx, max_val)
+        
+        # Compute metrics for each key
+        for key in level0_peaks:
+            level0_max_idx, level0_max_val = level0_peaks[key]
+            current_max_idx, current_max_val = current_peaks[key]
+            
+            baseline_peak = level0_max_val[0]
+            baseline_peak_day = t[level0_max_idx[0]]
+            
+            if len(current_max_idx) == 0 or current_max_idx[0] == 0:
+                peak_reduction = "None"
+                peak_delay = "None"
+            else:
+                current_peak = current_max_val[0]
+                current_peak_day = t[current_max_idx[0]]
+                peak_reduction = ((baseline_peak - current_peak) / baseline_peak) * 100 if baseline_peak > 0 else 0
+                peak_delay = current_peak_day - baseline_peak_day
+                # If delay is negative, set to None
+                if peak_delay < 0:
+                    peak_delay = "None"
+            
+            results[key].append({
+                'quarantine_level': level,
+                'peak_reduction_percent': peak_reduction,
+                'peak_delay_days': peak_delay
+            })
+    
+    return results
+
 # Define quarantine levels
 quarantine_levels = [0, 0.1, 0.35, 0.7, 0.74]
 
@@ -104,36 +167,45 @@ colors = plt.cm.rainbow(np.linspace(0, 1, len(quarantine_levels)))
 def plot_total_infected_all_levels(beta, N, gamma, mu, W, a, initial_conditions, time_span):
     t = np.linspace(0, time_span, int(time_span))
     plt.figure(figsize=(10, 6))
-
-    # Simulate Level 0 (no quarantine) to calculate baseline peak and timing
+    
+    # Simulate baseline (Level 0, no quarantine)
     results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
     total_base = results_base[:, 1] + results_base[:, 5] + results_base[:, 9]
     peak_base = np.max(total_base)
-    peak_time_base = t[np.argmax(total_base)]  # Time of peak for Level 0
-
+    peak_time_base = t[np.argmax(total_base)]
+    
     for i, level in enumerate(quarantine_levels):
-        # Adjust beta for the current quarantine level
         adjusted_beta = beta.copy() * (1 - level)
-
-        # Simulate the model
         results = odeint(deriv, initial_conditions, t, args=(N, adjusted_beta, gamma, mu, W, a))
-
-        # Extract results for the total Infected population
         total_infected = results[:, 1] + results[:, 5] + results[:, 9]
-        maxima_indices, _ = find_local_maxima(total_infected)
-
-        # Plot the total Infected population
-        plt.plot(t, total_infected, color=colors[i], label=f'Level: {int(level * 100)}%, Peak Reduction: {((peak_base - np.max(total_infected)) / peak_base) * 100:.2f}%, Delay: {t[np.argmax(total_infected)] - peak_time_base:.2f} days')
-
-        # Add black dots for relative maxima
-        plt.scatter(t[maxima_indices], total_infected[maxima_indices], color='black', zorder=5)
-
+        max_idx, _ = find_local_maxima(total_infected)
+        
+        if len(max_idx) == 0 or max_idx[0] == 0:
+            delay = "None"
+        else:
+            delay_val = t[max_idx[0]] - peak_time_base
+            delay = "None" if delay_val < 0 else f"{delay_val:.2f}"
+        
+        plt.plot(t, total_infected, color=colors[i],
+                 label=f'Level: {int(level * 100)}%, Peak Reduction: {((peak_base - np.max(total_infected)) / peak_base) * 100:.2f}%, Delay: {delay} days')
+        idx, _ = find_local_maxima(total_infected)
+        plt.scatter(t[idx], total_infected[idx], color='black', zorder=5)
+    
     plt.title('Total Infectious Population under Population-Wide Quarantine Levels')
     plt.xlabel('Days')
     plt.ylabel('Total Infectious Population (All Groups)')
     plt.legend(loc='upper right')
     plt.tight_layout()
     plt.show()
+
+# Compute peak reduction and delay for all groups and total population
+peak_results_all = compute_peak_reduction_and_delay_all(quarantine_levels, beta, N, gamma, mu, W, a, initial_conditions, time_span)
+
+# Display results for Total
+for result in peak_results_all['Total']:
+    print(f"Quarantine Level: {int(result['quarantine_level'] * 100)}% Reduction")
+    print(f"  Peak Reduction: {result['peak_reduction_percent']}%")
+    print(f"  Peak Delay: {result['peak_delay_days']} days\n")
 
 # Plot the total infected population
 plot_total_infected_all_levels(beta.copy(), N, gamma, mu, W, a, initial_conditions, time_span)
