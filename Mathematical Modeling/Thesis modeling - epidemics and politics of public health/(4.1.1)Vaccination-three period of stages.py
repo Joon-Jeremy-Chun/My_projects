@@ -49,10 +49,11 @@ initial_conditions = [
 # Define initial vaccination rate
 # vaccination_rates = np.array([1, 1, 1])  # Initial rate
 # vaccination_rates = np.array([0, 0, 0])
-vaccination_rates = np.array([0.02, 0.02, 0.02])
+#vaccination_rates = np.array([0.0228, 0.0228, 0.0228])
+vaccination_rates = np.array([0.0114, 0.0114, 0.0114])
 # Define three stage dates and % of boosts
 t1, t2 = 30, 60
-B_timeP0, B_timeP1, B_timeP2 = 1.0, 1.0, 1.0
+B_timeP0, B_timeP1, B_timeP2 = 0.5, 1.0, 1.0
 
 # Dynamic vaccination function
 def vaccination_strategy(t):

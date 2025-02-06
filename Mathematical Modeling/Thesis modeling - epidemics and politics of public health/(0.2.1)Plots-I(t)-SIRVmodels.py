@@ -14,8 +14,13 @@ data = pd.read_csv(file_path)
 data['Date'] = pd.to_datetime(data['Date'])
 
 # Filter the data for the required date range
-start_date = '2020-01-25'
-end_date = '2020-05-01'
+# start_date = '2020-01-25'
+# end_date = '2020-05-01'
+start_date = '2021-01-01'
+end_date = '2021-12-30'
+
+
+
 data = data[(data['Date'] >= start_date) & (data['Date'] <= end_date)]
 
 # Define age groups
