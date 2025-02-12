@@ -12,7 +12,9 @@ Three simulation scenarios are considered:
     3. Vaccination with Light Social Distancing: Apply a moderate reduction to β and vary the manual vaccination rate.
 
 For each simulation, we record the peak number of infections (total across groups)
-and the day on which that peak occurs.
+and the day on which that peak occurs. In addition, for Scenarios 2 and 3 we compute:
+    (a) the total number of vaccinated individuals at day 60 and day 365,
+    (b) the ratio of vaccinated individuals to the total population at day 60 and day 365.
 """
 
 import pandas as pd
@@ -59,7 +61,8 @@ initial_conditions = [
 # 2. VACCINATION STRATEGY SETUP
 # -----------------------------
 # Option 1: Manual constant vaccination rate (used in Vaccination Only and combined scenario)
-vaccination_rates = np.array([0.02, 0.02, 0.02])  # default manual rate
+vaccination_rates = np.array([0.0, 0.0, 0.0])  # default manual rate
+vaccination_rates_dynamic = vaccination_rates
 
 # Option 2: Dynamic vaccination rates based on target proportions (not used in these scenarios)
 k1, d1 = 0.8, 30  # e.g., 80% in 30 days for Children
@@ -68,7 +71,7 @@ k3, d3 = 0.9, 60  # e.g., 90% in 60 days for Seniors
 x1 = k1 ** (1/d1)
 x2 = k2 ** (1/d2)
 x3 = k3 ** (1/d3)
-vaccination_rates_dynamic = np.array([x1, x2, x3])
+# vaccination_rates_dynamic = np.array([x1, x2, x3])
 # In our current scenarios, we use the manual vaccination rate (set use_dynamic=False).
 
 # Stage times and boost factors (for vaccination strategy phases)
@@ -133,7 +136,10 @@ def deriv(y, t, N, beta, gamma, mu, W, use_dynamic):
 def run_simulation(beta_mod, use_dynamic):
     """
     Runs the model simulation using the given beta matrix (beta_mod) and vaccination strategy.
-    Returns the peak total infections and the day of the peak.
+    Returns:
+      - peak_value: peak total infections and the day of the peak,
+      - total_vaccinated_60, ratio_vaccinated_60 at day 60,
+      - total_vaccinated_365, ratio_vaccinated_365 at day 365.
     """
     t = np.linspace(0, time_span, int(time_span))
     results = odeint(deriv, initial_conditions, t, args=(N, beta_mod, gamma, mu, W, use_dynamic))
@@ -143,19 +149,31 @@ def run_simulation(beta_mod, use_dynamic):
     peak_idx = np.argmax(I_total)
     peak_value = I_total[peak_idx]
     peak_day = t[peak_idx]
-    return peak_value, peak_day
+    
+    # Determine index corresponding to day 60 and day 365 (if available)
+    index_60 = np.where(t >= 60)[0][0]
+    total_vaccinated_60 = results[index_60, 3] + results[index_60, 7] + results[index_60, 11]
+    ratio_vaccinated_60 = total_vaccinated_60 / np.sum(N)
+    
+    # For day 365, check if simulation ran that long; otherwise use last index.
+    if t[-1] >= 365:
+        index_365 = np.where(t >= 365)[0][0]
+    else:
+        index_365 = -1  # last index
+    total_vaccinated_365 = results[index_365, 3] + results[index_365, 7] + results[index_365, 11]
+    ratio_vaccinated_365 = total_vaccinated_365 / np.sum(N)
+    
+    return peak_value, peak_day, total_vaccinated_60, ratio_vaccinated_60, total_vaccinated_365, ratio_vaccinated_365
 
 # -----------------------------
 # 5. SCENARIO 1: SOCIAL DISTANCING ONLY
 # -----------------------------
 social_results = []
-# Define a range of multipliers for β (from no reduction (1.0) to a 50% reduction (0.5))
-beta_multipliers = np.linspace(1.0, 0.5, num=6)  # e.g., 1.0, 0.9, 0.8, 0.7, 0.6, 0.5
-
+beta_multipliers = [1.0, 0.9, 0.65, 0.3]
 for multiplier in beta_multipliers:
     beta_mod = beta * multiplier  # apply uniform reduction
-    # Use dynamic vaccination (here, vaccination strategy remains unchanged)
-    peak_value, peak_day = run_simulation(beta_mod, use_dynamic=True)
+    # Use dynamic vaccination (vaccination strategy unchanged)
+    peak_value, peak_day, _, _, _, _ = run_simulation(beta_mod, use_dynamic=True)
     social_results.append({
         'beta_multiplier': multiplier,
         'peak_infected': peak_value,
@@ -170,17 +188,19 @@ print(social_df)
 # 6. SCENARIO 2: VACCINATION ONLY
 # -----------------------------
 vaccination_results = []
-# For Vaccination Only, keep the original β matrix and vary the manual vaccination rate.
-vaccination_rates_range = np.linspace(0.02, 0.1, num=9)  # from 0.02 to 0.1
-
+vaccination_rates_range = np.linspace(0.0001, 0.0201, num=201)
 for v in vaccination_rates_range:
     # Override the manual vaccination rate (global variable used when use_dynamic=False)
     vaccination_rates = np.array([v, v, v])
-    peak_value, peak_day = run_simulation(beta, use_dynamic=False)
+    peak_value, peak_day, total_vacc_60, ratio_vacc_60, total_vacc_365, ratio_vacc_365 = run_simulation(beta, use_dynamic=False)
     vaccination_results.append({
         'vaccination_rate': v,
         'peak_infected': peak_value,
-        'peak_day': peak_day
+        'peak_day': peak_day,
+        'total_vaccinated_60': total_vacc_60,
+        'ratio_vaccinated_60': ratio_vacc_60,
+        'total_vaccinated_365': total_vacc_365,
+        'ratio_vaccinated_365': ratio_vacc_365
     })
 
 vaccination_df = pd.DataFrame(vaccination_results)
@@ -191,20 +211,20 @@ print(vaccination_df)
 # 7. SCENARIO 3: VACCINATION WITH LIGHT SOCIAL DISTANCING
 # -----------------------------
 combined_results = []
-# For this scenario, we apply a fixed light social distancing effect by setting a beta multiplier,
-# e.g., 0.9 (representing a 10% reduction in contact rates), and vary the manual vaccination rate.
 beta_multiplier_combined = 0.9
 beta_mod_combined = beta * beta_multiplier_combined
-
 for v in vaccination_rates_range:
     vaccination_rates = np.array([v, v, v])
-    # Use manual vaccination strategy with light social distancing applied
-    peak_value, peak_day = run_simulation(beta_mod_combined, use_dynamic=False)
+    peak_value, peak_day, total_vacc_60, ratio_vacc_60, total_vacc_365, ratio_vacc_365 = run_simulation(beta_mod_combined, use_dynamic=False)
     combined_results.append({
         'vaccination_rate': v,
         'beta_multiplier': beta_multiplier_combined,
         'peak_infected': peak_value,
-        'peak_day': peak_day
+        'peak_day': peak_day,
+        'total_vaccinated_60': total_vacc_60,
+        'ratio_vaccinated_60': ratio_vacc_60,
+        'total_vaccinated_365': total_vacc_365,
+        'ratio_vaccinated_365': ratio_vacc_365
     })
 
 combined_df = pd.DataFrame(combined_results)
@@ -214,7 +234,6 @@ print(combined_df)
 # -----------------------------
 # 8. OPTIONAL: PLOTTING EXAMPLE (for one simulation)
 # -----------------------------
-# Example: Plotting the infection curve for the baseline case (no intervention)
 t = np.linspace(0, time_span, int(time_span))
 results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, True))
 I_children = results[:, 1]
