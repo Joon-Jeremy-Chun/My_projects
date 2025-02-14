@@ -13,8 +13,9 @@ Three simulation scenarios are considered:
 
 For each simulation, we record the peak number of infections (total across groups)
 and the day on which that peak occurs. In addition, for Scenarios 2 and 3 we compute:
-    (a) the total number of vaccinated individuals at day 60 and day 365,
-    (b) the ratio of vaccinated individuals to the total population at day 60 and day 365.
+    - the total number of vaccinated individuals and the ratio (vaccinated/total) at day 30,
+    - at day 60, and
+    - at day 365.
 """
 
 import pandas as pd
@@ -137,7 +138,9 @@ def run_simulation(beta_mod, use_dynamic):
     """
     Runs the model simulation using the given beta matrix (beta_mod) and vaccination strategy.
     Returns:
-      - peak_value: peak total infections and the day of the peak,
+      - peak_value: peak total infections,
+      - peak_day: the day of the peak,
+      - total_vaccinated_30, ratio_vaccinated_30 at day 30,
       - total_vaccinated_60, ratio_vaccinated_60 at day 60,
       - total_vaccinated_365, ratio_vaccinated_365 at day 365.
     """
@@ -150,7 +153,11 @@ def run_simulation(beta_mod, use_dynamic):
     peak_value = I_total[peak_idx]
     peak_day = t[peak_idx]
     
-    # Determine index corresponding to day 60 and day 365 (if available)
+    # Determine indices corresponding to day 30, 60, and 365 (if available)
+    index_30 = np.where(t >= 30)[0][0]
+    total_vaccinated_30 = results[index_30, 3] + results[index_30, 7] + results[index_30, 11]
+    ratio_vaccinated_30 = total_vaccinated_30 / np.sum(N)
+    
     index_60 = np.where(t >= 60)[0][0]
     total_vaccinated_60 = results[index_60, 3] + results[index_60, 7] + results[index_60, 11]
     ratio_vaccinated_60 = total_vaccinated_60 / np.sum(N)
@@ -163,7 +170,10 @@ def run_simulation(beta_mod, use_dynamic):
     total_vaccinated_365 = results[index_365, 3] + results[index_365, 7] + results[index_365, 11]
     ratio_vaccinated_365 = total_vaccinated_365 / np.sum(N)
     
-    return peak_value, peak_day, total_vaccinated_60, ratio_vaccinated_60, total_vaccinated_365, ratio_vaccinated_365
+    return (peak_value, peak_day, 
+            total_vaccinated_30, ratio_vaccinated_30,
+            total_vaccinated_60, ratio_vaccinated_60,
+            total_vaccinated_365, ratio_vaccinated_365)
 
 # -----------------------------
 # 5. SCENARIO 1: SOCIAL DISTANCING ONLY
@@ -173,7 +183,7 @@ beta_multipliers = [1.0, 0.9, 0.65, 0.3]
 for multiplier in beta_multipliers:
     beta_mod = beta * multiplier  # apply uniform reduction
     # Use dynamic vaccination (vaccination strategy unchanged)
-    peak_value, peak_day, _, _, _, _ = run_simulation(beta_mod, use_dynamic=True)
+    peak_value, peak_day, _, _, _, _, _, _ = run_simulation(beta_mod, use_dynamic=True)
     social_results.append({
         'beta_multiplier': multiplier,
         'peak_infected': peak_value,
@@ -192,11 +202,16 @@ vaccination_rates_range = np.linspace(0.0001, 0.0201, num=201)
 for v in vaccination_rates_range:
     # Override the manual vaccination rate (global variable used when use_dynamic=False)
     vaccination_rates = np.array([v, v, v])
-    peak_value, peak_day, total_vacc_60, ratio_vacc_60, total_vacc_365, ratio_vacc_365 = run_simulation(beta, use_dynamic=False)
+    (peak_value, peak_day, 
+     total_vacc_30, ratio_vacc_30,
+     total_vacc_60, ratio_vacc_60,
+     total_vacc_365, ratio_vacc_365) = run_simulation(beta, use_dynamic=False)
     vaccination_results.append({
         'vaccination_rate': v,
         'peak_infected': peak_value,
         'peak_day': peak_day,
+        'total_vaccinated_30': total_vacc_30,
+        'ratio_vaccinated_30': ratio_vacc_30,
         'total_vaccinated_60': total_vacc_60,
         'ratio_vaccinated_60': ratio_vacc_60,
         'total_vaccinated_365': total_vacc_365,
@@ -215,12 +230,17 @@ beta_multiplier_combined = 0.9
 beta_mod_combined = beta * beta_multiplier_combined
 for v in vaccination_rates_range:
     vaccination_rates = np.array([v, v, v])
-    peak_value, peak_day, total_vacc_60, ratio_vacc_60, total_vacc_365, ratio_vacc_365 = run_simulation(beta_mod_combined, use_dynamic=False)
+    (peak_value, peak_day, 
+     total_vacc_30, ratio_vacc_30,
+     total_vacc_60, ratio_vacc_60,
+     total_vacc_365, ratio_vacc_365) = run_simulation(beta_mod_combined, use_dynamic=False)
     combined_results.append({
         'vaccination_rate': v,
         'beta_multiplier': beta_multiplier_combined,
         'peak_infected': peak_value,
         'peak_day': peak_day,
+        'total_vaccinated_30': total_vacc_30,
+        'ratio_vaccinated_30': ratio_vacc_30,
         'total_vaccinated_60': total_vacc_60,
         'ratio_vaccinated_60': ratio_vacc_60,
         'total_vaccinated_365': total_vacc_365,
