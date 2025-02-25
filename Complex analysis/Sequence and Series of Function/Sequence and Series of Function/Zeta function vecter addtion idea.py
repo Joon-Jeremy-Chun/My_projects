@@ -7,7 +7,7 @@ Created on Mon Feb 24 14:55:04 2025
 import numpy as np
 import matplotlib.pyplot as plt
 
-def partial_sums_zeta(s, max_terms=30):
+def partial_sums_zeta(s, max_terms=100000):
 
     partial_sums = []
     current_sum = 0 + 0j
@@ -77,10 +77,10 @@ def plot_input_and_vectors(s, partial_sums):
 
 def main():
     # Example: s = x + iy (with Re(s) > 1 for a decent approximation)
-    s = 2 - 1j
+    s = 2  + 1j
 
     # Number of terms to sum (and show in the diagram)
-    max_terms = 30
+    max_terms = 1000000
 
     # Compute partial sums
     partial_sums = partial_sums_zeta(s, max_terms)

@@ -61,7 +61,7 @@ def plot_results(s, result):
     plt.show()
 
 def main():
-    s = 2 + -1j  # Complex number input (x + yi)
+    s = 2 + 1j  # Complex number input (x + yi)
     result = zeta(s)
     print("zeta({}) approximated using {} terms is:".format(s, 1000000))
     print(result)
