@@ -70,22 +70,28 @@ def plot_results_multi(s_vals_list, zeta_vals_list, labels, colors_input, colors
 # Main Code
 # ---------------------------
 # Define the parameter range
-t_vals = np.linspace(0, 5, 100)
+t_vals = np.linspace(1, 5, 1000)
 
 # Define two different parameter equations.
 # Line 1: 
-x_func1 = lambda t: 1 + t
-y_func1 = lambda t: 1
+# x_func1 = lambda t: 1 + t
+# y_func1 = lambda t: 1
 
 # x_func1 = lambda t: 1.5
 # y_func1 = lambda t: -1 + t
 
-# x_func1 = lambda t: 1.5 + t
-# y_func1 = lambda t: 1.5 + t
+x_func1 = lambda t: 1.1 + t
+y_func1 = lambda t: 1.1 + t
+
+# x_func1 = lambda t: 1/2
+# y_func1 = lambda t: t
 
 # Line 2:
-x_func2 = lambda t: 1 + t
-y_func2 = lambda t: -1
+# x_func2 = lambda t: 1 + t
+# y_func2 = lambda t: -1
+
+x_func2 = lambda t: 1.1 + t
+y_func2 = lambda t: 1.1
 
 # Generate input complex numbers for both lines.
 s_vals1 = generate_complex_inputs(t_vals, x_func1, y_func1)

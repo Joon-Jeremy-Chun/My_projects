@@ -23,7 +23,9 @@ def zeta_functional_equation_rhs(s):
 # Set precision and define input
 # ------------------------------
 mp.mp.prec = 80  # set precision
-s = mp.mpc('2', '1')  # Complex number input (x + yi)
+s = mp.mpc('-1', '0')  # Complex number input (x + yi)
+
+
 
 # ------------------------------
 # Compute zeta(s) both ways
@@ -71,8 +73,10 @@ plt.tight_layout()
 plt.show()
 
 
-
-
+#s = mp.mpc('1/2', '14.134725')  # Complex number input (x + yi)
+# initial_guesses = [14.134725, 21.022040, 25.010857, 30.424876,
+#                    32.935062, 37.586178, 40.918719, 43.327073,
+#                    48.005151, 49.773832]
 
 
 

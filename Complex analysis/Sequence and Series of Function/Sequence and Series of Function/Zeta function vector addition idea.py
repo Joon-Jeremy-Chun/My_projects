@@ -77,7 +77,7 @@ def plot_input_and_vectors(s, partial_sums):
 
 def main():
     # Example: s = x + iy (with Re(s) > 1 for a decent approximation)
-    s = 2  + 1j
+    s = 2  + 2j
 
     # Number of terms to sum (and show in the diagram)
     max_terms = 1000000
