@@ -78,12 +78,12 @@ def plot_results(s_vals, zeta_vals):
     plt.show()
 
 def main():
-    # Define 100 equally spaced t values between 0 and 2.
-    t_vals = np.linspace(0, 2, 100)
+    # Define 100 equally spaced t values between ....
+    t_vals = np.linspace(0, 3, 100)
     
     # Parameter equations for the input complex numbers.
-    x_func = lambda t: 2 + t
-    y_func = lambda t: -1 + t*0
+    x_func = lambda t: 2 + 3*t
+    y_func = lambda t: 2 + 1*t
     
     # Generate input complex numbers using the parameter functions.
     s_vals = generate_complex_inputs(t_vals, x_func, y_func)

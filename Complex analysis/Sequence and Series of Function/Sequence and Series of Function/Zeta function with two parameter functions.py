@@ -82,16 +82,16 @@ def plot_results_multi(s_vals_list, zeta_vals_list, labels, colors_input, colors
     plt.show()
 
 def main():
-    # Define 100 equally spaced t values between 0 and 2.
-    t_vals = np.linspace(0, 1, 100)
+    # Define 100 equally spaced t values between ...
+    t_vals = np.linspace(0, 5, 100)
     
     # Define two different parameter equations.
     # Parameter Equation 1:
     # x_func1 = lambda t: 2
     # y_func1 = lambda t: 0.5 + t
     
-    x_func1 = lambda t:   2 + t
-    y_func1 = lambda t:   1 + t
+    x_func1 = lambda t:   2
+    y_func1 = lambda t:   1 +t
     
     # Parameter Equation 2:
     x_func2 = lambda t: 2 + t
