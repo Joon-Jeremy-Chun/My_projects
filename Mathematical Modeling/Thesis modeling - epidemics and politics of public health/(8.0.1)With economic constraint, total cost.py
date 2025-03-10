@@ -14,7 +14,7 @@ from scipy.signal import argrelextrema
 def load_parameters(file_path):
     df = pd.read_excel(file_path, header=None)
     
-    # Transmission rates matrix (3x3)
+    # Transmission rates matrix (3x3) from Excel (not used for beta)
     transmission_rates = df.iloc[0:3, 0:3].values
     
     # Recovery rates (3 values)
@@ -48,10 +48,16 @@ def load_parameters(file_path):
     return (transmission_rates, recovery_rates, maturity_rates, waning_immunity_rate,
             vaccination_rates, time_span, population_size, susceptible_init, infectious_init,
             recovered_init, vaccinated_init, under_quarantine_transmission_rates, quarantine_day)
+
 #%%
 # Load the parameters from the updated Excel file
 file_path = 'Inputs.xlsx'  # Ensure the correct path to the Excel file
-(beta, gamma, mu, W, a, time_span, N, S_init, I_init, R_init, V_init, beta_quarantine, quarantine_day) = load_parameters(file_path)
+# The beta matrix from Excel is ignored because beta is always loaded from CSV.
+(_, gamma, mu, W, a, time_span, N, S_init, I_init, R_init, V_init, beta_quarantine, quarantine_day) = load_parameters(file_path)
+
+# Now always load beta from the CSV file
+beta_csv_path = 'DataSets/Fitted_Beta_Matrix.csv'
+beta = pd.read_csv(beta_csv_path).iloc[0:3, 1:4].values
 
 # Economic parameters
 m, h, i = 0.8, 0.15, 0.05  # Ratios for medical cases (mild, hospitalized, intensive)
