@@ -110,7 +110,7 @@ optimal_beta = optimal_beta_df.values
 # -------------------------------
 # 3. Define Simulation Period Starting from Feb 26
 # -------------------------------
-extra_days = 180  # Simulation period: 90 extra days after Feb 26
+extra_days = 30  # Simulation period: 90 extra days after Feb 26
 t_extended = np.arange(extra_days + 1)  # 0,1,2,...,90
 
 # Generate simulation dates starting from Feb 26

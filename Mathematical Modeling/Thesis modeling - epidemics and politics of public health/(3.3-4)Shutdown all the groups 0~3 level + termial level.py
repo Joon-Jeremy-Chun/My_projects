@@ -158,7 +158,8 @@ def compute_peak_reduction_and_delay_all(quarantine_levels, beta, N, gamma, mu, 
     return results
 
 # Define quarantine levels
-quarantine_levels = [0, 0.1, 0.35, 0.7, 0.74]
+#quarantine_levels = [0, 0.1, 0.35, 0.7, 0.74]
+quarantine_levels = [0, 0.3, 0.65, 0.74, 0.8]
 
 # Rainbow color scheme
 colors = plt.cm.rainbow(np.linspace(0, 1, len(quarantine_levels)))
