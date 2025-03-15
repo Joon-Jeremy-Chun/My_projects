@@ -6,17 +6,24 @@ Created on Mon Mar 10 04:24:25 2025
 
 Recursive One-Step-Ahead Forecast with Daily 3x3 Beta Multiplier Optimization
 Using solve_ivp (BDF method) with relaxed tolerances to mitigate stiffness issues.
-Rolling period: March 1 to March 28, 2020.
+Rolling period: March 1 to March 31, 2020.
 Produces:
   - 4 plots: one for each age group (0-19, 20-49, 50-80+) and one for the total infectious population.
   - 9 plots: one for each element of the 3x3 multiplier matrix over time.
+All figures are saved in the folder 'Figures'.
 """
 
+import os
 import pandas as pd
 import numpy as np
 from scipy.integrate import solve_ivp
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+
+# Create "Figures" folder if it does not exist
+fig_folder = "Figures"
+if not os.path.exists(fig_folder):
+    os.makedirs(fig_folder)
 
 # -------------------------------
 # 1. Define the SIRV Model ODEs
@@ -32,12 +39,10 @@ def sirv_model(t, y, beta, gamma, a, delta):
     """
     S1, I1, R1, V1, S2, I2, R2, V2, S3, I3, R3, V3 = y
 
-    # Population sizes per group
     N1 = S1 + I1 + R1 + V1
     N2 = S2 + I2 + R2 + V2
     N3 = S3 + I3 + R3 + V3
 
-    # Force of infection for each group:
     lambda1 = sum(beta[0, j] * I / N for j, I, N in zip(range(3), [I1, I2, I3], [N1, N2, N3]))
     lambda2 = sum(beta[1, j] * I / N for j, I, N in zip(range(3), [I1, I2, I3], [N1, N2, N3]))
     lambda3 = sum(beta[2, j] * I / N for j, I, N in zip(range(3), [I1, I2, I3], [N1, N2, N3]))
@@ -64,9 +69,8 @@ def sirv_model(t, y, beta, gamma, a, delta):
 # -------------------------------
 # 2. Load Real Data and Fixed Parameters
 # -------------------------------
-# Define rolling period: March 1 to March 28, 2020.
 start_roll = pd.Timestamp('2020-03-01')
-end_roll   = pd.Timestamp('2020-03-31')
+end_roll   = pd.Timestamp('2020-04-01')
 
 roll_data = pd.read_csv('DataSets/Korea_threeGroups_SIRV_parameter.csv')
 roll_data['Date'] = pd.to_datetime(roll_data['Date'])
@@ -84,39 +88,32 @@ def get_state_from_row(row):
         row['S_50-80+'], row['I_50-80+'], row['R_50-80+'], row['V_50-80+']
     ], dtype=float)
 
-# Fixed parameters from Inputs.xlsx:
 inputs = pd.read_excel('Inputs.xlsx', header=None)
-gamma = inputs.iloc[4, 0:3].values        # recovery rates (length 3)
-a = inputs.iloc[10, 0:3].values           # vaccination rates (length 3)
-delta = inputs.iloc[8, 0]                 # waning immunity rate
+gamma = inputs.iloc[4, 0:3].values
+a = inputs.iloc[10, 0:3].values
+delta = inputs.iloc[8, 0]
 
-# Fitted beta matrix from CSV (3x3):
 optimal_beta_df = pd.read_csv('DataSets/Fitted_Beta_Matrix.csv', index_col=0)
 optimal_beta = optimal_beta_df.values
 
 # -------------------------------
 # 3. Set Up Rolling Forecast Settings
 # -------------------------------
-# We'll use a one-day integration: t in [0,1]
-t_span = [0, 1]
+t_span = [0, 1]  # one-day integration
 
 # -------------------------------
-# 4. Recursive Rolling Forecast with Update Using Computed Forecasts
+# 4. Recursive Rolling Forecast (Recursive Update)
 # -------------------------------
-# For day 0, use real data state on March 1.
 current_state = get_state_from_row(roll_data.iloc[0])
-forecast_dates = []    # dates corresponding to forecasted state (day d+1)
-predicted_states = []  # list to hold predicted states (length 12)
-daily_matrices = []    # store the optimal 3x3 multiplier matrix for each day
+forecast_dates = []    # Dates for forecasted state (day d+1)
+predicted_states = []  # Predicted states (length-12 vectors)
+daily_matrices = []    # Optimal 3x3 multiplier matrix for each day
 
-# Set optimization parameters for daily multiplier:
 bounds = [(0, 2)] * 9
 x0 = np.ones(9)
 
-# Loop for d from 0 to n_days - 2.
 for d in range(n_days - 1):
     target_state = get_state_from_row(roll_data.iloc[d+1])
-    # Optimize the 3x3 multiplier M (flattened as 9 parameters) so that one-day forecast fits target_state.
     res = minimize(lambda x: np.sum((solve_ivp(lambda t, y: sirv_model(t, y, x.reshape((3,3)) * optimal_beta, gamma, a, delta),
                                               [t_span[0], t_span[-1]], current_state,
                                               method='BDF', rtol=1e-3, atol=1e-6).y[:,-1] - target_state)**2),
@@ -127,7 +124,6 @@ for d in range(n_days - 1):
         best_M = np.full((3,3), np.nan)
     daily_matrices.append(best_M)
     
-    # Forecast one day ahead using best_M:
     new_beta = best_M * optimal_beta
     sol = solve_ivp(lambda t, y: sirv_model(t, y, new_beta, gamma, a, delta),
                     [t_span[0], t_span[-1]], current_state,
@@ -136,7 +132,6 @@ for d in range(n_days - 1):
     predicted_states.append(forecast_state)
     forecast_dates.append(roll_data['Date'].iloc[d+1])
     
-    # Update current_state recursively with computed forecast.
     current_state = forecast_state.copy()
     x0 = res.x  # warm start
 
@@ -166,11 +161,17 @@ multiplier_df = pd.DataFrame(flat_matrices, columns=cols)
 multiplier_df.to_csv('DataSets/Daily_Beta_Multipliers_Rolling.csv', index=False)
 
 # -------------------------------
-# 7. Plot Four Infectious Curves (Forecast vs. Actual)
+# 7. Plot and Save Four Infectious Curves (Forecast vs. Actual)
 # -------------------------------
 import matplotlib.dates as mdates
 
-plt.figure(figsize=(10, 6))
+# Define a function to save a figure.
+def save_fig(fig, fname):
+    fig.savefig(os.path.join(fig_folder, fname), dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+# Plot for Age Group 0-19
+fig = plt.figure(figsize=(10, 6))
 plt.plot(forecast_dates, pred_I_0_19, 'ro-', label='Predicted I (0-19)')
 plt.plot(forecast_dates, actual_I_0_19, 'k--', label='Actual I (0-19)')
 plt.title("Recursive Forecast for Age Group 0-19")
@@ -179,9 +180,10 @@ plt.ylabel("Infectious Population")
 plt.legend()
 plt.grid(True)
 plt.gcf().autofmt_xdate()
-plt.show()
+save_fig(fig, "Forecast_I_0-19.png")
 
-plt.figure(figsize=(10, 6))
+# Plot for Age Group 20-49
+fig = plt.figure(figsize=(10, 6))
 plt.plot(forecast_dates, pred_I_20_49, 'ro-', label='Predicted I (20-49)')
 plt.plot(forecast_dates, actual_I_20_49, 'k--', label='Actual I (20-49)')
 plt.title("Recursive Forecast for Age Group 20-49")
@@ -190,9 +192,10 @@ plt.ylabel("Infectious Population")
 plt.legend()
 plt.grid(True)
 plt.gcf().autofmt_xdate()
-plt.show()
+save_fig(fig, "Forecast_I_20-49.png")
 
-plt.figure(figsize=(10, 6))
+# Plot for Age Group 50-80+
+fig = plt.figure(figsize=(10, 6))
 plt.plot(forecast_dates, pred_I_50_80, 'ro-', label='Predicted I (50-80+)')
 plt.plot(forecast_dates, actual_I_50_80, 'k--', label='Actual I (50-80+)')
 plt.title("Recursive Forecast for Age Group 50-80+")
@@ -201,9 +204,10 @@ plt.ylabel("Infectious Population")
 plt.legend()
 plt.grid(True)
 plt.gcf().autofmt_xdate()
-plt.show()
+save_fig(fig, "Forecast_I_50-80+.png")
 
-plt.figure(figsize=(10, 6))
+# Plot for Total Infectious Population
+fig = plt.figure(figsize=(10, 6))
 plt.plot(forecast_dates, pred_I_total, 'ro-', label='Predicted Total I(t)')
 plt.plot(forecast_dates, actual_I_total, 'k--', label='Actual Total I(t)')
 plt.title("Recursive Forecast for Total Infectious Population")
@@ -212,20 +216,43 @@ plt.ylabel("Total Infectious Population")
 plt.legend()
 plt.grid(True)
 plt.gcf().autofmt_xdate()
-plt.show()
+save_fig(fig, "Forecast_Total_I.png")
 
 # -------------------------------
-# 8. Plot Nine Time Series for Each Multiplier Matrix Element
+# 8. Plot and Save Nine Time Series for Each Multiplier Matrix Element with Three-Level Averages
 # -------------------------------
+
+# Manually assign the subperiod boundaries
+t0 = start_roll
+t1 = pd.Timestamp('2020-03-03')  # Assign t1 manually
+t2 = pd.Timestamp('2020-03-10')  # Assign t2 manually
+t3 = end_roll
+
+subperiods = [t0, t1, t2, t3]
+
 for col in cols[1:]:
-    plt.figure(figsize=(10, 4))
+    fig = plt.figure(figsize=(10, 4))
     plt.plot(multiplier_df['Date'], multiplier_df[col], marker='o', linestyle='-', label=col)
-    avg_val = multiplier_df[col].mean()
-    plt.axhline(y=avg_val, color='r', linestyle='--', label=f'Mean = {avg_val:.3f}')
+    
+    # Compute and plot averages for each of the three subperiods
+    for i in range(3):
+        t_start = subperiods[i]
+        t_end = subperiods[i+1]
+        # Use inclusive/exclusive bounds as needed
+        if i < 2:
+            mask = (multiplier_df['Date'] >= t_start) & (multiplier_df['Date'] < t_end)
+        else:
+            mask = (multiplier_df['Date'] >= t_start) & (multiplier_df['Date'] <= t_end)
+        sub_data = multiplier_df.loc[mask, col]
+        if not sub_data.empty:
+            level_avg = sub_data.mean()
+            plt.hlines(y=level_avg, xmin=t_start, xmax=t_end, colors='r', linestyles='--',
+                       label=f'Level {i+1}: {level_avg:.3f}')
+    
     plt.title(f"Time Series of {col} Over {len(multiplier_df)} Days")
     plt.xlabel("Date")
     plt.ylabel(col)
     plt.legend()
     plt.grid(True)
     plt.gcf().autofmt_xdate()
-    plt.show()
+    save_fig(fig, f"Multiplier_{col}.png")

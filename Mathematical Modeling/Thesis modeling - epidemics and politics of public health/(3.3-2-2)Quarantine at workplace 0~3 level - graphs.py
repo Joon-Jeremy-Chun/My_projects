@@ -163,7 +163,8 @@ def compute_peak_reduction_and_delay_all(quarantine_levels, beta, N, gamma, mu, 
     return results
 
 # Define quarantine levels
-quarantine_levels = [0, 0.1, 0.35, 0.7]
+#quarantine_levels = [0, 0.1, 0.35, 0.7]
+quarantine_levels = [0, 0.3, 0.65, 0.8]
 
 # Compute peak reduction and delay for all groups and total population
 peak_results_all = compute_peak_reduction_and_delay_all(quarantine_levels, beta, N, gamma, mu, W, a, initial_conditions, time_span)
@@ -184,8 +185,8 @@ def plot_group_infected_4_levels_workplace(group_idx, group_label, beta, N, gamm
     colors = ['blue', 'green', 'orange', 'red']  # Colors for the 4 levels
 
     # Quarantine levels with respective reductions
-    quarantine_levels = [0, 0.1, 0.35, 0.7]
-
+    #quarantine_levels = [0, 0.1, 0.35, 0.7]
+    quarantine_levels = [0, 0.3, 0.65, 0.8]
     # Simulate Level 0 (no quarantine) to calculate baseline peak and timing
     results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
     I_base = results_base[:, group_idx + 1]
@@ -225,7 +226,8 @@ def plot_total_infected_4_levels_workplace(beta, N, gamma, mu, W, a, initial_con
     colors = ['blue', 'green', 'orange', 'red']  # Colors for the 4 levels
 
     # Quarantine levels with respective reductions
-    quarantine_levels = [0, 0.1, 0.35, 0.7]
+    #quarantine_levels = [0, 0.1, 0.35, 0.7]
+    quarantine_levels = [0, 0.3, 0.65, 0.8]
 
     # Simulate Level 0 (no quarantine) to calculate baseline peak and timing
     results_base = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, a))
