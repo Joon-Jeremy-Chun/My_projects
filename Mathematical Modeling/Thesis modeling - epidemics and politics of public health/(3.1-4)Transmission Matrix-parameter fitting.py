@@ -5,12 +5,17 @@ Created on Mon Dec 16 23:23:34 2024
 @author: joonc
 """
 
-
+import os
 import pandas as pd
 import numpy as np
 from scipy.integrate import odeint
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+
+# Create directory for figures if it doesn't exist
+fig_dir = 'Figures'
+if not os.path.exists(fig_dir):
+    os.makedirs(fig_dir)
 
 # Step 1: Load Data and Fixed Parameters
 file_path_parameters = 'DataSets/Korea_threeGroups_SIRV_parameter.csv'
@@ -115,7 +120,7 @@ t = range(len(fit_data))
 fitted_result = odeint(sirv_model, y0, t, args=(optimal_beta, gamma, a, delta))
 I_fitted = fitted_result[:, [1, 5, 9]]
 
-# Step 7: Plot Results
+# Step 7: Plot Results for Each Age Group and Save Figures
 for idx, age_group in enumerate(age_groups):
     plt.figure(figsize=(10, 6))
     plt.plot(fit_data['Date'], fit_data[f'I_{age_group}'], label='Actual I(t)', color='blue', linestyle='--')
@@ -126,7 +131,37 @@ for idx, age_group in enumerate(age_groups):
     plt.legend()
     plt.grid()
     plt.tight_layout()
+    
+    # Save the figure to the Figures directory
+    save_path = os.path.join(fig_dir, f"Actual_vs_Fitted_I_{age_group.replace('-', '_')}.png")
+    plt.savefig(save_path, dpi=300)
     plt.show()
+
+# Step 7A: Plot Total I(t) Across All Age Groups and Save Figure
+# Calculate total I(t) from the actual data:
+total_actual_I = (
+    fit_data['I_0-19'] +
+    fit_data['I_20-49'] +
+    fit_data['I_50-80+']
+)
+
+# Calculate total I(t) from the fitted model:
+total_fitted_I = I_fitted[:, 0] + I_fitted[:, 1] + I_fitted[:, 2]
+
+plt.figure(figsize=(10, 6))
+plt.plot(fit_data['Date'], total_actual_I, label='Actual Total I(t)', color='blue', linestyle='--')
+plt.plot(fit_data['Date'], total_fitted_I, label='Fitted Total I(t)', color='red')
+plt.title("Actual vs Fitted Total Infectious (All Age Groups)")
+plt.xlabel("Date")
+plt.ylabel("Infectious Population")
+plt.legend()
+plt.grid()
+plt.tight_layout()
+
+# Save the total I(t) plot
+save_path_total = os.path.join(fig_dir, "Actual_vs_Fitted_Total_I.png")
+plt.savefig(save_path_total, dpi=300)
+plt.show()
 
 # Step 8: Save Results
 output_file = 'DataSets/Fitted_Beta_Matrix.csv'
