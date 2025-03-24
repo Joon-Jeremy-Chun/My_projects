@@ -198,8 +198,8 @@ print(social_df)
 # 6. SCENARIO 2: VACCINATION ONLY
 # -----------------------------
 vaccination_results = []
-#vaccination_rates_range = np.linspace(0.0001, 0.0201, num=201)
-vaccination_rates_range = np.linspace(0.00001, 0.00401, num=401)
+vaccination_rates_range = np.linspace(0.0001, 0.0201, num=201)
+#vaccination_rates_range = np.linspace(0.001, 0.401, num=401)
 for v in vaccination_rates_range:
     # Override the manual vaccination rate (global variable used when use_dynamic=False)
     vaccination_rates = np.array([v, v, v])
@@ -227,7 +227,7 @@ print(vaccination_df)
 # 7. SCENARIO 3: VACCINATION WITH LIGHT SOCIAL DISTANCING
 # -----------------------------
 combined_results = []
-beta_multiplier_combined = 0.3
+beta_multiplier_combined = 0.7
 beta_mod_combined = beta * beta_multiplier_combined
 for v in vaccination_rates_range:
     vaccination_rates = np.array([v, v, v])
