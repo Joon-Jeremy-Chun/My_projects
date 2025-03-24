@@ -256,3 +256,119 @@ for col in cols[1:]:
     plt.grid(True)
     plt.gcf().autofmt_xdate()
     save_fig(fig, f"Multiplier_{col}.png")
+
+# -------------------------------
+# 9. Forecast using Mean Multiplier Matrices per Subperiod
+# -------------------------------
+
+# Compute mean multiplier matrices for each subperiod using the daily multiplier data.
+mean_matrices = []  # list to hold the 3x3 mean multiplier matrix for each subperiod
+for i in range(3):
+    t_start = subperiods[i]
+    t_end = subperiods[i+1]
+    # Define mask for the subperiod (for the first two subperiods use [t_start, t_end), for the last include t_end)
+    if i < 2:
+        mask = (multiplier_df['Date'] >= t_start) & (multiplier_df['Date'] < t_end)
+    else:
+        mask = (multiplier_df['Date'] >= t_start) & (multiplier_df['Date'] <= t_end)
+    # Compute mean of each of the 9 matrix elements
+    mean_values = multiplier_df.loc[mask, cols[1:]].mean().values  # shape (9,)
+    mean_matrix = mean_values.reshape((3, 3))
+    mean_matrices.append(mean_matrix)
+
+# Initialize lists to store forecasts using mean matrices.
+pred_mean_I_0_19 = []
+pred_mean_I_20_49 = []
+pred_mean_I_50_80 = []
+pred_mean_I_total = []
+forecast_dates_mean = []
+
+# For each subperiod, start with the real data (initial state) and simulate day-by-day using the corresponding constant mean multiplier.
+for i in range(3):
+    t_start = subperiods[i]
+    t_end = subperiods[i+1]
+    # Get all dates in the current subperiod from roll_data.
+    # For the last subperiod, include the endpoint.
+    if i < 2:
+        sub_dates = roll_data[(roll_data['Date'] >= t_start) & (roll_data['Date'] < t_end)]['Date'].tolist()
+    else:
+        sub_dates = roll_data[(roll_data['Date'] >= t_start) & (roll_data['Date'] <= t_end)]['Date'].tolist()
+    
+    # Use the real state from the first day of the subperiod as the initial condition.
+    sub_initial_state = get_state_from_row(roll_data[roll_data['Date'] == sub_dates[0]].iloc[0])
+    current_state = sub_initial_state.copy()
+    
+    # Compute the constant beta for this subperiod using the mean multiplier matrix.
+    mean_beta = mean_matrices[i] * optimal_beta
+    
+    # For each subsequent day in the subperiod, simulate one day ahead.
+    # (The initial day is from real data.)
+    for d in range(1, len(sub_dates)):
+        sol = solve_ivp(lambda t, y: sirv_model(t, y, mean_beta, gamma, a, delta),
+                        [t_span[0], t_span[-1]], current_state,
+                        method='BDF', rtol=1e-3, atol=1e-6)
+        forecast_state = sol.y[:, -1]
+        # Save forecasted infectious numbers.
+        pred_mean_I_0_19.append(forecast_state[1])
+        pred_mean_I_20_49.append(forecast_state[5])
+        pred_mean_I_50_80.append(forecast_state[9])
+        pred_mean_I_total.append(forecast_state[1] + forecast_state[5] + forecast_state[9])
+        # Save the forecast date.
+        forecast_dates_mean.append(sub_dates[d])
+        # Update current_state for the next day.
+        current_state = forecast_state.copy()
+
+# Plot the forecasts vs. actual curves (following the style of section 7).
+
+# Age Group 0-19
+fig = plt.figure(figsize=(10, 6))
+actual_I_0_19_mean = roll_data.set_index('Date').loc[forecast_dates_mean, 'I_0-19'].values
+plt.plot(forecast_dates_mean, pred_mean_I_0_19, 'ro-', label='Forecast using Mean Multiplier (0-19)')
+plt.plot(forecast_dates_mean, actual_I_0_19_mean, 'k--', label='Actual I (0-19)')
+plt.title("Forecast (Using Mean Multipliers) for Age Group 0-19")
+plt.xlabel("Date")
+plt.ylabel("Infectious Population")
+plt.legend()
+plt.grid(True)
+plt.gcf().autofmt_xdate()
+save_fig(fig, "Forecast_Mean_I_0-19.png")
+
+# Age Group 20-49
+fig = plt.figure(figsize=(10, 6))
+actual_I_20_49_mean = roll_data.set_index('Date').loc[forecast_dates_mean, 'I_20-49'].values
+plt.plot(forecast_dates_mean, pred_mean_I_20_49, 'ro-', label='Forecast using Mean Multiplier (20-49)')
+plt.plot(forecast_dates_mean, actual_I_20_49_mean, 'k--', label='Actual I (20-49)')
+plt.title("Forecast (Using Mean Multipliers) for Age Group 20-49")
+plt.xlabel("Date")
+plt.ylabel("Infectious Population")
+plt.legend()
+plt.grid(True)
+plt.gcf().autofmt_xdate()
+save_fig(fig, "Forecast_Mean_I_20-49.png")
+
+# Age Group 50-80+
+fig = plt.figure(figsize=(10, 6))
+actual_I_50_80_mean = roll_data.set_index('Date').loc[forecast_dates_mean, 'I_50-80+'].values
+plt.plot(forecast_dates_mean, pred_mean_I_50_80, 'ro-', label='Forecast using Mean Multiplier (50-80+)')
+plt.plot(forecast_dates_mean, actual_I_50_80_mean, 'k--', label='Actual I (50-80+)')
+plt.title("Forecast (Using Mean Multipliers) for Age Group 50-80+")
+plt.xlabel("Date")
+plt.ylabel("Infectious Population")
+plt.legend()
+plt.grid(True)
+plt.gcf().autofmt_xdate()
+save_fig(fig, "Forecast_Mean_I_50-80+.png")
+
+# Total Infectious Population
+fig = plt.figure(figsize=(10, 6))
+# Compute actual total infectious for the forecast dates.
+actual_I_total_mean = (actual_I_0_19_mean + actual_I_20_49_mean + actual_I_50_80_mean)
+plt.plot(forecast_dates_mean, pred_mean_I_total, 'ro-', label='Forecast using Mean Multiplier (Total)')
+plt.plot(forecast_dates_mean, actual_I_total_mean, 'k--', label='Actual Total I(t)')
+plt.title("Forecast (Using Mean Multipliers) for Total Infectious Population")
+plt.xlabel("Date")
+plt.ylabel("Total Infectious Population")
+plt.legend()
+plt.grid(True)
+plt.gcf().autofmt_xdate()
+save_fig(fig, "Forecast_Mean_Total_I.png")
