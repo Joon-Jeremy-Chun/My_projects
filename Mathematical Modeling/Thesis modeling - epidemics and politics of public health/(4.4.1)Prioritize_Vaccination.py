@@ -137,7 +137,7 @@ def deriv(y, t, N, beta, gamma, mu, W, use_dynamic):
     ]
 
 # -----------------------------
-# 4. UTILITY FUNCTION: RUN SIMULATION & PLOT
+# 4. UTILITY FUNCTION: RUN SIMULATION, COMPUTE METRICS & PLOT
 # -----------------------------
 def run_example_and_plot(example_label, figure_title,
                          vacc_a, vacc_b, vacc_c, vacc_d,
@@ -145,8 +145,9 @@ def run_example_and_plot(example_label, figure_title,
     """
     1) Updates the global vaccination arrays for each period (a, b, c, d).
     2) Runs the simulation with dynamic vaccination.
-    3) Plots I(t) for each age group plus total infections.
-    4) Adds an overall figure title and saves the figure to 'Figures/'.
+    3) Computes and prints the peak infections (and corresponding day) for each group and total.
+    4) Plots I(t) for each age group plus total infections.
+    5) Adds an overall figure title and saves the figure to 'Figures/'.
     """
     global vaccination_rates_dynamic_a, vaccination_rates_dynamic_b
     global vaccination_rates_dynamic_c, vaccination_rates_dynamic_d
@@ -161,13 +162,37 @@ def run_example_and_plot(example_label, figure_title,
     t = np.linspace(0, time_span, int(time_span))
     results = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, True))
     
-    # Extract infected individuals for each group
+    # --- Computation Section: Peak Infections for Each Group and Total ---
     I_0_20 = results[:, 1]   # Group 1 (Children)
     I_20_49 = results[:, 5]   # Group 2 (Adults)
     I_50_80 = results[:, 9]   # Group 3 (Seniors)
     I_total = I_0_20 + I_20_49 + I_50_80
     
-    # Create the figure and subplots
+    peak_idx_children = np.argmax(I_0_20)
+    peak_children = I_0_20[peak_idx_children]
+    time_peak_children = t[peak_idx_children]
+    
+    peak_idx_adults = np.argmax(I_20_49)
+    peak_adults = I_20_49[peak_idx_adults]
+    time_peak_adults = t[peak_idx_adults]
+    
+    peak_idx_seniors = np.argmax(I_50_80)
+    peak_seniors = I_50_80[peak_idx_seniors]
+    time_peak_seniors = t[peak_idx_seniors]
+    
+    peak_idx_total = np.argmax(I_total)
+    peak_total = I_total[peak_idx_total]
+    time_peak_total = t[peak_idx_total]
+    
+    print(f"Metrics for {example_label}:")
+    print(f"  Children: Peak Infected = {peak_children:.2f} at day {time_peak_children:.2f}")
+    print(f"  Adults:   Peak Infected = {peak_adults:.2f} at day {time_peak_adults:.2f}")
+    print(f"  Seniors:  Peak Infected = {peak_seniors:.2f} at day {time_peak_seniors:.2f}")
+    print(f"  Total:    Peak Infected = {peak_total:.2f} at day {time_peak_total:.2f}")
+    print("-" * 50)
+    # --- End of Computation Section ---
+    
+    # --- Plotting Section ---
     plt.figure(figsize=(12, 10))
     plt.suptitle(figure_title, fontsize=16, y=0.98)
     
@@ -220,7 +245,7 @@ def run_example_and_plot(example_label, figure_title,
 # Example 1: Children prioritized initially
 run_example_and_plot(
     example_label='Children Prioritized',
-    figure_title='Children Prioritized in first 60days',
+    figure_title='Children Prioritized in first 60 days',
     vacc_a=[0.015, 0.0, 0.0],    # Period a
     vacc_b=[0.015, 0.0, 0.0],    # Period b
     vacc_c=[0.015, 0.015, 0.015],# Period c
@@ -230,7 +255,7 @@ run_example_and_plot(
 # Example 2: Adults prioritized initially
 run_example_and_plot(
     example_label='Adults Prioritized',
-    figure_title='Adults Prioritized in first 60days',
+    figure_title='Adults Prioritized in first 60 days',
     vacc_a=[0.0, 0.015, 0.0],
     vacc_b=[0.0, 0.015, 0.0],
     vacc_c=[0.015, 0.015, 0.015],
@@ -240,7 +265,7 @@ run_example_and_plot(
 # Example 3: Seniors prioritized initially
 run_example_and_plot(
     example_label='Seniors Prioritized',
-    figure_title='Seniors Prioritized in first 60days',
+    figure_title='Seniors Prioritized in first 60 days',
     vacc_a=[0.0, 0.0, 0.015],
     vacc_b=[0.0, 0.0, 0.015],
     vacc_c=[0.015, 0.015, 0.015],
