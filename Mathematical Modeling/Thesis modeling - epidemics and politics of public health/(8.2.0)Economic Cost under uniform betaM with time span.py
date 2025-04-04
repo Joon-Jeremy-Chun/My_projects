@@ -10,11 +10,11 @@ This code simulates the epidemic under different social distancing measures (mod
 by scaling the transmission matrix with various β multipliers) and computes 
 the associated economic costs, day-by-day.
 
-Key change from the original:
-    * We do a day-by-day summation of Medical, Wage, Death, and GDP costs.
-    * The final bar chart uses the *cumulative* total from day 0 to day time_span.
-
-We set `time_span = 180`. 
+Key change:
+  * Daily costs (Medical, Wage, Death, GDP) are computed and then cumulatively summed.
+  * The final summary table (results_df) extracts the cumulative cost at the end of the simulation.
+  
+We set time_span = 30 days (change to 180 if desired).
 """
 
 import os
@@ -32,8 +32,8 @@ if not os.path.exists("Figures"):
 # -----------------------------
 def load_parameters(file_path):
     """
-    Loads parameters from an Excel file. 
-    Adjust indexing if your file structure differs.
+    Loads parameters from an Excel file.
+    Adjust the indices if your file structure differs.
     """
     df = pd.read_excel(file_path, header=None)
     recovery_rates = df.iloc[4, 0:3].values      # gamma for each age group
@@ -47,13 +47,13 @@ def load_parameters(file_path):
             population_size, susceptible_init, 
             infectious_init, recovered_init, vaccinated_init)
 
-# Adjust paths as needed
+# Adjust file path as needed
 file_path = 'Inputs.xlsx'
 (gamma, W, N, S_init, I_init, R_init, V_init) = load_parameters(file_path)
 
-time_span = 30  # 180 days
+time_span = 365
 
-# Load transmission matrix from CSV
+# Load transmission matrix from CSV (adjust path if needed)
 beta_df = pd.read_csv('DataSets/Fitted_Beta_Matrix.csv')
 beta = beta_df.iloc[0:3, 1:4].values
 
@@ -70,13 +70,13 @@ initial_conditions = [
 def deriv(y, t, N, beta, gamma, W):
     """
     SIRV model ODEs for three groups (Children, Adults, Seniors).
-    Vaccination = 0 (V does not change).
+    Vaccination is set to 0 (V remains constant).
     """
     S1, I1, R1, V1, S2, I2, R2, V2, S3, I3, R3, V3 = y
     
-    lambda1 = (beta[0,0]*I1/N[0] + beta[0,1]*I2/N[1] + beta[0,2]*I3/N[2])
-    lambda2 = (beta[1,0]*I1/N[0] + beta[1,1]*I2/N[1] + beta[1,2]*I3/N[2])
-    lambda3 = (beta[2,0]*I1/N[0] + beta[2,1]*I2/N[1] + beta[2,2]*I3/N[2])
+    lambda1 = beta[0,0]*I1/N[0] + beta[0,1]*I2/N[1] + beta[0,2]*I3/N[2]
+    lambda2 = beta[1,0]*I1/N[0] + beta[1,1]*I2/N[1] + beta[1,2]*I3/N[2]
+    lambda3 = beta[2,0]*I1/N[0] + beta[2,1]*I2/N[1] + beta[2,2]*I3/N[2]
     
     # Group 1 (Children)
     dS1dt = -lambda1*S1 + W*R1
@@ -96,142 +96,213 @@ def deriv(y, t, N, beta, gamma, W):
     dR3dt = gamma[2]*I3 - W*R3
     dV3dt = 0
     
-    return [
-        dS1dt, dI1dt, dR1dt, dV1dt,
-        dS2dt, dI2dt, dR2dt, dV2dt,
-        dS3dt, dI3dt, dR3dt, dV3dt
-    ]
+    return [dS1dt, dI1dt, dR1dt, dV1dt,
+            dS2dt, dI2dt, dR2dt, dV2dt,
+            dS3dt, dI3dt, dR3dt, dV3dt]
 
 def run_simulation(beta_mod):
-    t = np.linspace(0, time_span, time_span)  # daily steps: 0..179
+    t = np.linspace(0, time_span, time_span)  # daily steps: 0..time_span-1
     results = odeint(deriv, initial_conditions, t, args=(N, beta_mod, gamma, W))
     return results, t
 
 # -----------------------------
-# 3. Day-by-Day Economic Cost
+# 3. Day-by-Day Economic Cost Computation
 # -----------------------------
-# Economic parameters
-M_mild = 160.8
-employment_rates = np.array([0.02, 0.694, 0.513])  
-daily_income = np.array([27.74, 105.12, 92.45])   
+
+# -- Medical cost parameters for mild/hospital/ICU 
+cost_mild = 160.8
+cost_hosp = 432.5
+cost_icu  = 1129.5
+
+# Fractions of severity by age group:
+# Children (0-19): 95% mild, 4% hosp, 1% ICU
+f_child_mild = 0.95
+f_child_hosp = 0.04
+f_child_icu  = 0.01
+
+# Adults (20-49): 90% mild, 8% hosp, 2% ICU
+f_adult_mild = 0.90
+f_adult_hosp = 0.08
+f_adult_icu  = 0.02
+
+# Seniors (50+): 70% mild, 20% hosp, 10% ICU
+f_senior_mild = 0.70
+f_senior_hosp = 0.20
+f_senior_icu  = 0.10
+
+# -- Wage and other parameters
+employment_rates = np.array([0.02, 0.694, 0.513])
+daily_income = np.array([27.74, 105.12, 92.45])
 funeral_cost = 9405.38
 mortality_fraction = np.array([0.000001, 0.00003, 0.007])
-vaccination_cost_per_capita = 35.76  # Not used here (no vaccination)
+vaccination_cost_per_capita = 35.76  # Vaccination is off here; it remains 0
 GDP_per_capita = 31929
-a, b, c = -0.3648, -8.7989, -0.0012  # for GDP loss fraction
+
+# GDP loss fraction constants
+a, b, c = -0.3648, -8.7989, -0.0012
 
 def compute_cost_dataframe(results, beta_m, N, dt=1.0):
     """
-    For each day:
-      * Compute daily cost from Infectious compartments (Medical, Wage, Death),
-      * Add daily GDP cost,
-      * Sum & accumulate to get Cumulative_Cost.
-    Returns a DataFrame with daily and cumulative columns.
+    For each day, compute:
+      - Daily Medical, Wage, Death, and GDP costs (Vaccination=0).
+      - Split medical cost into mild/hospital/ICU based on age-group severity fractions.
+      - Wage loss includes child wage, caretaker wage, adult wage, senior wage.
+      - Compute cumulative totals.
     """
     T = results.shape[0]
     t_arr = np.arange(T)*dt
     
-    # Arrays for daily cost
     med_cost_daily   = np.zeros(T)
     wage_loss_daily  = np.zeros(T)
     death_cost_daily = np.zeros(T)
+    vacc_cost_daily  = np.zeros(T)  # remains zero
     gdp_loss_daily   = np.zeros(T)
     total_daily      = np.zeros(T)
     
-    # Arrays for cumulative
-    cum_med_cost  = np.zeros(T)
-    cum_wage_cost = np.zeros(T)
-    cum_death_cost= np.zeros(T)
-    cum_gdp_cost  = np.zeros(T)
-    cum_total     = np.zeros(T)
+    cum_med_cost   = np.zeros(T)
+    cum_wage_cost  = np.zeros(T)
+    cum_death_cost = np.zeros(T)
+    cum_vacc_cost  = np.zeros(T)
+    cum_gdp_cost   = np.zeros(T)
+    cum_total      = np.zeros(T)
     
-    # GDP daily cost
-    GDP_loss_fraction = a*np.exp(b*beta_m)+c
-    GDP_loss_rate = abs(GDP_loss_fraction)*GDP_per_capita*(np.sum(N)/365.0)
+    # Compute daily GDP loss rate (same each day)
+    GDP_loss_fraction = a * np.exp(b * beta_m) + c
+    GDP_loss_rate = abs(GDP_loss_fraction) * GDP_per_capita * (np.sum(N)/365.0)
     
     for i in range(T):
-        # S1,I1,R1,V1, S2,I2,R2,V2, S3,I3,R3,V3
         y = results[i]
-        I1, I2, I3 = y[1], y[5], y[9]
+        # Infectious compartments
+        I1 = y[1]  # Children
+        I2 = y[5]  # Adults
+        I3 = y[9]  # Seniors
         
-        # daily medical cost
-        med_cost = M_mild * (I1 + I2 + I3)
+        # ------------------------------------------------
+        # (1) Medical Costs with mild/hosp/ICU splits
+        # ------------------------------------------------
+        # Children (0-19)
+        med_child = I1 * (
+            f_child_mild*cost_mild + f_child_hosp*cost_hosp + f_child_icu*cost_icu
+        )
+        # Adults (20-49)
+        med_adult = I2 * (
+            f_adult_mild*cost_mild + f_adult_hosp*cost_hosp + f_adult_icu*cost_icu
+        )
+        # Seniors (50+)
+        med_senior = I3 * (
+            f_senior_mild*cost_mild + f_senior_hosp*cost_hosp + f_senior_icu*cost_icu
+        )
+        med = med_child + med_adult + med_senior
         
-        # daily wage loss
-        #  (adults + seniors) + caregiving for children
-        wage_adult_senior = (daily_income[1]*employment_rates[1]*I2 +
-                             daily_income[2]*employment_rates[2]*I3)
-        wage_caregiving   = daily_income[1]*employment_rates[1]*I1
-        wage_loss         = wage_adult_senior + wage_caregiving
+        # ------------------------------------------------
+        # (2) Wage Loss with caregiver logic
+        # ------------------------------------------------
+        W_child  = daily_income[0]
+        W_adult  = daily_income[1]
+        W_senior = daily_income[2]
         
-        # daily death cost from currently infected
-        #  approximate: funeral cost * (mortality * I)
-        death_cost = funeral_cost * (
+        E_child  = employment_rates[0]
+        E_adult  = employment_rates[1]
+        E_senior = employment_rates[2]
+        
+        # a) Children’s own wage loss (covers ~18–19 y/o in child group)
+        wage_child_loss = W_child * E_child * I1
+        
+        # b) One adult caretaker per infected child
+        wage_caregiver_loss = W_adult * E_adult * I1
+        
+        # c) Infected adults lose their own wage
+        wage_adult_loss = W_adult * E_adult * I2
+        
+        # d) Infected seniors lose their own wage
+        wage_senior_loss = W_senior * E_senior * I3
+        
+        wage = (wage_child_loss
+                + wage_caregiver_loss
+                + wage_adult_loss
+                + wage_senior_loss)
+        
+        # ------------------------------------------------
+        # (3) Death Cost
+        # ------------------------------------------------
+        death = funeral_cost * (
             mortality_fraction[0]*I1 +
             mortality_fraction[1]*I2 +
             mortality_fraction[2]*I3
         )
         
-        # daily GDP cost
+        # ------------------------------------------------
+        # (4) Vaccination Cost (0 here)
+        # ------------------------------------------------
+        vacc = 0.0
+        
+        # ------------------------------------------------
+        # (5) GDP Loss (constant daily rate)
+        # ------------------------------------------------
         gdp_daily = GDP_loss_rate
         
-        # sum
-        total = med_cost + wage_loss + death_cost + gdp_daily
+        # ------------------------------------------------
+        # Total Daily Cost
+        # ------------------------------------------------
+        total = med + wage + death + vacc + gdp_daily
         
-        # store daily
-        med_cost_daily[i]   = med_cost
-        wage_loss_daily[i]  = wage_loss
-        death_cost_daily[i] = death_cost
+        # Store daily
+        med_cost_daily[i]   = med
+        wage_loss_daily[i]  = wage
+        death_cost_daily[i] = death
+        vacc_cost_daily[i]  = vacc
         gdp_loss_daily[i]   = gdp_daily
         total_daily[i]      = total
         
-        # accumulate
+        # Accumulate
         if i == 0:
-            cum_med_cost[i]   = med_cost
-            cum_wage_cost[i]  = wage_loss
-            cum_death_cost[i] = death_cost
+            cum_med_cost[i]   = med
+            cum_wage_cost[i]  = wage
+            cum_death_cost[i] = death
+            cum_vacc_cost[i]  = vacc
             cum_gdp_cost[i]   = gdp_daily
             cum_total[i]      = total
         else:
-            cum_med_cost[i]   = cum_med_cost[i-1]   + med_cost
-            cum_wage_cost[i]  = cum_wage_cost[i-1]  + wage_loss
-            cum_death_cost[i] = cum_death_cost[i-1] + death_cost
+            cum_med_cost[i]   = cum_med_cost[i-1]   + med
+            cum_wage_cost[i]  = cum_wage_cost[i-1]  + wage
+            cum_death_cost[i] = cum_death_cost[i-1] + death
+            cum_vacc_cost[i]  = cum_vacc_cost[i-1]  + vacc
             cum_gdp_cost[i]   = cum_gdp_cost[i-1]   + gdp_daily
             cum_total[i]      = cum_total[i-1]      + total
-    
+            
     df = pd.DataFrame({
-        "time" : t_arr,
-        "S1"   : results[:,0],
-        "I1"   : results[:,1],
-        "R1"   : results[:,2],
-        "V1"   : results[:,3],
-        "S2"   : results[:,4],
-        "I2"   : results[:,5],
-        "R2"   : results[:,6],
-        "V2"   : results[:,7],
-        "S3"   : results[:,8],
-        "I3"   : results[:,9],
-        "R3"   : results[:,10],
-        "V3"   : results[:,11],
-        
-        # Daily cost
-        "Med_Daily"   : med_cost_daily,
-        "Wage_Daily"  : wage_loss_daily,
-        "Death_Daily" : death_cost_daily,
-        "GDP_Daily"   : gdp_loss_daily,
-        "Total_Daily" : total_daily,
-        
-        # Cumulative cost
-        "Cumulative_Med"   : cum_med_cost,
-        "Cumulative_Wage"  : cum_wage_cost,
-        "Cumulative_Death" : cum_death_cost,
-        "Cumulative_GDP"   : cum_gdp_cost,
-        "Cumulative_Cost"  : cum_total
+        "time": t_arr,
+        "S1": results[:,0],
+        "I1": results[:,1],
+        "R1": results[:,2],
+        "V1": results[:,3],
+        "S2": results[:,4],
+        "I2": results[:,5],
+        "R2": results[:,6],
+        "V2": results[:,7],
+        "S3": results[:,8],
+        "I3": results[:,9],
+        "R3": results[:,10],
+        "V3": results[:,11],
+        # Daily costs
+        "Med_Daily": med_cost_daily,
+        "Wage_Daily": wage_loss_daily,
+        "Death_Daily": death_cost_daily,
+        "Vacc_Daily": vacc_cost_daily,
+        "GDP_Daily": gdp_loss_daily,
+        "Total_Daily": total_daily,
+        # Cumulative costs
+        "Cumulative_Med": cum_med_cost,
+        "Cumulative_Wage": cum_wage_cost,
+        "Cumulative_Death": cum_death_cost,
+        "Cumulative_Vacc": cum_vacc_cost,
+        "Cumulative_GDP": cum_gdp_cost,
+        "Cumulative_Cost": cum_total
     })
     return df
 
 # -----------------------------
-# 4. Run Scenarios & Summaries
+# 4. Run Scenarios & Build Summary Table
 # -----------------------------
 beta_multipliers = [1.0, 0.7, 0.35, 0.2]
 results_list = []
@@ -239,25 +310,26 @@ cost_df_dict = {}
 
 for multiplier in beta_multipliers:
     beta_mod = beta * multiplier
+    sim_results, t_vec = run_simulation(beta_mod)
     
-    sim_results, t = run_simulation(beta_mod)
-    
-    # Build day-by-day cost DataFrame
+    # Compute day-by-day cost DataFrame
     cost_df = compute_cost_dataframe(sim_results, multiplier, N, dt=1.0)
     cost_df_dict[multiplier] = cost_df
     
-    # Grab final cumulative costs from last row
-    final_row = cost_df.iloc[-1]  # day 179
+    # Extract final cumulative costs from the last day
+    final_row = cost_df.iloc[-1]
     med_final   = final_row["Cumulative_Med"]
     wage_final  = final_row["Cumulative_Wage"]
     death_final = final_row["Cumulative_Death"]
+    vacc_final  = final_row["Cumulative_Vacc"]
     gdp_final   = final_row["Cumulative_GDP"]
     total_final = final_row["Cumulative_Cost"]
     
-    # Find peak infected (and day)
-    I_tot = sim_results[:,1] + sim_results[:,5] + sim_results[:,9]
-    peak_day = t[np.argmax(I_tot)]
-    peak_val = np.max(I_tot)
+    # Compute peak infected and peak day
+    I_tot = cost_df["I1"] + cost_df["I2"] + cost_df["I3"]
+    peak_index = I_tot.idxmax()
+    peak_day = cost_df.loc[peak_index, "time"]
+    peak_val = I_tot.max()
     
     scenario_result = {
         "beta_multiplier": multiplier,
@@ -266,26 +338,50 @@ for multiplier in beta_multipliers:
         "Medical Cost": med_final,
         "Wage Loss": wage_final,
         "Death Cost": death_final,
+        "Vaccination Cost": vacc_final,
         "GDP Loss": gdp_final,
         "Total Cost": total_final
     }
     results_list.append(scenario_result)
 
 results_df = pd.DataFrame(results_list)
-print("Scenario Results (Day-by-Day Summation):")
-print(results_df)
 
 # -----------------------------
-# 5. Visualizations (Log Scale Bar Charts)
+# 5. Print Summary Results
 # -----------------------------
-cost_components = ["Medical Cost", "Wage Loss", "Death Cost", "GDP Loss"]
+print("Time Span:", time_span, "days")
+print("\nScenario Results (Cumulative Costs computed day-by-day):")
+print(results_df)
+
+print("\nDetailed Final Cumulative Costs per Beta Multiplier:")
+for multiplier in beta_multipliers:
+    df_temp = cost_df_dict[multiplier]
+    final = df_temp.iloc[-1]
+    I_tot = df_temp["I1"] + df_temp["I2"] + df_temp["I3"]
+    peak_index = I_tot.idxmax()
+    peak_day = df_temp.loc[peak_index, "time"]
+    peak_val = I_tot.max()
+    print(f"\nBeta Multiplier: {multiplier}")
+    print(f"  Peak Infected: {peak_val:,.2f}")
+    print(f"  Peak day: {peak_day:,.2f}")
+    print(f"  Cumulative Medical Cost: {final['Cumulative_Med']:,.2f}")
+    print(f"  Cumulative Wage Loss:    {final['Cumulative_Wage']:,.2f}")
+    print(f"  Cumulative Death Cost:   {final['Cumulative_Death']:,.2f}")
+    print(f"  Cumulative Vaccination Cost: {final['Cumulative_Vacc']:,.2f}")
+    print(f"  Cumulative GDP Loss:     {final['Cumulative_GDP']:,.2f}")
+    print(f"  Cumulative Total Cost:   {final['Cumulative_Cost']:,.2f}")
+
+# -----------------------------
+# 6. Visualizations (Log Scale Bar Charts)
+# -----------------------------
+cost_components = ["Medical Cost", "Wage Loss", "Death Cost", "GDP Loss", "Vaccination Cost"]
 n_groups = len(results_df)
 index = np.arange(n_groups)
 bar_width = 0.2
 
 fig, ax = plt.subplots(figsize=(10,6))
-for i, component in enumerate(cost_components):
-    ax.bar(index + i*bar_width, results_df[component], bar_width, label=component)
+for i, comp in enumerate(cost_components):
+    ax.bar(index + i*bar_width, results_df[comp], bar_width, label=comp)
 
 ax.set_xlabel('Beta Multiplier')
 ax.set_ylabel('Cost in USD (Log Scale)')
@@ -298,24 +394,22 @@ ax.grid(True, which='both', ls='--')
 plt.savefig(f"Figures/EconCost_Breakdown_DaybyDay_{time_span}days.png")
 plt.show()
 
-# 5b. Line Graph of Total Cost vs. Beta Multiplier
+# 6b. Line Graph of Total Cost vs. Beta Multiplier
 plt.figure(figsize=(10,6))
 plt.plot(results_df["beta_multiplier"], results_df["Total Cost"], marker='o', linestyle='-', color='blue')
 plt.xlabel("Beta Multiplier")
 plt.ylabel("Total Economic Cost (USD, Log Scale)")
 plt.title(f"Total Economic Cost vs Social Distancing (Day-by-Day, {time_span} days)")
-plt.yscale('log')
-plt.grid(True, which='both', ls='--')
+plt.yscale("log")
+plt.grid(True, which="both", ls="--")
 plt.savefig(f"Figures/EconCost_vs_Beta_{time_span}days.png")
 plt.show()
 
-# Example: Print & Save a cost DataFrame for a chosen scenario
-chosen_beta = 1.0
-df_chosen = cost_df_dict[chosen_beta]
-print(f"\nDetailed day-by-day cost for beta={chosen_beta}:")
-print(df_chosen.head())
-
-out_name = f"Figures/Cost_Detail_Beta_{chosen_beta}.csv"
-df_chosen.to_csv(out_name, index=False)
-print(f"Saved day-by-day costs to {out_name}")
-
+# 6c. Save Detailed Day-by-Day Cost DataFrame for a Selected Scenario (beta = 1.0)
+selected_beta = 1.0
+df_selected = cost_df_dict[selected_beta]
+print(f"\nDetailed Day-by-Day Cost DataFrame for beta = {selected_beta}:")
+print(df_selected.head())
+out_file = f"Figures/Cost_Detail_Beta_{selected_beta}.csv"
+df_selected.to_csv(out_file, index=False)
+print(f"Saved detailed results to {out_file}")

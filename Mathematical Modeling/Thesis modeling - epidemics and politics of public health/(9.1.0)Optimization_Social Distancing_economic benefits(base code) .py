@@ -3,13 +3,9 @@
 Created on Tue Apr  1 23:44:36 2025
 @author: joonc
 
-Day-by-day summation of cost components in an SIRV model with piecewise vaccination.
-
-This script:
-  1) Runs SIRV simulations for multiple β multipliers,
-  2) Uses a daily approach to compute Medical, Wage, Death, Vaccination, GDP costs,
-  3) Cumulatively sums them in a DataFrame (cost_df),
-  4) Takes final values from cost_df's last day to build results_df, ensuring consistency.
+Day-by-day summation of cost components in an SIRV model with piecewise vaccination,
+now updated to incorporate separate costs for mild, hospitalized, and ICU cases,
+with age-group-specific severity fractions (e.g., 0–19, 20–49, 50+).
 """
 
 import os
@@ -27,7 +23,7 @@ if not os.path.exists("Figures"):
 # -----------------------------
 # 1. Define Model Parameters
 # -----------------------------
-N = np.array([6246073, 31530507, 13972160])  # (Children, Adults, Seniors)
+N = np.array([6246073, 31530507, 13972160])  # (Children=0-19, Adults=20-49, Seniors=50+)
 S_init = N.copy()
 I_init = np.array([1, 1, 1])
 R_init = np.array([0, 0, 0])
@@ -48,6 +44,11 @@ W = 0.005                               # waning immunity
 t1 = 30
 t2 = 60
 
+# Vacciantion ratio 
+Vr0 = 0.01
+Vr1 = 0.01
+Vr2 = 0.01
+
 # Transmission matrix
 beta = np.array([
     [0.1901, 0.0660, 0.0028],
@@ -55,8 +56,31 @@ beta = np.array([
     [0.1356, 0.1540, 0.1165]
 ])
 
+# -----------------------------
 # Economic parameters
-M_mild  = 160.8
+# -----------------------------
+# Medical cost parameters from Kim et al. (example references)
+cost_mild   = 160.8   # per day, mild
+cost_hosp   = 432.5   # per day, hospitalized (non-ICU)
+cost_icu    = 1129.5  # per day, ICU
+
+# Fraction of infected who are mild/hospital/ICU for each age group
+# 0-19:  95% mild, 4% hosp, 1% ICU
+f_child_mild = 0.95
+f_child_hosp = 0.04
+f_child_icu  = 0.01
+
+# 20-49: 90% mild, 8% hosp, 2% ICU
+f_adult_mild = 0.90
+f_adult_hosp = 0.08
+f_adult_icu  = 0.02
+
+# 50+:   70% mild, 20% hosp, 10% ICU
+f_senior_mild = 0.70
+f_senior_hosp = 0.20
+f_senior_icu  = 0.10
+
+# Wages, funeral, etc.
 employment_rates = np.array([0.02, 0.694, 0.513])
 daily_income     = np.array([27.74, 105.12, 92.45])
 funeral_cost     = 9405.38
@@ -68,18 +92,19 @@ GDP_per_capita = 31929
 a, b, c = -0.3648, -8.7989, -0.0012
 
 time_span = 180
-t = np.linspace(0, time_span, time_span)  # day 0..359
+t = np.linspace(0, time_span, time_span)  # day 0..179
 
 # -----------------------------
 # 2. SIRV Model with Piecewise Vaccination
 # -----------------------------
 def deriv(y, t, N, beta, gamma, W, t1, t2):
+    # piecewise vaccination rate
     if t < t1:
-        v = 0.01
+        v = Vr0
     elif t < t2:
-        v = 0.005
+        v = Vr1
     else:
-        v = 0.001
+        v = Vr2
 
     S1, I1, R1, V1, S2, I2, R2, V2, S3, I3, R3, V3 = y
     
@@ -116,11 +141,11 @@ def run_simulation(beta_mod):
 # -----------------------------
 def compute_cost_dataframe(results, beta_m, N, dt=1.0):
     """
-    - For each day:
-        * compute daily cost from infection/wage/death/vaccination/GDP
-        * accumulate to get Cumulative_Cost
-    - Return a DataFrame with columns:
-        time, S1,I1,R1,V1,S2..., daily costs, cumulative costs, etc.
+    For each day i:
+      - Extract I_children, I_adults, I_seniors
+      - Compute daily medical cost based on mild/hosp/ICU fractions
+      - Compute wage, death, vaccination, GDP costs
+      - Accumulate all to get cumulative totals
     """
     T = results.shape[0]
     times = np.arange(T) * dt
@@ -146,30 +171,76 @@ def compute_cost_dataframe(results, beta_m, N, dt=1.0):
     for i in range(T):
         y = results[i]
         
+        # Infecteds in each age group
         I_children = y[1]
         I_adults   = y[5]
         I_seniors  = y[9]
         
-        # daily costs
-        med  = M_mild * (I_children + I_adults + I_seniors)
-        wage = (daily_income[1]*employment_rates[1]*I_adults +
-                daily_income[2]*employment_rates[2]*I_seniors +
-                daily_income[1]*employment_rates[1]*I_children)
+        # -----------------------------
+        # 1) Medical costs
+        #    Use severity splits for each age group
+        # -----------------------------
+        med_child = I_children * (
+            f_child_mild*cost_mild + f_child_hosp*cost_hosp + f_child_icu*cost_icu
+        )
+        med_adult = I_adults * (
+            f_adult_mild*cost_mild + f_adult_hosp*cost_hosp + f_adult_icu*cost_icu
+        )
+        med_senior = I_seniors * (
+            f_senior_mild*cost_mild + f_senior_hosp*cost_hosp + f_senior_icu*cost_icu
+        )
+        
+        med = med_child + med_adult + med_senior
+        
+        # -----------------------------
+        # 2) Wage loss (already updated to handle caregiver + children’s small wage)
+        # -----------------------------
+        W_child  = daily_income[0]
+        W_adult  = daily_income[1]
+        W_senior = daily_income[2]
+        
+        E_child  = employment_rates[0]
+        E_adult  = employment_rates[1]
+        E_senior = employment_rates[2]
+        
+        wage_child_loss = W_child * E_child * I_children
+        wage_caregiver_loss = W_adult * E_adult * I_children
+        wage_adult_loss = W_adult * E_adult * I_adults
+        wage_senior_loss= W_senior* E_senior* I_seniors
+        
+        wage = (wage_child_loss
+                + wage_caregiver_loss
+                + wage_adult_loss
+                + wage_senior_loss)
+        
+        # -----------------------------
+        # 3) Death cost
+        # -----------------------------
         death = funeral_cost * (
             mortality_fraction[0]*I_children +
             mortality_fraction[1]*I_adults +
             mortality_fraction[2]*I_seniors
         )
+        
+        # -----------------------------
+        # 4) Vaccination cost
+        # -----------------------------
         V_children = y[3]
         V_adults   = y[7]
         V_seniors  = y[11]
-        vacc = vaccination_cost_per_capita*(V_children+V_adults+V_seniors)
+        vacc = vaccination_cost_per_capita*(V_children + V_adults + V_seniors)
         
+        # -----------------------------
+        # 5) GDP loss
+        # -----------------------------
         gdp_daily = GDP_loss_rate
         
+        # -----------------------------
+        # Sum of all daily costs
+        # -----------------------------
         total_rate = med + wage + death + vacc + gdp_daily
         
-        # store daily
+        # record daily
         med_cost_arr[i]   = med
         wage_loss_arr[i]  = wage
         death_cost_arr[i] = death
@@ -193,7 +264,7 @@ def compute_cost_dataframe(results, beta_m, N, dt=1.0):
             cum_gdp_arr[i]   = cum_gdp_arr[i-1]   + gdp_daily
             cum_total_arr[i] = cum_total_arr[i-1] + total_rate
     
-    # unpack compartments
+    # Unpack compartments for reference
     S1_arr = results[:, 0]
     I1_arr = results[:, 1]
     R1_arr = results[:, 2]
@@ -214,14 +285,14 @@ def compute_cost_dataframe(results, beta_m, N, dt=1.0):
         "S1": S1_arr, "I1": I1_arr, "R1": R1_arr, "V1": V1_arr,
         "S2": S2_arr, "I2": I2_arr, "R2": R2_arr, "V2": V2_arr,
         "S3": S3_arr, "I3": I3_arr, "R3": R3_arr, "V3": V3_arr,
-        # daily
+        # Daily costs
         "Med_Cost": med_cost_arr,
         "Wage_Loss": wage_loss_arr,
         "Death_Cost": death_cost_arr,
         "Vacc_Cost": vacc_cost_arr,
         "GDP_Loss": gdp_loss_arr,
         "Total_Rate": total_cost_arr,
-        # cumulative
+        # Cumulative
         "Cumulative_Med_Cost": cum_med_arr,
         "Cumulative_Wage_Loss": cum_wage_arr,
         "Cumulative_Death_Cost": cum_death_arr,
@@ -247,15 +318,12 @@ for multiplier in beta_multipliers:
     # 2) Build daily cost DataFrame
     cost_df = compute_cost_dataframe(sim_results, beta_m=multiplier, N=N, dt=1.0)
     
-    # store the time-series for plotting
+    # store time-series for plotting
     cumulative_cost_dict[multiplier] = cost_df["Cumulative_Cost"].values
-    
-    # store the full day-by-day DataFrame
     cost_df_dict[multiplier] = cost_df
     
     # 3) Extract final (cumulative) values from the last row
-    final_row = cost_df.iloc[-1]  # day 359
-    # This final row has the total integrated costs
+    final_row = cost_df.iloc[-1]  # day 179
     final_cumulative_cost = final_row["Cumulative_Cost"]
     
     final_med   = final_row["Cumulative_Med_Cost"]
@@ -264,12 +332,11 @@ for multiplier in beta_multipliers:
     final_vacc  = final_row["Cumulative_Vacc_Cost"]
     final_gdp   = final_row["Cumulative_GDP_Loss"]
     
-    # 4) Also compute peak infected from sim_results
+    # 4) Compute peak infected
     I_total = sim_results[:, 1] + sim_results[:, 5] + sim_results[:, 9]
     peak_value = np.max(I_total)
     peak_day   = t[np.argmax(I_total)]
     
-    # Store scenario results in a dict
     scenario_result = {
         "beta_multiplier": multiplier,
         "peak_infected": peak_value,
@@ -283,15 +350,13 @@ for multiplier in beta_multipliers:
     }
     results_list.append(scenario_result)
 
-# Build final summary DataFrame
 results_df = pd.DataFrame(results_list)
-print("Day-by-Day Summation Results (time_span=360):")
+print("Day-by-Day Summation Results (time_span=180):")
 print(results_df)
 
 # -----------------------------
 # 5. Plots & Outputs
 # -----------------------------
-
 # 5a. Grouped bar chart for final cumulative cost components
 cost_components = ["Medical Cost", "Wage Loss", "Death Cost", "GDP Loss", "Vaccination Cost"]
 n_groups = len(results_df)
@@ -337,41 +402,13 @@ plt.grid(True, ls="--")
 plt.savefig("Figures/Cumulative_Total_Cost_vs_Time_DaybyDay.png")
 plt.show()
 
-# 5d. Detailed cost DataFrame for selected scenario
-selected_multiplier = 1.0
-df_Lt = cost_df_dict[selected_multiplier]
-print(f"\nDetailed day-by-day cost DataFrame for beta={selected_multiplier}:")
-print(df_Lt.head())
-df_Lt.to_csv(f"Figures/Cost_Detail_beta_{selected_multiplier}.csv", index=False)
-
-# 5e. Plot I(t) and V(t) with local maxima for selected scenario
-selected_results = run_simulation(beta * selected_multiplier)
-I_total = selected_results[:, 1] + selected_results[:, 5] + selected_results[:, 9]
-V_total = selected_results[:, 3] + selected_results[:, 7] + selected_results[:, 11]
-
-I_max_index = np.argmax(I_total)
-V_max_index = np.argmax(V_total)
-I_max = I_total[I_max_index]
-V_max = V_total[V_max_index]
-
-plt.figure(figsize=(10, 6))
-plt.plot(t, I_total, label="Total Infected I(t)", color="red")
-plt.plot(t, V_total, label="Total Vaccinated V(t)", color="green")
-plt.scatter(t[I_max_index], I_max, color="black", marker="o", s=100,
-            label=f"Max I(t) ~{I_max:.0f} on day {t[I_max_index]:.0f}")
-plt.scatter(t[V_max_index], V_max, color="blue", marker="o", s=100,
-            label=f"Max V(t) ~{V_max:.0f} on day {t[V_max_index]:.0f}")
-plt.xlabel("Time (days)")
-plt.ylabel("Population")
-plt.title(f"Total Infected & Vaccinated Over Time (β={selected_multiplier})")
-plt.legend()
-plt.grid(True, ls="--")
-plt.savefig("Figures/Total_I_V_with_Max_DaybyDay.png")
-plt.show()
-
-# 5f. Print final cost from each scenario
+# 5d. Print final cost from each scenario
 print("\nFinal Cumulative Cost from day-by-day data:")
 for multiplier in beta_multipliers:
     final_cost = cost_df_dict[multiplier]["Cumulative_Cost"].iloc[-1]
     print(f"β={multiplier}: Final Cumulative Cost = {final_cost:,.2f} USD")
 
+# Example of exporting one scenario's day-by-day DataFrame to CSV
+selected_multiplier = 1.0
+df_Lt = cost_df_dict[selected_multiplier]
+df_Lt.to_csv(f"Figures/Cost_Detail_beta_{selected_multiplier}.csv", index=False)
