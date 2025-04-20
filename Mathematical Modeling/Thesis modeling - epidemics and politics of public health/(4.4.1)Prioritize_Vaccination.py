@@ -271,3 +271,83 @@ run_example_and_plot(
     vacc_c=[0.015, 0.015, 0.015],
     vacc_d=[0.015, 0.015, 0.015]
 )
+
+# -----------------------------
+# 6. COMPARISON PLOT FOR TOTAL INFECTIONS
+# -----------------------------
+def plot_total_infections_comparison():
+    """
+    Generates a single plot containing the total infection curves 
+    I_total(t) for three scenarios:
+      - Children prioritized,
+      - Adults prioritized,
+      - Seniors prioritized.
+    """
+    # Create the time grid using the previously loaded time_span parameter
+    t = np.linspace(0, time_span, int(time_span))
+    
+    # --- Simulation for Children Prioritized ---
+    vacc_a_children = [0.015, 0.0, 0.0]
+    vacc_b_children = [0.015, 0.0, 0.0]
+    vacc_c_children = [0.015, 0.015, 0.015]
+    vacc_d_children = [0.015, 0.015, 0.015]
+    
+    global vaccination_rates_dynamic_a, vaccination_rates_dynamic_b, vaccination_rates_dynamic_c, vaccination_rates_dynamic_d
+    vaccination_rates_dynamic_a = np.array(vacc_a_children)
+    vaccination_rates_dynamic_b = np.array(vacc_b_children)
+    vaccination_rates_dynamic_c = np.array(vacc_c_children)
+    vaccination_rates_dynamic_d = np.array(vacc_d_children)
+    
+    results_children = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, True))
+    I_total_children = results_children[:, 1] + results_children[:, 5] + results_children[:, 9]
+    
+    # --- Simulation for Adults Prioritized ---
+    vacc_a_adults = [0.0, 0.015, 0.0]
+    vacc_b_adults = [0.0, 0.015, 0.0]
+    vacc_c_adults = [0.015, 0.015, 0.015]
+    vacc_d_adults = [0.015, 0.015, 0.015]
+    
+    vaccination_rates_dynamic_a = np.array(vacc_a_adults)
+    vaccination_rates_dynamic_b = np.array(vacc_b_adults)
+    vaccination_rates_dynamic_c = np.array(vacc_c_adults)
+    vaccination_rates_dynamic_d = np.array(vacc_d_adults)
+    
+    results_adults = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, True))
+    I_total_adults = results_adults[:, 1] + results_adults[:, 5] + results_adults[:, 9]
+    
+    # --- Simulation for Seniors Prioritized ---
+    vacc_a_seniors = [0.0, 0.0, 0.015]
+    vacc_b_seniors = [0.0, 0.0, 0.015]
+    vacc_c_seniors = [0.015, 0.015, 0.015]
+    vacc_d_seniors = [0.015, 0.015, 0.015]
+    
+    vaccination_rates_dynamic_a = np.array(vacc_a_seniors)
+    vaccination_rates_dynamic_b = np.array(vacc_b_seniors)
+    vaccination_rates_dynamic_c = np.array(vacc_c_seniors)
+    vaccination_rates_dynamic_d = np.array(vacc_d_seniors)
+    
+    results_seniors = odeint(deriv, initial_conditions, t, args=(N, beta, gamma, mu, W, True))
+    I_total_seniors = results_seniors[:, 1] + results_seniors[:, 5] + results_seniors[:, 9]
+    
+    # --- Plotting the three total infection curves on one plot ---
+    plt.figure(figsize=(10, 6))
+    plt.plot(t, I_total_children, label='Children Prioritized')
+    plt.plot(t, I_total_adults, label='Adults Prioritized')
+    plt.plot(t, I_total_seniors, label='Seniors Prioritized')
+    
+    plt.xlabel('Time (days)')
+    plt.ylabel('Total Infected Individuals')
+    plt.title('Comparison of Total Infections under Different Vaccination Prioritizations')
+    plt.legend()
+    plt.grid(True)
+    
+    # Save the figure in the Figures folder
+    os.makedirs('Figures', exist_ok=True)
+    figure_path = 'Figures/Total_Infections_Comparison.png'
+    plt.savefig(figure_path, dpi=150)
+    print(f"Saved comparison figure to {figure_path}")
+    
+    plt.show()
+
+# Call the comparison plot function to generate the figure
+plot_total_infections_comparison()
