@@ -91,11 +91,11 @@ def main():
     # y_func1 = lambda t: 0.5 + t
     
     x_func1 = lambda t:   2
-    y_func1 = lambda t:   1 +t
+    y_func1 = lambda t:   2 +t
     
     # Parameter Equation 2:
     x_func2 = lambda t: 2 + t
-    y_func2 = lambda t: 1
+    y_func2 = lambda t: 2
     
     # Generate input complex numbers for both equations.
     s_vals1 = generate_complex_inputs(t_vals, x_func1, y_func1)

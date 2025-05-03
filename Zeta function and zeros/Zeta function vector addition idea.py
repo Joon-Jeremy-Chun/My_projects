@@ -24,9 +24,9 @@ def plot_input_and_vectors(s, partial_sums):
     # Prepare figure with two subplots
     fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 6))
 
-    # -------------------------------------------------------------------------
+    
     # Left Subplot: Input Complex Plane
-    # -------------------------------------------------------------------------
+    
     ax_left.scatter(s.real, s.imag, color='blue', s=100,
                     label=f"s = {s.real:.2f} {s.imag:+.2f}i")
     ax_left.axhline(0, color='black', lw=0.5)
@@ -39,9 +39,9 @@ def plot_input_and_vectors(s, partial_sums):
     ax_left.legend()
     ax_left.grid(True)
 
-    # -------------------------------------------------------------------------
+    
     # Right Subplot: Polyline of Partial Sums
-    # -------------------------------------------------------------------------
+    
     # Insert the origin at the start for convenience
     cumulative = np.insert(partial_sums, 0, 0+0j)
 

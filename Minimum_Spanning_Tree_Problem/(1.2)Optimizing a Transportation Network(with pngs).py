@@ -16,7 +16,7 @@ ALPHA = 0.3
 ORIG_COLOR = 'skyblue'
 KRUSKAL_COLOR = 'lightgreen'
 PRIM_COLOR = 'lightcoral'
-PAUSE_TIME = 0.2  # 2초 대기
+PAUSE_TIME = 0.2  # X초 대기
 FIG_DIR = 'Figures'
 
 # Ensure output directory exists
