@@ -352,3 +352,4 @@ plot_group_infected_4_levels_population(8, "Group 3 (Seniors)",
 
 plot_total_infected_4_levels_population(beta.copy(), N, gamma, mu, W, a,
                                         initial_conditions, time_span)
+

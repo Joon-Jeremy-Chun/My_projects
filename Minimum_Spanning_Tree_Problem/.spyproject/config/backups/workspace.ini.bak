@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['..\\..\\..\\.spyder-py3\\temp.py', '(1.1)Optimizing a Transportation Network.py', '(1.2)Optimizing a Transportation Network(with pngs).py', '(1.3)Optimizing a Transportation Network(with animations).py', '(2.0.1)Real World problmes ex1.py']
+recent_files = ['..\\..\\..\\.spyder-py3\\temp.py', '(1.1)Optimizing a Transportation Network.py', '(1.2)Optimizing a Transportation Network(with pngs).py', '(1.3)Optimizing a Transportation Network(with animations).py', '(2.0.1)Real World problmes ex1.py', 'data_20_Coun_extraction.py']
 
 [main]
 version = 0.2.0
