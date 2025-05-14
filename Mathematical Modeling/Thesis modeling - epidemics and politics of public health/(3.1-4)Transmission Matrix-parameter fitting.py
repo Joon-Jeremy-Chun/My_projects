@@ -106,6 +106,7 @@ result = minimize(objective, initial_beta.flatten(), method='L-BFGS-B', bounds=b
 if result.success:
     optimal_beta = result.x.reshape((3, 3))
     print("Optimization Successful!")
+    print(optimal_beta)
 else:
     print("Optimization Failed:", result.message)
     exit()
@@ -120,51 +121,89 @@ t = range(len(fit_data))
 fitted_result = odeint(sirv_model, y0, t, args=(optimal_beta, gamma, a, delta))
 I_fitted = fitted_result[:, [1, 5, 9]]
 
-# Step 7: Plot Results for Each Age Group and Save Figures
+
+# ------------------------------------------------------------------
+# ►  GLOBAL PLOTTING STYLE  ◄
+#   (place right after `import matplotlib.pyplot as plt`)
+# ------------------------------------------------------------------
+plt.rcParams.update({
+    "figure.figsize"  : (6.4, 4.8),   # default literal size in inches
+    "savefig.dpi"     : 300,          # high-resolution output
+    "figure.dpi"      : 150,          # screen / notebook preview
+    "font.size"       : 30,           # main text in each panel
+    "axes.titlesize"  : 25,
+    "axes.labelsize"  : 20,
+    "xtick.labelsize" : 12,
+    "ytick.labelsize" : 15,
+    "legend.fontsize" : 17,
+    "lines.linewidth" : 2.5,
+    "pdf.fonttype"    : 42,           # embed fonts (good for LaTeX)
+    "ps.fonttype"     : 42
+})
+
+
+# ------------------------------------------------------------------
+# Step 7 :  Individual-age-group panels  (title shows “50+”)
+# ------------------------------------------------------------------
+title_map = {'0-19': '0–19',
+             '20-49': '20–49',
+             '50-80+': '50+'}                    # only the title text changes
+
 for idx, age_group in enumerate(age_groups):
     plt.figure(figsize=(10, 6))
-    plt.plot(fit_data['Date'], fit_data[f'I_{age_group}'], label='Actual I(t)', color='blue', linestyle='--')
-    plt.plot(fit_data['Date'], I_fitted[:, idx], label='Fitted I(t)', color='red')
-    plt.title(f"Actual vs Fitted I(t) for Age Group {age_group}")
+    plt.plot(fit_data['Date'],
+             fit_data[f'I_{age_group}'],
+             label='Actual I(t)', color='blue', linestyle='--')
+    plt.plot(fit_data['Date'],
+             I_fitted[:, idx],
+             label='Fitted I(t)', color='red')
+
+    plt.title(f"Actual vs Fitted I(t)  —  Age {title_map[age_group]}")
     plt.xlabel("Date")
-    plt.ylabel("Infectious Population")
+    plt.ylabel("Infectious population")
     plt.legend()
-    plt.grid()
+    plt.grid(True)
     plt.tight_layout()
-    
-    # Save the figure to the Figures directory
-    save_path = os.path.join(fig_dir, f"Actual_vs_Fitted_I_{age_group.replace('-', '_')}.png")
+
+    # keep the original filename unchanged
+    save_path = os.path.join(fig_dir,
+                             f"Actual_vs_Fitted_I_{age_group.replace('-', '_')}.png")
     plt.savefig(save_path, dpi=300)
     plt.show()
 
-# Step 7A: Plot Total I(t) Across All Age Groups and Save Figure
-# Calculate total I(t) from the actual data:
-total_actual_I = (
-    fit_data['I_0-19'] +
-    fit_data['I_20-49'] +
-    fit_data['I_50-80+']
-)
 
-# Calculate total I(t) from the fitted model:
-total_fitted_I = I_fitted[:, 0] + I_fitted[:, 1] + I_fitted[:, 2]
+# ------------------------------------------------------------------
+# Step 7A :  Total infectious population  (unchanged)
+# ------------------------------------------------------------------
+total_actual_I = (fit_data['I_0-19'] +
+                  fit_data['I_20-49'] +
+                  fit_data['I_50-80+'])
+
+total_fitted_I = I_fitted.sum(axis=1)
 
 plt.figure(figsize=(10, 6))
-plt.plot(fit_data['Date'], total_actual_I, label='Actual Total I(t)', color='blue', linestyle='--')
-plt.plot(fit_data['Date'], total_fitted_I, label='Fitted Total I(t)', color='red')
-plt.title("Actual vs Fitted Total Infectious (All Age Groups)")
+plt.plot(fit_data['Date'], total_actual_I,
+         label='Actual total I(t)', color='blue', linestyle='--')
+plt.plot(fit_data['Date'], total_fitted_I,
+         label='Fitted total I(t)', color='red')
+
+plt.title("Actual vs Fitted  —  Total infectious population")
 plt.xlabel("Date")
-plt.ylabel("Infectious Population")
+plt.ylabel("Infectious population")
 plt.legend()
-plt.grid()
+plt.grid(True)
 plt.tight_layout()
 
-# Save the total I(t) plot
 save_path_total = os.path.join(fig_dir, "Actual_vs_Fitted_Total_I.png")
 plt.savefig(save_path_total, dpi=300)
 plt.show()
 
-# Step 8: Save Results
+
+# ------------------------------------------------------------------
+# Step 8 :  Save fitted β-matrix  (unchanged)
+# ------------------------------------------------------------------
 output_file = 'DataSets/Fitted_Beta_Matrix.csv'
-print(optimal_beta)
-pd.DataFrame(optimal_beta, columns=age_groups, index=age_groups).to_csv(output_file, index=True)
-print(f"Fitted beta matrix saved to: {output_file}")
+pd.DataFrame(optimal_beta, columns=age_groups, index=age_groups)\
+  .to_csv(output_file, index=True)
+print("Fitted β-matrix saved to:", output_file)
+

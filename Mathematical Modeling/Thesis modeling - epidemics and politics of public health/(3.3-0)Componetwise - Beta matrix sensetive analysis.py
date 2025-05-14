@@ -15,6 +15,20 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from scipy.signal import argrelextrema
+import matplotlib.pyplot as plt
+
+# ===================== Font-size patch (추가) =====================
+plt.rcParams.update({
+    'font.size': 20,        # 기본 폰트
+    'axes.titlesize': 20,   # 서브플롯 제목
+    'axes.labelsize': 15,   # x/y 라벨
+    'xtick.labelsize': 9,
+    'ytick.labelsize': 9,
+    'legend.fontsize': 15,    # 범례
+    'figure.titlesize': 30,
+})
+# ================================================================
+
 
 # Create "Figures" directory if it doesn't exist
 if not os.path.exists("Figures"):
@@ -150,9 +164,9 @@ def plot_component_wise_beta_reduction():
             ax.set_title(f"Reduction on {key}")
             ax.set_xlabel("Time (days)")
             ax.set_ylabel("Total Infected")
-            ax.legend(fontsize=8)
+            ax.legend(fontsize=10)
     
-    fig.suptitle(f"Total Infected Population with Component-wise {reduction_factor} β multipliers on the Matrix", fontsize=16)
+    fig.suptitle(f"Total Infected Population with Component-wise {reduction_factor} β multipliers on the Matrix", fontsize=20, fontweight='normal')
     plt.tight_layout(rect=[0, 0, 1, 0.96]) 
     # Save the figure with the reduction factor included in the file name
     filename = f"Figures/component_wise_beta_reduction_multiplier_{reduction_factor}.png"
