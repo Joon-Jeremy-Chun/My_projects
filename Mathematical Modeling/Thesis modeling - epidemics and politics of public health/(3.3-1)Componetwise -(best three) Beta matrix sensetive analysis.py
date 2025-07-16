@@ -220,7 +220,7 @@ def plot_top3_combined():
     ax.set_xlabel("Time (days)")
     ax.set_ylabel("Total Infected")
     ax.set_title("Baseline vs. Top-3 Component-wise β Reductions (20 %)")
-    ax.legend(fontsize=10)
+    ax.legend(fontsize=14)
     ax.set_ylim(0, baseline_total.max() * 1.25)
 
     plt.tight_layout()
@@ -233,5 +233,60 @@ def plot_top3_combined():
 # plot_component_wise_beta_reduction()  # full 3×3 grid (optional)
 # plot_top3_beta_reductions()          # separate 1×3 panel (optional)
 plot_top3_combined()                   # single-axis summary (default)
+
+# ------------------------------------------------------------------
+# Single axis: baseline + all nine component-wise reductions
+# ------------------------------------------------------------------
+def plot_all9_combined():
+    """
+    Plot the baseline curve together with every β[i][j] element reduced
+    to 20 % of its original value.  The legend shows the percentage drop
+    in the peak and the peak-time delay (Δt) for each modified curve.
+    """
+    # Collect results for every element (i, j)
+    info = {}
+    for i in range(3):
+        for j in range(3):
+            t_mod, curve, peak_val, peak_t = simulate_modified_beta(i, j)
+            pct_red = (baseline_peak - peak_val) / baseline_peak * 100
+            info[(i, j)] = (pct_red, t_mod, curve, peak_val, peak_t)
+
+    # Colour palette (9 distinct colours from Matplotlib's tab10)
+    cmap    = plt.cm.get_cmap('tab10')
+    colors  = [cmap(k) for k in range(9)]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Baseline curve
+    ax.plot(t, baseline_total, '--', color='gray', linewidth=2, label='Baseline')
+    ax.legend(fontsize=20, loc='upper right', frameon=True)
+    # Loop over the nine modified curves
+    for idx, ((i, j), (pct, t_mod, curve, peak_val, peak_t)) in enumerate(info.items()):
+        delay = peak_t - baseline_peak_time
+        ax.plot(t_mod, curve,
+                color=colors[idx], linewidth=1.8,
+                label=f'β[{i}][{j}]  Peak ↓{pct:.1f}% | Dealy: {delay:+.0f} d')
+        ax.scatter(peak_t, peak_val,
+                   s=35, color=colors[idx], edgecolor='k', zorder=5)
+
+    # Axis styling
+    ax.set_xlabel('Time (days)')
+    ax.set_ylabel('Total Infected')
+    ax.set_title('Baseline vs. All 9 Component-wise β Reductions (20 %)')
+    ax.set_ylim(0, baseline_total.max() * 1.25)
+
+    # Legend inside the plot, upper-right corner
+    ax.legend(fontsize=14, loc='upper right', frameon=True)
+
+    plt.tight_layout()
+    plt.savefig('Figures/all9_combined.png', dpi=300)
+    plt.show()
+
+
+# ------------------------------------------------------------------
+# Call the new function
+# ------------------------------------------------------------------
+plot_all9_combined()
+
 
 

@@ -57,7 +57,9 @@ beta_base = np.array([
 
 # Daily vaccination capacity (about 1.07% of entire population)
 total_pop = np.sum(N)
-daily_vacc_capacity = 0.0107 * total_pop
+# daily_vacc_capacity = 0.0107 * total_pop
+# daily_vacc_capacity = 0.0115 * total_pop
+daily_vacc_capacity = 0.01 * total_pop
 
 # Time settings for ODE solve (e.g., 150 days)
 time_span = 150
@@ -342,8 +344,8 @@ def build_cost_array_for_fixedBM(beta_m, v1_candidates, v2_candidates):
 
 # Create heat maps for each beta_m in a 3x3 grid.
 fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(12, 12), sharex=True, sharey=True)
-fig.suptitle("Heat Maps of Final Cost vs (v1, v2) for Different beta_m", y=1.02)
-
+# fig.suptitle("Heat Maps of Final Cost vs (v1, v2) for Different beta_m", y=1.02)
+fig.suptitle("Heat Maps of Final Cost vs (v1, v2) for Different beta-multipliers", y=1.02)
 pcm = None  # To hold the last pcolormesh for the colorbar
 
 for idx, bm in enumerate(beta_m_values):
@@ -359,6 +361,7 @@ for idx, bm in enumerate(beta_m_values):
     
     pc = ax.pcolormesh(X, Y, Z, cmap=cmap, shading='auto')
     ax.set_title(f"beta_m = {bm:.1f}")
+    ax.set_title(f"m = {bm:.1f}")
     ax.set_xlabel("v2 (Adults)")
     ax.set_ylabel("v1 (Children)")
     
