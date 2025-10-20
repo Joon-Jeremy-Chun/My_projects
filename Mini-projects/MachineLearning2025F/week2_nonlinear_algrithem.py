@@ -12,18 +12,11 @@ import numpy as np
 import pandas as pd
 
 # 기본 데이터 경로 설정 (동일 폴더 우선 → /mnt/data 폴백)
-CANDIDATES = [
-    os.path.join(os.getcwd(), "week1_health_dataset.csv"),
-    "/mnt/data/week1_health_dataset.csv"
-]
-CSV_PATH = next((p for p in CANDIDATES if os.path.exists(p)), None)
-assert CSV_PATH is not None, "❌ 데이터 파일 week1_health_dataset.csv 을(를) 찾을 수 없습니다."
-
-OUT_DIR  = os.path.join(os.path.dirname(CSV_PATH), "outputs_week2")
+CSV_PATH = r"C:\Users\joonc\My_github\My_projects\Mini-projects\DataSets\week1_health_dataset.csv"
+OUT_DIR  = os.path.join(os.path.dirname(CSV_PATH), "outputs_week1")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 print("CSV_PATH:", CSV_PATH)
-print("OUT_DIR :", OUT_DIR)
 
 # %## Load Dataset & Normalize Headers (snake_case)
 df = pd.read_csv(CSV_PATH)
