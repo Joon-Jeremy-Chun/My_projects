@@ -1,0 +1,13 @@
+ID,Height_in,Weight_lb,Waist_in,Favorite_Color,true_label
+1,70,159,32,Blue,Healthy
+2,65,187,37,Red,Unhealthy
+3,72,198,39,Green,Unhealthy
+4,63,121,28,Yellow,Healthy
+5,68,150,31,Black,Healthy
+6,67,209,41,Blue,Unhealthy
+7,71,172,33,Pink,Healthy
+8,62,181,36,Purple,Unhealthy
+9,69,146,31,Orange,Healthy
+10,73,231,43,White,Unhealthy
+11,64,128,28,Green,Healthy
+12,70,154,33,Red,Healthy

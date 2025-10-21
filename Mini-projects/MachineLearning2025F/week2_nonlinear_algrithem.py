@@ -13,7 +13,7 @@ import pandas as pd
 
 # 기본 데이터 경로 설정 (동일 폴더 우선 → /mnt/data 폴백)
 CSV_PATH = r"C:\Users\joonc\My_github\My_projects\Mini-projects\DataSets\week1_health_dataset.csv"
-OUT_DIR  = os.path.join(os.path.dirname(CSV_PATH), "outputs_week1")
+OUT_DIR  = os.path.join(os.path.dirname(CSV_PATH), "MachineLearning2025F_outputs")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 print("CSV_PATH:", CSV_PATH)

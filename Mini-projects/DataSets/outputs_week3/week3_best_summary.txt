@@ -1,0 +1,3 @@
+Best train accuracy: 1.000
+Best weights (w1,w2,w3,w4): (np.float64(0.0), np.float64(0.0), np.float64(0.7), np.float64(0.3))
+Best threshold T: 0.45
