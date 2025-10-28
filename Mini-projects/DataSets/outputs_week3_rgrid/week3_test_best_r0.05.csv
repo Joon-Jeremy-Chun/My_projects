@@ -1,0 +1,3 @@
+id,height_in,weight_lb,waist_in,favorite_color,score_best,pred_best,true_label
+11,64,128,28,Green,0.075,Healthy,Healthy
+12,70,154,33,Red,0.2708333333333333,Healthy,Healthy

@@ -1,0 +1,11 @@
+id,height_in,weight_lb,waist_in,favorite_color,score_best,pred_best,true_label,correct
+1,70,159,32,Blue,0.18666666666666665,Healthy,Healthy,1
+2,65,187,37,Red,0.45749999999999996,Unhealthy,Unhealthy,1
+3,72,198,39,Green,0.5883333333333333,Unhealthy,Unhealthy,1
+4,63,121,28,Yellow,0.11249999999999999,Healthy,Healthy,1
+5,68,150,31,Black,0.29,Healthy,Healthy,1
+6,67,209,41,Blue,0.6066666666666667,Unhealthy,Unhealthy,1
+7,71,172,33,Pink,0.4208333333333333,Healthy,Healthy,1
+8,62,181,36,Purple,0.5983333333333333,Unhealthy,Unhealthy,1
+9,69,146,31,Orange,0.40249999999999997,Healthy,Healthy,1
+10,73,231,43,White,1.0,Unhealthy,Unhealthy,1

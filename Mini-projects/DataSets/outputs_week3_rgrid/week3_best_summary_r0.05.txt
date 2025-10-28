@@ -1,0 +1,15 @@
+r-grid step: 0.05
+Best train accuracy: 1.000
+Best weights (w1,w2,w3,w4): (np.float64(0.0), np.float64(0.0), np.float64(0.7), np.float64(0.3))
+Best threshold T*: 0.439167
+
+--- TEST EVAL ---
+precision   recall  f1-score   support
+Healthy        1.000   1.000     1.000         2
+Unhealthy      0.000   0.000     0.000         0
+
+accuracy: 1.000  total=2
+Confusion Matrix (rows=true, cols=pred):
+,pred_Healthy,pred_Unhealthy
+true_Healthy,2,0
+true_Unhealthy,0,0
