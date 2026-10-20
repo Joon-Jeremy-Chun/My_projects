@@ -2,3 +2,20 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Local environments, credentials, and generated tool caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.spyproject/
+.env
+.env.*
+!.env.example
+Thumbs.db
+.DS_Store
+
+# Existing tracked figures, data, notebooks, and IDE records remain tracked.

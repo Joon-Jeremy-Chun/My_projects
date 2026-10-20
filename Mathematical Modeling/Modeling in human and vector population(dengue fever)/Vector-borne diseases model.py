@@ -34,7 +34,9 @@ def si_model(y, t, beta_h, beta_m, gamma_h, gamma_m):
     dI_hdt = beta_h * S_h * I_m - gamma_h * I_h
     
     # Rate of change equations for mosquito population
-    dS_mdt = -beta_m * I_m * I_m * S_h  # No natural input for susceptible mosquitoes
+    # Infection transfers S_m to I_m; mortality applies to both mosquito states.
+    # With no recruitment, d(S_m + I_m)/dt = -gamma_m * (S_m + I_m).
+    dS_mdt = -beta_m * S_m * I_h - gamma_m * S_m
     dI_mdt = beta_m * S_m * I_h - gamma_m * I_m
     
     return [dS_hdt, dI_hdt, dS_mdt, dI_mdt]

@@ -27,9 +27,10 @@ def sis_model_vaccine(y, t, beta, gamma, delta):
     S, I, V = y
     
     # Rate of change equations
-    dSdt = - beta * S * I + delta * V
+    # Perfect protection: vaccination S->V, SIS recovery I->S.
+    dSdt = - beta * S * I - delta * S + gamma * I
     dIdt = beta * S * I - gamma * I
-    dVdt = - delta * V + gamma * I
+    dVdt = delta * S
     
     return [dSdt, dIdt, dVdt]
 

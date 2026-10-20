@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="450" viewBox="0 0 1200 450" role="img" aria-labelledby="title desc">
+<title id="title">Joon Chun — Computational Mathematics</title><desc id="desc">A portfolio of models, algorithms, and evidence. Decorative curves are illustrations, not data plots.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102337"/><stop offset="1" stop-color="#23263f"/></linearGradient></defs>
+<rect width="1200" height="450" rx="24" fill="url(#bg)"/>
+<g font-family="Arial,sans-serif"><text x="55" y="62" fill="#79e1de" font-weight="700" letter-spacing="3" font-size="16">JOON CHUN / COMPUTATIONAL MATHEMATICS</text>
+<text x="55" y="137" fill="#f7fafc" font-weight="700" font-size="58">Models. Algorithms.</text><text x="55" y="204" fill="#f7fafc" font-weight="700" font-size="58">Evidence.</text>
+<text x="58" y="254" fill="#c5d1e1" font-size="21">Research, numerical methods, and a record of learning in code.</text>
+<g font-size="15" font-weight="700"><rect x="55" y="316" width="250" height="78" rx="12" fill="#203c4a"/><text x="76" y="347" fill="#79e1de">RESEARCH &amp; MODELING</text><text x="76" y="373" fill="#edf4fa" font-weight="400">Epidemics · ODEs · Optimization</text>
+<rect x="322" y="316" width="250" height="78" rx="12" fill="#30364d"/><text x="343" y="347" fill="#c4afff">NUMERICAL METHODS</text><text x="343" y="373" fill="#edf4fa" font-weight="400">Linear algebra · PDEs · Error</text>
+<rect x="589" y="316" width="250" height="78" rx="12" fill="#263e39"/><text x="610" y="347" fill="#a4e3ae">PROBABILITY &amp; STRUCTURE</text><text x="610" y="373" fill="#edf4fa" font-weight="400">Markov chains · Graphs · Zeta</text>
+<rect x="856" y="316" width="289" height="78" rx="12" fill="#413b35"/><text x="877" y="347" fill="#ffd199">LEARNING &amp; EXPLORATION</text><text x="877" y="373" fill="#edf4fa" font-weight="400">Statistics · Worksheets · Data</text></g></g>
+<g fill="none" stroke="#79e1de" opacity="0.2"><path d="M880 270V72M845 226H1145"/><path d="M860 209C905 88 942 264 982 140S1063 111 1125 84" stroke-width="4"/></g></svg>

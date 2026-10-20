@@ -1,0 +1,8 @@
+# Focused numerical regressions and documentation maintenance.
+# Collection-specific historical dependencies are listed separately in docs.
+numpy
+pandas
+scipy
+matplotlib
+pytest
+ruff

@@ -11,14 +11,16 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
 # SIR model differential equations with two groups.
-def deriv(y, t, Nc, Na, beta_cc, beta_ca, beta_ac, beta_aa, gamma_c, gamma_a, fg):
+def deriv(y, t, Nc, Na, beta_cc, beta_ca, beta_ac, beta_aa, gamma_c, gamma_a, fg, mu_A=0.0001):
     Sc, Ic, Rc, Sa, Ia, Ra = y
-    dScdt = -(beta_cc*Ic/Nc + beta_ac*Ia/Na)*Sc - fg*Sc + mu_A*Na
+    # Adult deaths are balanced by births into the susceptible child group.
+    births = mu_A * (Sa + Ia + Ra)
+    dScdt = -(beta_cc*Ic/Nc + beta_ac*Ia/Na)*Sc - fg*Sc + births
     dIcdt = (beta_cc*Ic/Nc + beta_ac*Ia/Na)*Sc - gamma_c*Ic - fg*Ic
     dRcdt = gamma_c*Ic - fg*Rc
-    dSadt = -(beta_aa*Ia/Na + beta_ca*Ic/Nc)*Sa + fg*Sc - mu_A
-    dIadt = (beta_aa*Ia/Na + beta_ca*Ic/Nc)*Sa - gamma_a*Ia + fg*Ic - mu_A
-    dRadt = gamma_a*Ia + fg*Rc - mu_A
+    dSadt = -(beta_aa*Ia/Na + beta_ca*Ic/Nc)*Sa + fg*Sc - mu_A*Sa
+    dIadt = (beta_aa*Ia/Na + beta_ca*Ic/Nc)*Sa - gamma_a*Ia + fg*Ic - mu_A*Ia
+    dRadt = gamma_a*Ia + fg*Rc - mu_A*Ra
     return dScdt, dIcdt, dRcdt, dSadt, dIadt, dRadt
 
 # Initial number of individuals in each group
@@ -54,7 +56,7 @@ t = np.linspace(0, 20, 4000)
 y0 = Sc0, Ic0, Rc0, Sa0, Ia0, Ra0
 
 # Integrate the SIR equations over the time grid, t.
-ret = odeint(deriv, y0, t, args=(Nc, Na, beta_cc, beta_ca, beta_ac, beta_aa, gamma_c, gamma_a, fg))
+ret = odeint(deriv, y0, t, args=(Nc, Na, beta_cc, beta_ca, beta_ac, beta_aa, gamma_c, gamma_a, fg, MU_A))
 Sc, Ic, Rc, Sa, Ia, Ra = ret.T
 #%%
 # Plot the data on six separate curves for Sc(t), Ic(t), Rc(t), Sa(t), Ia(t), and Ra(t)

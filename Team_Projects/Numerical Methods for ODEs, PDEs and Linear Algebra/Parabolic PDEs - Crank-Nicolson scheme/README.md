@@ -1,46 +1,35 @@
-# Solar Pond Temperature Simulation
+# Solar-Pond Diffusion and Crank–Nicolson
 
-## Project Overview
+**How can a forced diffusion equation be stepped implicitly?**
 
-This project involves simulating the temperature distribution in a solar pond using the Crank-Nicolson numerical scheme. A solar pond is a saltwater pool designed to collect and store solar energy. The presence of a salt gradient within the pond reduces heat convection, thereby minimizing heat loss and enhancing heat transfer via conduction.
+[Portfolio](../../../README.md) · [Evidence & results](../../../docs/PROJECT_EVIDENCE.md) · [2026 repairs](../../../docs/REPAIRS.md) · [Reproduction](../../../docs/REPRODUCIBILITY.md) · [Full code catalog](../../../docs/CODE_CATALOG.md) · [Collection overview](../../README.md)
 
-## Problem Statement
+---
 
-The temperature \( u(x, t) \) at depth \( x \) and time \( t \) in the pond follows the heat equation, modified to include linear heat addition with depth, expressed as:
+## Question and approach
 
-$$
-u_t = u_{xx} + C(L−x)
-$$
+The two solar-pond scripts form A and B with their scheme scaled by two. Their source vector is now 2Δt·C(L−x), with the existing Dirichlet and zero-flux boundary terms.
 
-where:
-- \( L \) is the depth of the pond,
-- \( C \) is the heating rate,
-- \( T0 \) is the initial surface water temperature.
 
-Boundary conditions assume no heat transfer at the pond's bottom and maintain a constant surface temperature.
 
-## Methodology
+## File-by-file reading guide
 
-1. **Crank-Nicolson Scheme:** This numerical method approximates the temperature distribution, using a central difference method for the derivative boundary condition.
-2. **Simulation Parameters:**
-   - \( C = 0.5 \)
-   - \( L = 1 \) (depth of the pond)
-   - \( T0 = 60 \) (surface temperature)
-   - Grid sizes: \( $\Delta x = 0.1 \$) and \( $\Delta t = 0.005 \$)
-3. **Initial and Boundary Conditions:** These conditions define the initial temperature distribution and the boundary conditions at the pond’s surface and bottom.
-4. **Tridiagonal Matrix Approach:** Employed for efficient resolution of the numerical scheme.
+| Source | What to inspect |
+|---|---|
+| [Example Jocobi Method.py](Example%20Jocobi%20Method.py) | Defined helpers: `jacobi`, `animate` |
+| [Solar Pond - parabolic PDEs - Crank-Nicolson (code).py](Solar%20Pond%20-%20parabolic%20PDEs%20-%20Crank-Nicolson%20%28code%29.py) | Defined helpers: `crank_nicolson` |
+| [Solar Pond - parabolic PDEs - Crank-Nicolson.py](Solar%20Pond%20-%20parabolic%20PDEs%20-%20Crank-Nicolson.py) | Defined helpers: `crank_nicolson` |
 
-## Code Implementation
+## Inputs, tools, and outputs
 
-- Setup of domain and grid sizes.
-- Definition of boundary and initial conditions.
-- Construction of tridiagonal matrices and vectors for iterative solutions.
-- Execution of iterative steps using the NumPy library to solve the system of equations.
+Observed import roots: `matplotlib`, `numpy`, `scipy`. These observations are not a tested dependency lockfile.
 
-## Results
+## Interpretation and reproduction limits
 
-The simulation provides temperature distributions at times \( t = 0 \), \( t = 0.5 \), and \( t = 1 \). These results are visualized in a single plot with different colors and legends for clarity.
+The parameter variants use different grids/time horizons. A manufactured steady-state regression checks spatial convergence after the source fix. No physical solar-pond calibration is claimed.
 
-## Conclusion
+Check the actual input path, state ordering, parameter units, working directory, and output destination before a new run. New code repairs and their tested scope are listed in [the repair record](../../../docs/REPAIRS.md).
 
-This project enhances the understanding of the Crank-Nicolson scheme, illustrating its application in solving linear equations. The results may be compared with those obtained using the Jacobi Method. Additionally, it provides insights into how effectively a solar pond can store thermal energy and how the temperature distribution changes over time under specified conditions.
+---
+
+[Portfolio](../../../README.md) · [Evidence & results](../../../docs/PROJECT_EVIDENCE.md) · [2026 repairs](../../../docs/REPAIRS.md) · [Reproduction](../../../docs/REPRODUCIBILITY.md) · [Full code catalog](../../../docs/CODE_CATALOG.md)

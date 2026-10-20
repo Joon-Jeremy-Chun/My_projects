@@ -1,41 +1,36 @@
-# Boundary Value Problem & the Jacobi Method
+# Boundary Values and Jacobi Iteration
 
-## Overview
+**How is a two-endpoint boundary problem converted into a tridiagonal solve?**
 
-This project focuses on solving a boundary value problem (BVP) associated with the deflection of a thin beam supported at both ends under a uniform load. The deflection, denoted as `u(x)`, varies along the beam and is governed by a specific differential equation with given boundary conditions.
+[Portfolio](../../../README.md) · [Evidence & results](../../../docs/PROJECT_EVIDENCE.md) · [2026 repairs](../../../docs/REPAIRS.md) · [Reproduction](../../../docs/REPRODUCIBILITY.md) · [Full code catalog](../../../docs/CODE_CATALOG.md) · [Collection overview](../../README.md)
 
-The core of the project involves discretizing the BVP into a system of linear equations and then applying the Jacobi method to approximate the solution. This process converts the continuous model into a discrete form suitable for computational analysis.
+---
 
-## Differential Equation
+## Question and approach
 
-The deflection of the beam `u(x)` is governed by the differential equation:
-
-$$ - u'' + pu = qx(L - x), \quad 0 < x < L $$
-
-With boundary conditions:
-
-$$ u(0) = u(L) = 0. $$
-
-Where:
-- $\frac{d^2u}{dx^2}$ is the second derivative of the deflection `u` with respect to the position `x` along the beam.
-- $p$ a constant that depends on the material properties of the beam.
-- $q$ a constant that depends on the material properties of the beam.
+The main example uses central differences for −u″+pu=qx(L−x), u(0)=u(L)=0, then iterates with an infinity-norm residual. Its right-hand-side sign now matches that stated equation.
 
 
-## Objectives
 
-- **Discretization of the BVP**: Transform the continuous BVP into a discrete system of linear equations using the central difference approximation for the second-order derivative.
-- **System Construction**: Construct a tridiagonal system of linear equations derived from the discretization process with a specified mesh size `h`.
-- **Jacobi Method Implementation**: Implement the Jacobi iterative method to solve the resulting system of linear equations, thereby approximating the beam's deflection at specified points.
-- **Analysis and Visualization**: Analyze the convergence of the Jacobi method and visualize the deflection of the beam across its length.
+## File-by-file reading guide
 
-## Methodology
+| Source | What to inspect |
+|---|---|
+| [Animation (2nd senario) - Boundary Value Problem & the Jacobi Method.py](Animation%20%282nd%20senario%29%20-%20Boundary%20Value%20Problem%20%26%20the%20Jacobi%20Method.py) | Defined helpers: `jacobi`, `animate` |
+| [Animation (3rd senario) - Boundary Value Problem & the Jacobi Method.py](Animation%20%283rd%20senario%29%20-%20Boundary%20Value%20Problem%20%26%20the%20Jacobi%20Method.py) | Defined helpers: `jacobi`, `animate` |
+| [Animation - Boundary Value Problem & the Jacobi Method.py](Animation%20-%20Boundary%20Value%20Problem%20%26%20the%20Jacobi%20Method.py) | Defined helpers: `jacobi`, `animate` |
+| [Boundary Value Problem & the Jacobi Method.py](Boundary%20Value%20Problem%20%26%20the%20Jacobi%20Method.py) | Defined helpers: `jacobi` |
 
-1. **Discretization**: The BVP is first discretized using the central difference approximation, resulting in a tridiagonal matrix representation of the problem.
-2. **System of Linear Equations**: With a specified mesh size `h`, the problem is transformed into a system of linear equations characterized by a tridiagonal matrix.
-3. **Jacobi Method**: The Jacobi iterative method is then employed to approximate the solution to the system. The method's convergence is monitored through an error metric, with iterations continuing until the error falls below a predetermined threshold or a maximum number of iterations is reached.
-4. **Visualization**: The approximate solution is plotted to visualize the beam's deflection, providing insights into the physical behavior of the system under the given load.
+## Inputs, tools, and outputs
 
-## Expected Outcome
+Observed import roots: `matplotlib`, `numpy`. These observations are not a tested dependency lockfile.
 
-The project aims to efficiently approximate the deflection `u(x)` of the beam using the Jacobi method. The number of iterations required to achieve the desired accuracy and the maximum deflection observed will be key outcomes of this analysis. Additionally, a plot of the deflection across the beam will be provided to illustrate the solution's physical implications.
+## Interpretation and reproduction limits
+
+The animation variants use a constant negative load and therefore represent a different forcing convention. They are preserved as variants, not described as identical copies of the repaired main equation.
+
+Check the actual input path, state ordering, parameter units, working directory, and output destination before a new run. New code repairs and their tested scope are listed in [the repair record](../../../docs/REPAIRS.md).
+
+---
+
+[Portfolio](../../../README.md) · [Evidence & results](../../../docs/PROJECT_EVIDENCE.md) · [2026 repairs](../../../docs/REPAIRS.md) · [Reproduction](../../../docs/REPRODUCIBILITY.md) · [Full code catalog](../../../docs/CODE_CATALOG.md)

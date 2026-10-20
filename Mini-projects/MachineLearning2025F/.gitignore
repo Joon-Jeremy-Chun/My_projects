@@ -1,0 +1,12 @@
+# Ignore all data folders
+DataSets/
+
+# Ignore Excel files
+*.xlsx
+
+# Ignore CSV files
+*.csv
+
+# Ignore Python cache
+__pycache__/
+*.pyc

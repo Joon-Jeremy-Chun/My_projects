@@ -2,7 +2,8 @@ import mpmath as mp
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from scipy.stats import ks_2samp
+from scipy.stats import kstest
+from scipy.special import erf
 
 # Ensure Figures directory exists
 fig_dir = 'Figures'
@@ -90,6 +91,12 @@ s = spacings / running_avg
 def p_gue(x):
     return (32/np.pi**2) * x**2 * np.exp(-4*x**2/np.pi)
 
+
+def gue_cdf(x):
+    """CDF of the plotted GUE Wigner surmise on nonnegative spacings."""
+    x = np.maximum(np.asarray(x, dtype=float), 0.0)
+    return np.clip(erf(2*x/np.sqrt(np.pi)) - (4*x/np.pi)*np.exp(-4*x*x/np.pi), 0.0, 1.0)
+
 # ------------------------------
 # Plot histogram vs. GUE curve
 # ------------------------------
@@ -111,12 +118,10 @@ plt.savefig(outpath, dpi=300)
 plt.show()
 
 # ------------------------------
-# Two-sample KS test vs. GUE CDF
+# One-sample KS diagnostic vs. GUE CDF
 # ------------------------------
-# empirical CDF of s at points xs
-ecdf = np.searchsorted(np.sort(s), xs, side='right') / len(s)
-# theoretical CDF by numerical integration of p_gue
-tcdf = np.array([np.trapz(p_gue(xs[:i+1]), xs[:i+1]) for i in range(len(xs))])
-D, pval = ks_2samp(ecdf, tcdf)
+# Compare observed spacings to a CDF, not two arrays of CDF ordinates.
+# Zeta spacings are not independent IID draws; p-values remain descriptive.
+D, pval = kstest(s, gue_cdf)
 print(f"KS statistic vs GUE: D = {D:.4f}, p-value = {pval:.4f}")
 print(f"Saved GUE comparison plot to: {outpath}")

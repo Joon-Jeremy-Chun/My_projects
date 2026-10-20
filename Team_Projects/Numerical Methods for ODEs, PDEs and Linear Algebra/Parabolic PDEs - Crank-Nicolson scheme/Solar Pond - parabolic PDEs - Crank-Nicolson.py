@@ -44,7 +44,8 @@ B[-1, -2] = 2*r # Given that another boundary that Assign the value for the Last
 
 #%%
 # Define the fN vector
-fN = C * (L - dx * np.arange(1, Nx+1)) 
+# A and B use the scheme multiplied by 2; the constant source is 2*dt*f.
+fN = 2 * dt * C * (L - dx * np.arange(1, Nx+1))
 fN[0] +=  2*r*T0 #Given bounday condtion that the first entry should be added 2rT0
 
 #%%

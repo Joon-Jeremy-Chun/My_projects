@@ -290,23 +290,30 @@ print(results_vacc_df)
 # -----------------------------
 # 5. Plot Total Economic Cost vs. Vaccination Rate
 # -----------------------------
+
+# convert total cost to billions of USD
+results_vacc_df["Total_Cost_B"] = results_vacc_df["Total_Cost"] / 1e9
+
 plt.figure(figsize=(10,6))
-plt.plot(results_vacc_df["vaccination_rate"], results_vacc_df["Total_Cost"],
-         marker='o', linestyle='-', color='green')
+plt.plot(
+    results_vacc_df["vaccination_rate"],
+    results_vacc_df["Total_Cost_B"],
+    marker='o', linestyle='-', color='green'
+)
 plt.xlabel("Vaccination Rate (constant daily)")
-plt.ylabel("Total Economic Cost (USD)")
-plt.title(f"Total Economic Cost vs. Vaccination Rate ({time_span} Days, β=1.0)")
+plt.ylabel("Total Economic Cost (billion USD)")
+plt.title(f"Total Economic Cost vs. Vaccination Rate ({time_span} Days, β={beta_M})")
 plt.grid(True, ls="--")
-plt.savefig(f"Figures/Total_Cost_vs_Vaccination_Rate_{time_span}days(beta{beta_M}).png")
+plt.savefig(f"Figures/Total_Cost_vs_Vaccination_Rate_{time_span}days(beta{beta_M})_billion.png")
 plt.show()
 
 # Find the optimal vaccination rate (minimizes total cost)
 optimal_index = np.argmin(results_vacc_df["Total_Cost"])
-optimal_rate = results_vacc_df["vaccination_rate"].iloc[optimal_index]
-optimal_cost = results_vacc_df["Total_Cost"].iloc[optimal_index]
+optimal_rate  = results_vacc_df["vaccination_rate"].iloc[optimal_index]
+optimal_cost  = results_vacc_df["Total_Cost"].iloc[optimal_index]
 
 print(f"\nOptimal vaccination rate: {optimal_rate:.3f}")
-print(f"Minimum total economic cost: ${optimal_cost:,.2f}")
+print(f"Minimum total economic cost: {optimal_cost/1e9:.2f} billion USD")
 
 # -----------------------------
 # 6. Compute and Plot Peak Infected vs. Vaccination Rate

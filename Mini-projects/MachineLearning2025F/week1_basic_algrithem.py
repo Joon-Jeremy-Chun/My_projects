@@ -4,9 +4,14 @@
 import os, re
 import numpy as np
 import pandas as pd
+from pathlib import Path
+try:
+    from IPython.display import display
+except ImportError:
+    display = print
 
 # 데이터 경로
-CSV_PATH = r"C:\Users\joonc\My_github\My_projects\Mini-projects\DataSets\week1_health_dataset.csv"
+CSV_PATH = str(Path(os.environ.get("MY_PROJECTS_DATA_DIR", Path(__file__).resolve().parents[1] / "DataSets")) / "week1_health_dataset.csv")
 OUT_DIR  = os.path.join(os.path.dirname(CSV_PATH), "MachineLearning2025F_outputs")
 os.makedirs(OUT_DIR, exist_ok=True)
 

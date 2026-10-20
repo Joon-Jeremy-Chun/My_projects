@@ -20,54 +20,40 @@ import numpy as np
 # 1. r; radious 2. iteration 3. h; hight
 
 def hybrid(f, g, a, b, diff_a_b, max_iter):
-# Condition to proceed with iterations
-    if f(a) * f(b) >= 0:
-        print("hybrid method may not converge because f(a) * f(b) >= 0")
-        return None
-    
-    if f(b) - f(a) == 0 :
-        print("hybrid method may not converge becasue f(b) - f(a) = 0")
-        return None
-
-    iteration = 0
-    x_prime = (a+b)/2 #initiated the first sudo x_prime (not record, not effect) for geting start the first roof
-    
-    while abs(x_prime - (b - ((f(b)*(b-a))/(f(b)-f(a)))) ) > diff_a_b and iteration < max_iter and f(b) - f(a) != 0:
-        # Perform secant method first
-        x_prime = b - ((f(b)*(b-a))/(f(b)-f(a)))
-
-        #Denote iteration
-        iteration += 1
-        #print("~~iteration :", iteration)
-
-        #Check for location of new x value
-        #First condition checks if new value lies outside of the interval
-        if x_prime < a or x_prime>b:
-            #Performs bisection to obtain new x value
-            #print("bicetion mothod")
-            x_prime = (b-a)/2.0
-
-            #Checks image of new x value
-            if f(a) * f(x_prime) < 0:
-                b = x_prime
-                #print("a:", a, "b:", x_prime)
-            else:
-                a = x_prime
-                #print("a:", x_prime, "b:", b)
-
+    """Safeguarded secant/bisection on a sign-changing finite interval."""
+    import math
+    if not (math.isfinite(a) and math.isfinite(b) and a < b):
+        raise ValueError("Expected finite endpoints a < b.")
+    if not math.isfinite(diff_a_b) or diff_a_b <= 0 or not isinstance(max_iter, int) or max_iter < 1:
+        raise ValueError("Positive tolerance and iteration limit are required.")
+    fa, fb = f(a), f(b)
+    if not (math.isfinite(fa) and math.isfinite(fb)):
+        raise ValueError("Endpoint function values must be finite.")
+    if fa == 0:
+        return a, 0, g(a)
+    if fb == 0:
+        return b, 0, g(b)
+    if (fa > 0) == (fb > 0):
+        raise ValueError("The endpoints must bracket a sign change.")
+    for iteration in range(1, max_iter + 1):
+        width = b-a
+        if width <= 2*diff_a_b:
+            midpoint = (a+b)/2
+            return midpoint, iteration, g(midpoint)
+        x = b-fb*width/(fb-fa) if fb != fa else (a+b)/2
+        # A central bracket step prevents secant stagnation on steep functions.
+        if not math.isfinite(x) or not a+0.1*width <= x <= b-0.1*width:
+            x = (a+b)/2
+        fx = f(x)
+        if not math.isfinite(fx):
+            raise ValueError("Nonfinite function value inside the bracket.")
+        if fx == 0:
+            return x, iteration, g(x)
+        if (fa > 0) != (fx > 0):
+            b, fb = x, fx
         else:
-            #Checks image of new x value if secant lies within the interval
-            #print("secant mothod")
-            if f(a)*f(x_prime)<0:
-                b = x_prime
-                #print("a:", a, "b:", x_prime)
-            else:
-                a=x_prime
-                #print("a:", x_prime, "b:", b)
-
-        #print("\n")
-    height = g(x_prime)
-    return x_prime, iteration, height
+            a, fa = x, fx
+    raise RuntimeError("Hybrid method did not reach the bracket tolerance.")
 
 #define the function we want to know
 def f(x):
