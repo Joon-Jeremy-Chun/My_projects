@@ -24,8 +24,17 @@ comment-only files are completed; the focused suite has 21 passing cases.
 Root plus collection/project READMEs total 60, supported by evidence,
 reproduction, repairs, and a full 306-artifact catalog.
 
+Publication is complete: commit `5b2833eb68a75399a9239b816ec6206b66f5e9be`
+was pushed to GitHub master and verified with `git ls-remote`. The publication
+worktree is `my_projects-publish-20261020`, on
+`codex/portfolio-publish-20261020`. The repair commit is `d1dbfc7`; both commits
+have the same reviewed tree, `4410cd1774f8fb26a245a34962a6776e521e0c42`.
+Completion records follow in a separate documentation commit.
+
 Publication preparation found historical unpushed CSV blobs up to 636,205,778
-bytes, absent from the current final tree. Preserve the local 14-commit history.
-Publish a final-tree snapshot on top of origin/master without force pushing or
-rewriting existing history. Read the handoff before attempting to push the
-original local master; its historical large blobs remain local.
+bytes, absent from the current final tree. The final-tree snapshot was added
+on top of the previous origin/master without force pushing or rewriting
+history. The original local 14-commit history and uncommitted work remain
+preserved. Start future work from the verified remote/publication branch;
+read the handoff before attempting to push original local master, whose
+historical large blobs remain local.

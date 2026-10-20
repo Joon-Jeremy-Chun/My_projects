@@ -61,6 +61,23 @@ origin/master 위의 별도 게시 브랜치에 검토한 최종 트리의 diff�
 
 ## 완료 확인
 
-문서·코드·로컬 검증은 준비했다. 이 파일을 쓴 시점에는 명시적 stage·commit과
-최종 트리 게시, 원격 SHA 확인이 마지막 단계다. 실제 게시 결과는 이어지는
-세션 기록과 작업 상태에서 확인한다.
+[팩트] 문서·코드 수정과 검증을 완료하고 GitHub master에 게시했다.
+
+- 수정 보관 커밋: `d1dbfc7f7dafad54cd193df592ec71d9d9a2d4df`.
+- 구현·문서 게시 커밋: `5b2833eb68a75399a9239b816ec6206b66f5e9be`.
+- 두 커밋의 동일한 트리: `4410cd1774f8fb26a245a34962a6776e521e0c42`.
+- 게시 worktree: `my_projects-publish-20261020`.
+- 게시 브랜치: `codex/portfolio-publish-20261020`.
+- 일반 push 성공 후 `git ls-remote --heads origin master`와 로컬 SHA 일치 확인.
+- 기존 원격 `58a5121`의 fast-forward이며 원래 로컬 14커밋과 미커밋 작업 보존.
+
+현재 완료 기록은 위 게시 이후의 별도 문서 커밋으로 남긴다. 후속 작업은 원격 master
+또는 게시 브랜치에서 시작한다. 원래 master를 원격에 맞추려고 초기화하지 않는다.
+
+### 최종 트리 전달 시 참고
+
+전역 PDF textconv가 활성화되어 있어 단순 `git diff --binary`는 PDF를 텍스트로 바꾼다.
+적용 가능한 원본 binary diff는 `--no-ext-diff --no-textconv --binary --full-index`로 만들었다.
+패치 적용 후 검토한 수정 커밋과 트리 해시가 완전히 같은지 확인한 뒤 게시했다.
+검토한 수정의 공백 검사는 통과했다. 이전 미게시 커밋에 이미 있던 공백은 보존했으므로
+이전 원격 전체와의 차이에 대한 `diff --check`는 기존 공백을 보고할 수 있다.
